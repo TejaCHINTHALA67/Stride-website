@@ -1,0 +1,27 @@
+---
+const links = [
+  { href: '/#how', label: 'How it works' },
+  { href: '/#game', label: 'The game' },
+  { href: '/#faq', label: 'FAQ' },
+];
+---
+<header class="fixed inset-x-0 top-0 z-50">
+  <nav class="mx-auto mt-3 flex max-w-6xl items-center justify-between gap-4 rounded-2xl glass px-4 py-2.5 sm:px-5">
+    <a href="/" class="flex items-center gap-2.5" aria-label="Stride home">
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-mint/15 ring-1 ring-mint/40">
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+          <path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2z" stroke="#06D6A0" stroke-width="1.6" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="font-display text-lg font-semibold tracking-tight">Stride</span>
+    </a>
+    <div class="hidden items-center gap-7 md:flex">
+      {links.map((l) => (
+        <a href={l.href} class="text-sm text-ink-soft transition hover:text-ink">{l.label}</a>
+      ))}
+    </div>
+    <a href="/#waitlist" class="rounded-xl bg-mint px-4 py-2 text-sm font-semibold text-[#04231B] transition hover:shadow-glow">
+      Join the waitlist
+    </a>
+  </nav>
+</header>

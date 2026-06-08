@@ -1,0 +1,236 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Waitlist from '../components/Waitlist.astro';
+
+const steps = [
+  { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself — around your block, a park, your neighbourhood.', c: '#06D6A0' },
+  { n: '02', t: 'Claim the area', d: 'The real area your loop encloses becomes your territory on a live 3D map. Bigger loop, bigger turf.', c: '#FBBF24' },
+  { n: '03', t: 'Defend & conquer', d: 'Run over a rival’s turf to steal it. Get robbed? Run it back for a revenge bonus. The city is the board.', c: '#FF6B35' },
+];
+
+const features = [
+  { t: 'Real territory, not hexes', d: 'Your turf is the actual shape you run — measured in m² with PostGIS precision and painted in your colour.', icon: 'hex', span: 'sm:col-span-2' },
+  { t: 'Steal & get stolen', d: 'Overlap a rival’s land and it’s yours. Loss-aversion that actually makes you lace up again.', icon: 'swords' },
+  { t: 'Shields & fair fights', d: 'New players and the freshly-robbed get protected. Small runners can’t be farmed by whales.', icon: 'shield' },
+  { t: 'Monthly leagues', d: 'Climb Bronze → Diamond each season. A fresh ladder every month.', icon: 'crown' },
+  { t: 'Plant your flag', d: 'Equip a flag and it waves on your turf with your name — tap any rival’s to size them up.', icon: 'flag', span: 'sm:col-span-2' },
+  { t: 'Live 3D war map', d: 'Tilted, building-extruded, neon territories. Your city has never looked like this.', icon: 'map' },
+];
+
+const faqs = [
+  { q: 'What is Stride?', a: 'Stride is a competitive territory-running game for iOS. You run a loop outdoors and the real-world area your route encloses becomes your territory on a shared, live 3D map — you can steal rivals’ territory, defend your own, and climb monthly leagues.' },
+  { q: 'When does Stride launch?', a: 'We’re in active development for iOS and onboarding the waitlist in waves. Join the waitlist and you’ll be among the first invited.' },
+  { q: 'How do you actually “own” territory?', a: 'When your GPS route closes into a loop, the area it encloses is captured as a polygon and becomes yours on the shared map. Other runners can take it by enclosing it themselves — and you can take theirs.' },
+  { q: 'Is it free?', a: 'Yes — Stride is free to play. A future optional membership may add cosmetic and convenience perks, never pay-to-win territory.' },
+  { q: 'Do I need to share my location?', a: 'Stride needs GPS while you run to track your route, like any running app. You control privacy settings, and you can run in explore mode without claiming. See our Privacy Policy.' },
+  { q: 'Is there an Android version?', a: 'iOS first to get it right, Android to follow. Join the waitlist and pick your platform when we ask.' },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+<Layout>
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} is:inline />
+  <!-- HERO -->
+  <section class="relative overflow-hidden pt-28 sm:pt-36">
+    <div class="dot-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"></div>
+    <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[1.05fr_0.95fr]">
+      <div>
+        <div class="reveal sheen inline-flex items-center gap-2 rounded-full border border-mint/30 bg-mint/10 px-3 py-1.5 text-xs font-medium text-mint">
+          <span class="h-1.5 w-1.5 rounded-full bg-mint"></span> iOS · Now onboarding the waitlist
+        </div>
+        <h1 class="reveal mt-6 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl" style="animation-delay:.05s">
+          Run a loop.<br /><span class="text-gradient">Own the block.</span>
+        </h1>
+        <p class="reveal mt-6 max-w-md text-lg leading-relaxed text-ink-soft" style="animation-delay:.12s">
+          Stride turns your city into a turf war. The area you enclose on a run becomes your territory — claim it, defend it, and steal your rivals’ on a living 3D map.
+        </p>
+        <div class="reveal mt-8" id="waitlist-top" style="animation-delay:.18s">
+          <Waitlist />
+          <p class="mt-3 text-xs text-ink-faint">Be first in line. No spam — just one email when it’s live.</p>
+        </div>
+        <div class="reveal mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-faint" style="animation-delay:.24s">
+          <span class="flex items-center gap-2"><span class="text-mint">✦</span> Free to play</span>
+          <span class="flex items-center gap-2"><span class="text-mint">✦</span> Real area, not hexes</span>
+          <span class="flex items-center gap-2"><span class="text-mint">✦</span> Live 3D map</span>
+        </div>
+      </div>
+
+      <!-- signature claim animation -->
+      <div class="reveal relative" style="animation-delay:.1s">
+        <div class="ring-grad relative mx-auto aspect-square w-full max-w-md rounded-[2rem] glass p-5">
+          <div class="dot-grid absolute inset-5 rounded-2xl opacity-30"></div>
+          <svg viewBox="0 0 360 360" class="relative h-full w-full" role="img" aria-label="A running loop drawing itself and flooding a territory">
+            <!-- faint streets -->
+            <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
+              <path d="M20 90 H340 M20 170 H340 M20 250 H340 M90 20 V340 M180 20 V340 M270 20 V340" />
+            </g>
+            <!-- territory fill -->
+            <polygon class="claim-fill" points="80,120 250,90 290,200 200,290 90,250"
+              fill="#06D6A0" />
+            <!-- the loop being run -->
+            <polygon class="claim-line" points="80,120 250,90 290,200 200,290 90,250"
+              fill="none" stroke="#06D6A0" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"
+              pathLength="100" />
+            <!-- runner -->
+            <circle r="6" fill="#06D6A0" class="runner">
+              <animateMotion dur="3.4s" repeatCount="indefinite" rotate="auto"
+                path="M80,120 L250,90 L290,200 L200,290 L90,250 Z" />
+            </circle>
+            <!-- planted flag -->
+            <g class="flag" transform="translate(250,90)">
+              <rect x="-1" y="-34" width="2" height="34" fill="#cbd5e1" />
+              <path d="M0,-34 h22 l-6,7 l6,7 h-22 z" fill="#FF6B35" />
+            </g>
+          </svg>
+          <div class="absolute bottom-7 left-7 right-7 flex items-center justify-between rounded-xl glass glass-mint px-4 py-3">
+            <div>
+              <div class="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Territory claimed</div>
+              <div class="font-display text-xl font-semibold text-mint claim-count" data-target="48250">0 m²</div>
+            </div>
+            <div class="grid h-9 w-9 place-items-center rounded-lg bg-mint/15 ring-1 ring-mint/40">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2z" stroke="#06D6A0" stroke-width="1.6" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="pointer-events-none absolute -inset-6 -z-10 animate-pulse-glow rounded-full bg-mint/10 blur-3xl"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="relative mx-auto max-w-6xl px-5 pt-28">
+    <div class="reveal max-w-xl">
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-mint">How it works</p>
+      <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">Three moves. The whole city.</h2>
+    </div>
+    <div class="mt-12 grid gap-5 md:grid-cols-3">
+      {steps.map((s, i) => (
+        <div class="reveal group relative overflow-hidden rounded-2xl glass p-7" style={`animation-delay:${i * 0.08}s`}>
+          <div class="font-mono text-sm" style={`color:${s.c}`}>{s.n}</div>
+          <h3 class="mt-4 font-display text-2xl font-semibold">{s.t}</h3>
+          <p class="mt-3 text-sm leading-relaxed text-ink-soft">{s.d}</p>
+          <div class="mt-6 h-1 w-full rounded-full bg-white/5">
+            <div class="h-1 rounded-full transition-all duration-700 group-hover:w-full" style={`width:34%;background:${s.c};box-shadow:0 0 16px ${s.c}`}></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- THE GAME (bento) -->
+  <section id="game" class="relative mx-auto max-w-6xl px-5 pt-28">
+    <div class="reveal max-w-xl">
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-flame">The game</p>
+      <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">A running app with a <span class="text-gradient">scoreboard</span>.</h2>
+      <p class="mt-4 text-ink-soft">Not another step counter. A hard, skill-based territory game where every run changes the map.</p>
+    </div>
+    <div class="mt-12 grid auto-rows-[1fr] gap-5 sm:grid-cols-3">
+      {features.map((f, i) => (
+        <div class={`reveal rounded-2xl glass p-6 ${f.span ?? ''}`} style={`animation-delay:${i * 0.06}s`}>
+          <div class="grid h-10 w-10 place-items-center rounded-xl bg-white/5 ring-1 ring-white/10">
+            <span class="text-mint">◆</span>
+          </div>
+          <h3 class="mt-4 font-display text-xl font-semibold">{f.t}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink-soft">{f.d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- STAT TEASE -->
+  <section class="relative mx-auto max-w-6xl px-5 pt-28">
+    <div class="reveal grid gap-px overflow-hidden rounded-2xl glass ring-grad sm:grid-cols-3">
+      {[
+        { k: 'm²', v: 'Every loop', s: 'measured to the metre' },
+        { k: '12', v: 'Tiers + leagues', s: 'climb from Rookie to Titan' },
+        { k: '1', v: 'Shared map', s: 'one city, one war' },
+      ].map((x) => (
+        <div class="bg-canvas/40 p-8 text-center">
+          <div class="font-display text-4xl font-bold text-mint">{x.v}</div>
+          <div class="mt-1 text-sm text-ink-soft">{x.s}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="relative mx-auto max-w-3xl px-5 pt-28">
+    <div class="reveal text-center">
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-mint">FAQ</p>
+      <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">Good questions.</h2>
+    </div>
+    <div class="mt-10 divide-y divide-white/8 overflow-hidden rounded-2xl glass">
+      {faqs.map((f) => (
+        <details class="group px-6 py-5">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg font-medium marker:hidden">
+            {f.q}
+            <span class="text-ink-faint transition group-open:rotate-45 group-open:text-mint">+</span>
+          </summary>
+          <p class="mt-3 text-sm leading-relaxed text-ink-soft">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="waitlist" class="relative mx-auto max-w-4xl px-5 pt-28">
+    <div class="reveal relative overflow-hidden rounded-[2rem] glass glass-mint px-6 py-16 text-center sm:px-12">
+      <div class="dot-grid pointer-events-none absolute inset-0 opacity-30"></div>
+      <div class="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 animate-pulse-glow rounded-full bg-mint/15 blur-3xl"></div>
+      <div class="relative">
+        <h2 class="font-display text-4xl font-bold tracking-tight sm:text-5xl">Claim your city first.</h2>
+        <p class="mx-auto mt-4 max-w-md text-ink-soft">Join the waitlist and get early access the day Stride goes live. Your block is waiting.</p>
+        <div class="mt-8"><Waitlist /></div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    /* draw the loop, then flood the territory, on a loop */
+    .claim-line { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 3.4s ease-in-out infinite; filter: drop-shadow(0 0 6px #06D6A0); }
+    .claim-fill { opacity: 0; animation: flood 3.4s ease-in-out infinite; }
+    .runner { filter: drop-shadow(0 0 8px #06D6A0); }
+    .flag { opacity: 0; transform-box: fill-box; transform-origin: bottom; animation: plant 3.4s ease-in-out infinite; }
+    @keyframes draw { 0% { stroke-dashoffset: 100; } 55% { stroke-dashoffset: 0; } 92% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0.25; } }
+    @keyframes flood { 0%, 50% { opacity: 0; } 70%, 92% { opacity: 0.28; } 100% { opacity: 0.12; } }
+    @keyframes plant { 0%, 55% { opacity: 0; transform: scaleY(0); } 64% { opacity: 1; transform: scaleY(1.1); } 70%, 100% { opacity: 1; transform: scaleY(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      .claim-line { stroke-dashoffset: 0; animation: none; }
+      .claim-fill { opacity: 0.24; animation: none; }
+      .flag { opacity: 1; transform: none; animation: none; }
+      .runner { display: none; }
+    }
+  </style>
+
+  <!-- count-up for the claimed-area chip -->
+  <script is:inline>
+    (() => {
+      const el = document.querySelector('.claim-count');
+      if (!el) return;
+      const target = +el.dataset.target;
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = target.toLocaleString() + ' m²'; return; }
+      let started = false;
+      const run = () => {
+        if (started) return; started = true;
+        const t0 = performance.now();
+        const tick = (t) => {
+          const p = Math.min(1, (t - t0) / 1400);
+          const e = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * e).toLocaleString() + ' m²';
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      };
+      const io = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && run()), { threshold: 0.4 });
+      io.observe(el);
+    })();
+  </script>
+</Layout>

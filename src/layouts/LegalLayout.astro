@@ -1,0 +1,27 @@
+---
+import Layout from './Layout.astro';
+export interface Props { title: string; updated: string; path: string; description?: string }
+const { title, updated, path, description } = Astro.props;
+---
+<Layout title={`${title} — Stride`} description={description ?? `${title} for Stride — Run & Own Your City.`} path={path} noindex={false}>
+  <article class="mx-auto max-w-3xl px-5 pt-28">
+    <a href="/" class="text-sm text-ink-faint hover:text-mint">← Back to Stride</a>
+    <h1 class="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">{title}</h1>
+    <p class="mt-3 font-mono text-xs uppercase tracking-widest text-ink-faint">Last updated · {updated}</p>
+    <div class="legal mt-10 space-y-6 text-[15px] leading-relaxed text-ink-soft">
+      <slot />
+    </div>
+    <p class="mt-12 rounded-xl border border-white/8 bg-surface/50 p-4 text-xs text-ink-faint">
+      This page is provided for transparency and is not legal advice. Have a qualified attorney review these documents before public launch.
+    </p>
+  </article>
+</Layout>
+
+<style is:global>
+  .legal h2 { @apply font-display text-2xl font-semibold text-ink mt-10 mb-2; }
+  .legal h3 { @apply font-display text-lg font-semibold text-ink mt-6 mb-1; }
+  .legal p { @apply text-ink-soft; }
+  .legal ul { @apply list-disc space-y-1.5 pl-5 text-ink-soft; }
+  .legal a { @apply text-mint hover:underline; }
+  .legal strong { @apply text-ink; }
+</style>

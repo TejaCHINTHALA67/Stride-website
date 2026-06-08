@@ -1,0 +1,41 @@
+# Stride — Run & Own Your City
+
+> Stride is a competitive territory-running game for iOS. You run a loop outdoors; the real-world area your route encloses becomes your territory on a shared, live 3D map. You can steal rivals' territory by enclosing it, defend your own, climb monthly leagues, join clubs, and compete on city and global leaderboards. Free to play. Website: https://striderunning.run
+
+## What Stride is
+- A running app **and** a real-time strategy game in one. Think "running app meets territory control / turf war."
+- Territory is the **actual area you enclose with a closed running route**, measured in square metres (m²) with PostGIS precision — not a hexagon grid.
+- Every run changes a **shared map of your city**: territories are painted in each owner's colour and visible to everyone.
+
+## Who it's for
+- Runners who find step-counting and plain pace-tracking boring and want a goal, a rival, and a reason to run again.
+- People who like competitive, skill-based mobile games (territory control, leagues, leaderboards) and want one that gets them moving in the real world.
+- Anyone searching for: a competitive running app, a territory / turf-war running game, a running game with a map, a Strava alternative that's a game, a "run to own land" app, gamified running.
+
+## How it works
+1. Run any route that closes into a loop.
+2. The enclosed area becomes your territory on the live map.
+3. Run over a rival's turf to steal it; if you're robbed, run it back for a revenge bonus.
+
+## Key features
+- Real enclosed-area territory (m²), not hex tiles.
+- Steal and defend territory; loss-aversion + revenge loop.
+- Shields protect new and recently-robbed players; steal-scaling stops low-level players being farmed by high-level ones (fair fights).
+- 12 progression tiers plus monthly **leagues** (Bronze → Diamond) that reset each season.
+- Equip a **flag** that waves on your turf with your name; tap rivals' flags to see their stats.
+- Live **3D map** with extruded buildings and neon territories.
+- Clubs, events (with nearby-event notifications), challenges, achievements, and city/country/global leaderboards.
+- Free to play. No pay-to-win territory.
+
+## Availability
+- iOS first (in active development, onboarding a waitlist). Android planned later.
+- Join the waitlist at https://striderunning.run
+
+## Pages
+- Home / waitlist: https://striderunning.run
+- Privacy Policy: https://striderunning.run/privacy
+- Terms of Service: https://striderunning.run/terms
+- Safety Disclaimer: https://striderunning.run/disclaimer
+
+## Contact
+- hello@striderunning.run

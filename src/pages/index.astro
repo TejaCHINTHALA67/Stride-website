@@ -3,25 +3,25 @@ import Layout from '../layouts/Layout.astro';
 import Waitlist from '../components/Waitlist.astro';
 
 const steps = [
-  { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself — around your block, a park, your neighbourhood.', c: '#06D6A0' },
+  { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself, around your block, a park, your neighbourhood.', c: '#06D6A0' },
   { n: '02', t: 'Claim the area', d: 'The real area your loop encloses becomes your territory on a live 3D map. Bigger loop, bigger turf.', c: '#FBBF24' },
   { n: '03', t: 'Defend & conquer', d: 'Run over a rival’s turf to steal it. Get robbed? Run it back for a revenge bonus. The city is the board.', c: '#FF6B35' },
 ];
 
 const features = [
-  { t: 'Real territory, not hexes', d: 'Your turf is the actual shape you run — measured in m² with PostGIS precision and painted in your colour.', icon: 'hex', span: 'sm:col-span-2' },
+  { t: 'Real territory, not hexes', d: 'Your turf is the actual shape you run, measured in m² with PostGIS precision and painted in your colour.', icon: 'hex', span: 'sm:col-span-2' },
   { t: 'Steal & get stolen', d: 'Overlap a rival’s land and it’s yours. Loss-aversion that actually makes you lace up again.', icon: 'swords' },
   { t: 'Shields & fair fights', d: 'New players and the freshly-robbed get protected. Small runners can’t be farmed by whales.', icon: 'shield' },
   { t: 'Monthly leagues', d: 'Climb Bronze → Diamond each season. A fresh ladder every month.', icon: 'crown' },
-  { t: 'Plant your flag', d: 'Equip a flag and it waves on your turf with your name — tap any rival’s to size them up.', icon: 'flag', span: 'sm:col-span-2' },
+  { t: 'Plant your flag', d: 'Equip a flag and it waves on your turf with your name, tap any rival’s to size them up.', icon: 'flag', span: 'sm:col-span-2' },
   { t: 'Live 3D war map', d: 'Tilted, building-extruded, neon territories. Your city has never looked like this.', icon: 'map' },
 ];
 
 const faqs = [
-  { q: 'What is Stride?', a: 'Stride is a competitive territory-running game for iOS. You run a loop outdoors and the real-world area your route encloses becomes your territory on a shared, live 3D map — you can steal rivals’ territory, defend your own, and climb monthly leagues.' },
+  { q: 'What is Stride?', a: 'Stride is a competitive territory-running game for iOS. You run a loop outdoors and the real-world area your route encloses becomes your territory on a shared, live 3D map, you can steal rivals’ territory, defend your own, and climb monthly leagues.' },
   { q: 'When does Stride launch?', a: 'We’re in active development for iOS and onboarding the waitlist in waves. Join the waitlist and you’ll be among the first invited.' },
-  { q: 'How do you actually “own” territory?', a: 'When your GPS route closes into a loop, the area it encloses is captured as a polygon and becomes yours on the shared map. Other runners can take it by enclosing it themselves — and you can take theirs.' },
-  { q: 'Is it free?', a: 'Yes — Stride is free to play. A future optional membership may add cosmetic and convenience perks, never pay-to-win territory.' },
+  { q: 'How do you actually “own” territory?', a: 'When your GPS route closes into a loop, the area it encloses is captured as a polygon and becomes yours on the shared map. Other runners can take it by enclosing it themselves, and you can take theirs.' },
+  { q: 'Is it free?', a: 'Yes. Stride is free to play. A future optional membership may add cosmetic and convenience perks, never pay-to-win territory.' },
   { q: 'Do I need to share my location?', a: 'Stride needs GPS while you run to track your route, like any running app. You control privacy settings, and you can run in explore mode without claiming. See our Privacy Policy.' },
   { q: 'Is there an Android version?', a: 'iOS first to get it right, Android to follow. Join the waitlist and pick your platform when we ask.' },
 ];
@@ -43,23 +43,26 @@ const faqJsonLd = {
     <div class="dot-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"></div>
     <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[1.05fr_0.95fr]">
       <div>
-        <div class="reveal sheen inline-flex items-center gap-2 rounded-full border border-mint/30 bg-mint/10 px-3 py-1.5 text-xs font-medium text-mint">
-          <span class="h-1.5 w-1.5 rounded-full bg-mint"></span> iOS · Now onboarding the waitlist
+        <div class="reveal flex items-center gap-2 text-sm font-medium text-mint">
+          <span class="h-2 w-2 rounded-full bg-mint animate-pulse-glow"></span>
+          <span class="uppercase tracking-[0.18em] text-xs">iOS · Now onboarding the waitlist</span>
         </div>
         <h1 class="reveal mt-6 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl" style="animation-delay:.05s">
           Run a loop.<br /><span class="text-gradient">Own the block.</span>
         </h1>
         <p class="reveal mt-6 max-w-md text-lg leading-relaxed text-ink-soft" style="animation-delay:.12s">
-          Stride turns your city into a turf war. The area you enclose on a run becomes your territory — claim it, defend it, and steal your rivals’ on a living 3D map.
+          Stride turns your city into a turf war. The area you enclose on a run becomes your territory. Claim it, defend it, and steal your rivals’ on a living 3D map.
         </p>
         <div class="reveal mt-8" id="waitlist-top" style="animation-delay:.18s">
           <Waitlist />
-          <p class="mt-3 text-xs text-ink-faint">Be first in line. No spam — just one email when it’s live.</p>
+          <p class="mt-3 text-xs text-ink-faint">Be first in line. No spam, just one email when it’s live.</p>
         </div>
-        <div class="reveal mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-faint" style="animation-delay:.24s">
-          <span class="flex items-center gap-2"><span class="text-mint">✦</span> Free to play</span>
-          <span class="flex items-center gap-2"><span class="text-mint">✦</span> Real area, not hexes</span>
-          <span class="flex items-center gap-2"><span class="text-mint">✦</span> Live 3D map</span>
+        <div class="reveal mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-faint" style="animation-delay:.24s">
+          <span>Free to play</span>
+          <span class="text-ink-faint/50">·</span>
+          <span>Real area, not hexes</span>
+          <span class="text-ink-faint/50">·</span>
+          <span>Live 3D map</span>
         </div>
       </div>
 
@@ -143,40 +146,6 @@ const faqJsonLd = {
         </div>
       ))}
     </div>
-  </section>
-
-  <!-- SCREENSHOTS -->
-  <section id="app" class="relative mx-auto max-w-6xl px-5 pt-28">
-    <div class="reveal max-w-xl">
-      <p class="font-mono text-xs uppercase tracking-[0.2em] text-mint">In your pocket</p>
-      <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">Your city, live and at war.</h2>
-      <p class="mt-4 text-ink-soft">A dark, tilted 3D map. Your turf glowing in your colour. Flags planted by everyone who got there first.</p>
-    </div>
-    <div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-      {[
-        { src: '/shots/map.png', label: 'The war map', tint: '#06D6A0' },
-        { src: '/shots/run.png', label: 'Claim mid-run', tint: '#FF6B35' },
-        { src: '/shots/leaders.png', label: 'Climb the board', tint: '#FBBF24' },
-      ].map((s, i) => (
-        <div class="reveal mx-auto w-full max-w-[260px]" style={`animation-delay:${i * 0.08}s`}>
-          <div class="relative aspect-[9/19] rounded-[2.2rem] border border-white/12 bg-elevated p-2 shadow-2xl ring-grad">
-            <div class="absolute left-1/2 top-2 z-10 h-5 w-24 -translate-x-1/2 rounded-full bg-black/70"></div>
-            <div class="relative h-full w-full overflow-hidden rounded-[1.7rem] bg-canvas">
-              <!-- graceful placeholder behind the screenshot -->
-              <div class="dot-grid absolute inset-0 grid place-items-center opacity-60">
-                <div class="text-center">
-                  <svg viewBox="0 0 24 24" class="mx-auto h-7 w-7" fill="none" style={`opacity:.5`}><path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2z" stroke={s.tint} stroke-width="1.5" stroke-linejoin="round"/></svg>
-                  <p class="mt-2 px-4 text-[11px] text-ink-faint">{s.label}</p>
-                </div>
-              </div>
-              <img src={s.src} alt={`Stride app — ${s.label}`} loading="lazy" decoding="async"
-                class="relative h-full w-full object-cover" onerror="this.style.display='none'" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-    <p class="reveal mt-6 text-center text-xs text-ink-faint">Real captures from the Stride app.</p>
   </section>
 
   <!-- STAT TEASE -->

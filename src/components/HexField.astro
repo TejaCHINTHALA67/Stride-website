@@ -1,0 +1,50 @@
+---
+// Slow-drifting hexagons behind everything — echoes the app's territory motif.
+// Pure CSS (transform/opacity only), fixed full-viewport, click-through, and
+// fully disabled under prefers-reduced-motion.
+const hexes = [
+  { top: '8%',  left: '6%',  size: 110, color: '#06D6A0', dur: 46, delay: 0,  dx: 36 },
+  { top: '18%', left: '82%', size: 80,  color: '#FF6B35', dur: 54, delay: 7,  dx: -28 },
+  { top: '62%', left: '12%', size: 64,  color: '#FBBF24', dur: 60, delay: 3,  dx: 30 },
+  { top: '74%', left: '76%', size: 120, color: '#06D6A0', dur: 52, delay: 11, dx: -40 },
+  { top: '40%', left: '46%', size: 54,  color: '#06D6A0', dur: 64, delay: 5,  dx: 24 },
+  { top: '30%', left: '24%', size: 44,  color: '#FF6B35', dur: 58, delay: 14, dx: -20 },
+  { top: '88%', left: '40%', size: 70,  color: '#06D6A0', dur: 50, delay: 9,  dx: 34 },
+  { top: '52%', left: '88%', size: 48,  color: '#FBBF24', dur: 62, delay: 2,  dx: -26 },
+];
+---
+<div class="hexfield" aria-hidden="true">
+  {hexes.map((h) => (
+    <svg
+      class="hex"
+      width={h.size}
+      height={h.size}
+      viewBox="0 0 100 100"
+      style={`top:${h.top};left:${h.left};color:${h.color};--dur:${h.dur}s;--delay:${h.delay}s;--dx:${h.dx}px`}
+    >
+      <polygon points="50,3 92,26 92,74 50,97 8,74 8,26" fill="currentColor" fill-opacity="0.035" stroke="currentColor" stroke-opacity="0.16" stroke-width="1.5" />
+    </svg>
+  ))}
+</div>
+
+<style>
+  .hexfield { position: fixed; inset: 0; z-index: -5; overflow: hidden; pointer-events: none; }
+  .hex {
+    position: absolute;
+    opacity: 0;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 0 12px currentColor);
+    animation: hexfloat var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+  @keyframes hexfloat {
+    0%   { transform: translateY(24px) translateX(0) rotate(0deg) scale(0.9); opacity: 0; }
+    18%  { opacity: 0.55; }
+    50%  { transform: translateY(-34px) translateX(var(--dx)) rotate(180deg) scale(1.05); opacity: 0.7; }
+    82%  { opacity: 0.5; }
+    100% { transform: translateY(24px) translateX(0) rotate(360deg) scale(0.9); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hex { animation: none; opacity: 0.22; transform: none; }
+  }
+</style>

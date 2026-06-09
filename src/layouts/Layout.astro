@@ -18,7 +18,9 @@ const {
 
 const site = 'https://striderunning.run';
 const canonical = new URL(path, site).href;
-const ogImage = `${site}/og.png`;
+// SVG renders in most link-preview unfurlers (Slack/Discord/LinkedIn/iMessage).
+// For Twitter/Facebook (raster only) export og.svg → og.png and switch this.
+const ogImage = `${site}/og.svg`;
 
 const jsonLd = {
   '@context': 'https://schema.org',

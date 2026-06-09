@@ -1,7 +1,10 @@
 ---
-// Pulls public Supabase creds at build time and hands them to the client script.
-const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
-const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+// Public Supabase creds. The anon key is SAFE to expose (it ships in the browser
+// regardless; the waitlist table is insert-only via RLS). Env vars override these
+// defaults, but the hardcoded fallback means the site works on Cloudflare with no
+// env config at all.
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? 'https://nqcydhogowrrzrarhcha.supabase.co';
+const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xY3lkaG9nb3dycnpyYXJoY2hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNTMxMzgsImV4cCI6MjA5NTYyOTEzOH0.bOePEWCKnqhx_mOef8Blav8561_c-D08GzHRxMUEho4';
 ---
 <div class="mx-auto w-full max-w-md">
   <form id="waitlist-form" class="flex flex-col gap-3 sm:flex-row" novalidate>

@@ -1,0 +1,6 @@
+# Deep-link paths render the app-open fallback page (200 rewrite keeps the URL).
+# iPhones WITH Stride installed never hit these — universal links intercept.
+/e/* /go.html 200
+/c/* /go.html 200
+/u/* /go.html 200
+/r/* /go.html 200

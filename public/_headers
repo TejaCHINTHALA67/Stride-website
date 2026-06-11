@@ -13,3 +13,8 @@
 /llms.txt
   Content-Type: text/markdown; charset=utf-8
   Cache-Control: public, max-age=3600
+
+# Universal links: Apple requires JSON content-type, no redirect, on this exact path
+/.well-known/apple-app-site-association
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600

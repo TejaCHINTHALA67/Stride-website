@@ -30,5 +30,15 @@ create policy waitlist_insert on public.waitlist
 revoke all on public.waitlist from anon, authenticated;
 grant insert on public.waitlist to anon, authenticated;
 
+-- Public signup COUNT for the live waitlist counter on the site. SECURITY
+-- DEFINER so anonymous visitors can read the number without read access to the
+-- rows themselves. The site displays BASELINE (2678) + this count.
+create or replace function public.waitlist_count()
+returns integer
+language sql stable security definer set search_path = public as $$
+  select count(*)::int from public.waitlist;
+$$;
+grant execute on function public.waitlist_count() to anon, authenticated;
+
 -- Export your list any time (dashboard SQL editor, service role):
 --   select email, source, created_at from public.waitlist order by created_at desc;

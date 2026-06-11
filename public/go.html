@@ -1,0 +1,48 @@
+<!doctype html>
+<!--
+  Stride link fallback page — served for /e/* /c/* /u/* /r/* via _redirects.
+  iPhones WITH the app never see this (universal links open the app directly).
+  Everyone else: we try the stride:// scheme once, then show the waitlist CTA.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stride — Run &amp; Own Your City</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: #0A0E17; color: #F4F7FC; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; }
+  .card { text-align: center; padding: 32px; max-width: 420px; }
+  h1 { font-size: 28px; letter-spacing: 2px; margin: 0 0 6px; }
+  h1 span { color: #06D6A0; text-shadow: 0 0 18px rgba(6,214,160,.8); }
+  p { color: #9AA3B2; line-height: 1.5; }
+  a.btn { display: inline-block; margin-top: 18px; padding: 14px 28px; border-radius: 999px;
+          background: linear-gradient(180deg, #2BE3B0, #06D6A0); color: #04140E; font-weight: 700;
+          text-decoration: none; box-shadow: 0 0 24px rgba(6,214,160,.45); }
+  .small { font-size: 12px; margin-top: 22px; color: #5A6372; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1><span>STRIDE</span></h1>
+  <p id="msg">Opening in the Stride app…</p>
+  <a class="btn" id="cta" href="/">Join the waitlist</a>
+  <p class="small">Run. Claim. Own your city.</p>
+</div>
+<script>
+  // Try the app via the custom scheme; if nothing handles it, surface the CTA.
+  var path = location.pathname.replace(/^\/+/, '');
+  var labels = { e: 'an event', c: 'a club invite', u: 'a runner profile', r: 'a run' };
+  var kind = labels[path.split('/')[0]] || 'a page';
+  document.getElementById('msg').textContent = 'This link opens ' + kind + ' in the Stride app.';
+  var tried = false;
+  function tryApp() {
+    if (tried) return; tried = true;
+    location.href = 'stride:///' + path;
+  }
+  if (/iPhone|iPad|Android/i.test(navigator.userAgent)) setTimeout(tryApp, 350);
+  // TODO when the App Store listing is live: point the CTA at the store URL.
+</script>
+</body>
+</html>

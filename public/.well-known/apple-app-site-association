@@ -1,0 +1,18 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["KD2JWLL2YZ.com.teja.stride"],
+        "components": [
+          { "/": "/e/*", "comment": "event detail" },
+          { "/": "/c/*", "comment": "club invite (join by code)" },
+          { "/": "/u/*", "comment": "runner profile" },
+          { "/": "/r/*", "comment": "run detail" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["KD2JWLL2YZ.com.teja.stride"]
+  }
+}

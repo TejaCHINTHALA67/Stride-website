@@ -1,80 +1,165 @@
 ---
-// Public Supabase creds. The anon key is SAFE to expose (it ships in the browser
-// regardless; the waitlist table is insert-only via RLS). Env vars override these
-// defaults, but the hardcoded fallback means the site works on Cloudflare with no
-// env config at all.
+// Waitlist form + LIVE counter. The counter shows BASELINE + the real number of
+// signups in Supabase (read via the anon-safe `waitlist_count()` RPC), animates
+// up on scroll-in, and ticks +1 with a pulse when YOU join. The anon key is
+// SAFE to expose (it ships in the browser regardless; the waitlist table is
+// insert-only via RLS and the count comes from a SECURITY DEFINER function).
 const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? 'https://nqcydhogowrrzrarhcha.supabase.co';
 const SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xY3lkaG9nb3dycnpyYXJoY2hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNTMxMzgsImV4cCI6MjA5NTYyOTEzOH0.bOePEWCKnqhx_mOef8Blav8561_c-D08GzHRxMUEho4';
+const BASELINE = 2678; // display floor — real signups continue from here
+
+const { compact = false } = Astro.props;
 ---
 <div class="mx-auto w-full max-w-md">
-  <form id="waitlist-form" class="flex flex-col gap-3 sm:flex-row" novalidate>
-    <label for="wl-email" class="sr-only">Email address</label>
+  <form class="wl-form flex flex-col gap-3 sm:flex-row" novalidate>
+    <label class="sr-only">Email address</label>
     <input
-      id="wl-email"
       name="email"
       type="email"
       required
       autocomplete="email"
       inputmode="email"
       placeholder="you@email.com"
-      class="min-w-0 flex-1 rounded-xl border border-white/12 bg-surface/70 px-4 py-3.5 text-ink placeholder:text-ink-faint outline-none transition focus:border-mint/60 focus:shadow-glow"
+      class="wl-email min-w-0 flex-1 rounded-xl border border-white/12 bg-surface/70 px-4 py-3.5 text-ink placeholder:text-ink-faint outline-none transition focus:border-mint/60 focus:shadow-glow"
     />
-    <button type="submit" id="wl-btn" class="btn-primary whitespace-nowrap">
-      <span id="wl-btn-label">Get early access</span>
-      <svg id="wl-spin" class="hidden h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="40 60"/></svg>
+    <button type="submit" class="wl-btn btn-primary whitespace-nowrap">
+      <span class="wl-btn-label">Claim my spot</span>
+      <svg class="wl-spin hidden h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="40 60"/></svg>
     </button>
   </form>
-  <p id="wl-msg" class="mt-3 min-h-[1.25rem] text-sm" role="status" aria-live="polite"></p>
+  <p class="wl-msg mt-3 min-h-[1.25rem] text-sm" role="status" aria-live="polite"></p>
+
+  {!compact && (
+    <div class="wl-social mt-4 flex items-center gap-3">
+      <!-- runner avatar cluster -->
+      <div class="flex -space-x-2.5" aria-hidden="true">
+        {['#06D6A0', '#FBBF24', '#FF6B35', '#60A5FA', '#A78BFA'].map((c, i) => (
+          <span
+            class="grid h-8 w-8 place-items-center rounded-full ring-2 ring-canvas"
+            style={`background: linear-gradient(145deg, ${c}33, ${c}14); border: 1px solid ${c}66;`}
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" aria-hidden="true">
+              <circle cx="14.5" cy="5" r="2" fill={c} />
+              <path d="M13.5 8.5 10 11l1.5 3.5L8 18.5 M13.5 8.5l3 2 3-1 M11.5 14.5l3 1 1 4" stroke={c} stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+        ))}
+      </div>
+      <p class="text-sm text-ink-soft">
+        <span class="wl-count font-display text-base font-semibold text-mint tabular-nums" data-baseline={BASELINE}>{BASELINE.toLocaleString()}</span>
+        <span> runners already in line</span>
+        <span class="wl-live ml-1 inline-block h-1.5 w-1.5 rounded-full bg-mint align-middle animate-pulse-glow" aria-hidden="true"></span>
+      </p>
+    </div>
+  )}
 </div>
 
-<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
-  const form = document.getElementById('waitlist-form');
-  const input = document.getElementById('wl-email');
-  const btn = document.getElementById('wl-btn');
-  const label = document.getElementById('wl-btn-label');
-  const spin = document.getElementById('wl-spin');
-  const msg = document.getElementById('wl-msg');
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY, BASELINE }}>
+  // There can be several Waitlist instances per page — wire each form, but keep
+  // ONE shared live count that every counter element mirrors.
+  const counters = Array.from(document.querySelectorAll('.wl-count'));
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let shown = BASELINE; // what's currently rendered
+  let target = BASELINE;
 
-  const setMsg = (text, ok) => {
-    msg.textContent = text;
-    msg.style.color = ok === true ? '#06D6A0' : ok === false ? '#FCA5A5' : '#9CA3AF';
+  const render = (n) => counters.forEach((el) => { el.textContent = Math.round(n).toLocaleString(); });
+
+  const animateTo = (n) => {
+    target = n;
+    if (reduced || counters.length === 0) { shown = n; render(n); return; }
+    const from = shown;
+    const t0 = performance.now();
+    const dur = Math.min(1600, 600 + Math.abs(n - from) * 8);
+    const tick = (t) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      shown = from + (target - from) * e;
+      render(shown);
+      if (p < 1 && target === n) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   };
-  const loading = (on) => {
-    btn.disabled = on;
-    spin.classList.toggle('hidden', !on);
-    label.textContent = on ? 'Joining…' : 'Get early access';
-  };
 
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = (input.value || '').trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('Please enter a valid email.', false); input.focus(); return; }
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) { setMsg('Waitlist isn’t configured yet — try again soon.', false); return; }
+  const pulse = () => counters.forEach((el) => {
+    el.animate?.([
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.18)', textShadow: '0 0 18px rgba(6,214,160,0.9)' },
+      { transform: 'scale(1)' },
+    ], { duration: 520, easing: 'cubic-bezier(0.16,1,0.3,1)' });
+  });
 
-    loading(true);
+  // Fetch the real count once the counter scrolls into view (or instantly).
+  const loadCount = async () => {
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/waitlist_count`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          Prefer: 'return=minimal',
-        },
-        body: JSON.stringify({ email, source: 'website' }),
+        headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+        body: '{}',
       });
-      if (res.ok) {
-        form.reset();
-        setMsg('You’re on the list. We’ll email you when Stride launches. 🟢', true);
-      } else if (res.status === 409) {
-        setMsg('You’re already on the list — see you at launch.', true);
-      } else {
-        setMsg('Something went wrong. Please try again.', false);
+      if (!res.ok) return;
+      const real = await res.json();
+      if (typeof real === 'number' && real >= 0) animateTo(BASELINE + real);
+    } catch { /* counter stays at baseline */ }
+  };
+  if (counters.length) {
+    let loaded = false;
+    const io = new IntersectionObserver((es) => es.forEach((x) => {
+      if (x.isIntersecting && !loaded) { loaded = true; loadCount(); io.disconnect(); }
+    }), { threshold: 0.4 });
+    counters.forEach((el) => io.observe(el));
+  }
+
+  // Wire every form instance.
+  document.querySelectorAll('.wl-form').forEach((form) => {
+    const scope = form.parentElement;
+    const input = form.querySelector('.wl-email');
+    const btn = form.querySelector('.wl-btn');
+    const label = form.querySelector('.wl-btn-label');
+    const spin = form.querySelector('.wl-spin');
+    const msg = scope.querySelector('.wl-msg');
+
+    const setMsg = (text, ok) => {
+      msg.textContent = text;
+      msg.style.color = ok === true ? '#06D6A0' : ok === false ? '#FCA5A5' : '#9CA3AF';
+    };
+    const loading = (on) => {
+      btn.disabled = on;
+      spin.classList.toggle('hidden', !on);
+      label.textContent = on ? 'Joining…' : 'Claim my spot';
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (input.value || '').trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setMsg('Please enter a valid email.', false); input.focus(); return; }
+
+      loading(true);
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify({ email, source: 'website' }),
+        });
+        if (res.ok) {
+          form.reset();
+          setMsg(`You're in — spot #${Math.round(target + 1).toLocaleString()}. We'll email you at launch. 🟢`, true);
+          animateTo(Math.round(target) + 1);
+          pulse();
+        } else if (res.status === 409) {
+          setMsg('You’re already on the list — see you at launch.', true);
+        } else {
+          setMsg('Something went wrong. Please try again.', false);
+        }
+      } catch {
+        setMsg('Network error — check your connection and retry.', false);
+      } finally {
+        loading(false);
       }
-    } catch {
-      setMsg('Network error — check your connection and retry.', false);
-    } finally {
-      loading(false);
-    }
+    });
   });
 </script>

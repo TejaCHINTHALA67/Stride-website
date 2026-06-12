@@ -25,7 +25,6 @@ const updated = 'June 12, 2026';
   <h3>Health data (only if you connect it)</h3>
   <ul>
     <li><strong>Apple Health (HealthKit):</strong> if you choose to connect, we read heart rate, active energy (calories), and workouts to show heart-rate zones and effort on your runs, and we write your Stride runs to Apple Health as workouts. <strong>HealthKit data is never used for advertising or marketing, is never sold, and is never shared with third parties.</strong> You can disconnect at any time in the app or revoke access in the iOS Health app, and you can ask us to delete any health-derived data we hold.</li>
-    <li><strong>Fitbit (if you connect it):</strong> we import your recent runs (time, distance, duration) and can post your Stride runs to your Fitbit activity log, per the toggles you control. OAuth tokens are stored server-side only and are deleted when you disconnect.</li>
   </ul>
   <h3>Collected automatically</h3>
   <ul>
@@ -53,7 +52,7 @@ const updated = 'June 12, 2026';
   <h2>4. How we share information</h2>
   <ul>
     <li><strong>Service providers (processors)</strong> that process data on our behalf and only on our instructions: Supabase (database, authentication, file storage, realtime infrastructure), Mapbox (map tiles and rendering — receives map viewport requests), Apple and Expo (push notification delivery), Sentry (crash diagnostics), and Cloudflare (website hosting). Each is bound by contractual data-protection terms.</li>
-    <li><strong>Integrations you connect</strong> (Apple Health, Fitbit, Garmin when available): data flows only in the directions you toggle on, under that provider's own privacy policy.</li>
+    <li><strong>Apple Health, if you connect it:</strong> data flows only in the directions described above, on your device, under Apple's HealthKit rules.</li>
     <li><strong>Legal:</strong> if required by law, subpoena, or to protect the rights, property, or safety of Stride, our users, or the public.</li>
     <li><strong>Business transfer:</strong> if Stride is acquired or merged, your data may transfer to the successor, who must honour this Policy or notify you of changes.</li>
   </ul>
@@ -74,11 +73,11 @@ const updated = 'June 12, 2026';
     <li>Account deletion: removes your data immediately from production; residual copies leave encrypted backups within their normal rotation period (up to ~30 days).</li>
     <li>Territory history may be retained in <strong>anonymised, aggregate</strong> form (no longer linked to you) for game-integrity statistics.</li>
     <li>Crash diagnostics are retained per Sentry's rolling window (90 days or less).</li>
-    <li>OAuth tokens for integrations are deleted the moment you disconnect.</li>
+    <li>Disconnecting Apple Health stops all health reads immediately; you can also revoke access in the iOS Health app.</li>
   </ul>
 
   <h2>7. Security</h2>
-  <p>We use industry-standard safeguards: encryption in transit (TLS) for all traffic, database row-level security so each account can only reach its own private data, server-side-only storage of integration tokens (the app never sees them), and least-privilege access. No method of transmission or storage is 100% secure; if a breach affecting your personal data occurs, we will notify you and the relevant authorities as required by law.</p>
+  <p>We use industry-standard safeguards: encryption in transit (TLS) for all traffic, database row-level security so each account can only reach its own private data, and least-privilege access. No method of transmission or storage is 100% secure; if a breach affecting your personal data occurs, we will notify you and the relevant authorities as required by law.</p>
 
   <h2>8. Children</h2>
   <p>Stride is not directed to children under 13 (or the higher minimum age your country sets for consent to data processing — e.g., up to 16 in parts of the EEA), and we do not knowingly collect their data. The app asks for your date of birth and refuses sign-up below the minimum age. If you believe a child has provided us data, contact us at <a href="mailto:privacy@striderunning.run">privacy@striderunning.run</a> and we will delete it promptly.</p>

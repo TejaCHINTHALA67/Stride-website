@@ -1,61 +1,94 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
-const updated = 'June 8, 2026';
+const updated = 'June 12, 2026';
 ---
-<LegalLayout title="Privacy Policy" updated={updated} path="/privacy" description="How Stride collects, uses, and protects your data — including location used to track your runs.">
-  <p>This Privacy Policy explains how <strong>Stride</strong> ("Stride", "we", "us") collects, uses, and shares information when you use the Stride mobile app and <a href="/">striderunning.run</a> (the "Service"). By using the Service you agree to this Policy.</p>
+<LegalLayout title="Privacy Policy" updated={updated} path="/privacy" description="How Stride collects, uses, and protects your data — including location and health data used to track your runs.">
+  <p>This Privacy Policy explains how <strong>Stride</strong> ("Stride", "we", "us", "our") collects, uses, shares, and protects information when you use the Stride mobile app and <a href="/">striderunning.run</a> (together, the "Service"). Stride is a location-based running game — location is core to how it works, and this Policy is written to be honest about exactly what that means. <strong>We do not sell your personal information, and we do not show ads.</strong></p>
+  <p>By using the Service you agree to this Policy. If you do not agree, please do not use the Service.</p>
 
   <h2>1. Information we collect</h2>
-  <h3>You give us</h3>
+  <h3>Information you give us</h3>
   <ul>
-    <li><strong>Account:</strong> email, username, display name, optional avatar and bio.</li>
-    <li><strong>Content you create:</strong> runs, posts, comments, clubs, events, and your chosen territory colour and flag.</li>
+    <li><strong>Account:</strong> email address, username, optional display name, avatar photo, bio, and your chosen territory colour and flag. If you sign in with Apple, we receive the identifier (and email, unless you hide it) Apple shares with us.</li>
+    <li><strong>About you (all optional):</strong> gender (used only to pick your in-app body silhouette), date of birth (used to verify you meet the minimum age and to tailor stats), and how often you run. You can decline these.</li>
+    <li><strong>Content you create:</strong> posts, comments, photos you attach, kudos, clubs and club cover photos, events, and challenges.</li>
+    <li><strong>Safety contacts (optional):</strong> names and contact details of people you choose to add. We store them only so the app can show them to you; we never contact them ourselves or use them for marketing.</li>
     <li><strong>Waitlist:</strong> if you join from the website, your email address.</li>
   </ul>
-  <h3>Collected as you run</h3>
+  <h3>Information collected as you run</h3>
   <ul>
-    <li><strong>Precise location (GPS):</strong> we record your route <em>while you actively track a run</em> to calculate distance, pace, and the territory you enclose. You can deny location and use explore mode.</li>
-    <li><strong>Activity data:</strong> distance, duration, pace, elevation, and captured area.</li>
-    <li><strong>Approximate location/city:</strong> derived from your device to power city leaderboards and nearby-event notifications.</li>
-    <li><strong>Device & usage:</strong> app version, device model, and diagnostics for stability and security.</li>
+    <li><strong>Precise location (GPS):</strong> we record your route <em>while you actively track a run</em> — including in the background during an active run if you grant background permission — to calculate distance, pace, splits, and the territory you enclose. We do not track your location when you are not viewing the map or recording a run. You can deny location entirely and use the app in explore mode.</li>
+    <li><strong>Activity data:</strong> distance, duration, pace, elevation, splits, and captured area for each run.</li>
+    <li><strong>Approximate location/city:</strong> derived once, with your permission, to place you on city and country leaderboards and surface nearby events. You can hide yourself from leaderboards in Settings.</li>
+    <li><strong>Anti-cheat signals:</strong> we analyse the GPS data of each run (speed profile, accuracy, movement signature) to detect vehicle use and GPS spoofing. This protects the fairness of the game and is applied equally to everyone.</li>
+  </ul>
+  <h3>Health data (only if you connect it)</h3>
+  <ul>
+    <li><strong>Apple Health (HealthKit):</strong> if you choose to connect, we read heart rate, active energy (calories), and workouts to show heart-rate zones and effort on your runs, and we write your Stride runs to Apple Health as workouts. <strong>HealthKit data is never used for advertising or marketing, is never sold, and is never shared with third parties.</strong> You can disconnect at any time in the app or revoke access in the iOS Health app, and you can ask us to delete any health-derived data we hold.</li>
+    <li><strong>Fitbit (if you connect it):</strong> we import your recent runs (time, distance, duration) and can post your Stride runs to your Fitbit activity log, per the toggles you control. OAuth tokens are stored server-side only and are deleted when you disconnect.</li>
+  </ul>
+  <h3>Collected automatically</h3>
+  <ul>
+    <li><strong>Device &amp; diagnostics:</strong> app version, device model, OS version, crash reports and performance traces (via Sentry) so we can fix problems. We do not use third-party advertising or cross-app tracking SDKs, and we do not request the iOS App Tracking Transparency permission because we do not track you across other companies’ apps or websites.</li>
+    <li><strong>Push token:</strong> if you enable notifications, a device push token so we can deliver them. Every notification category can be turned off in Settings.</li>
+    <li><strong>Motion (on-device only):</strong> the app may use the accelerometer to animate on-screen effects (for example, liquid that tilts with your phone). This sensor data is processed on your device in real time and is never recorded or transmitted.</li>
   </ul>
 
   <h2>2. How we use information</h2>
   <ul>
-    <li>Provide the core game — track runs, compute and display territory, and run leaderboards, leagues, clubs and events.</li>
-    <li>Send you notifications you’ve enabled (e.g., your turf was taken, a nearby event, streak reminders).</li>
-    <li>Maintain safety, prevent cheating and abuse, and enforce our Terms.</li>
-    <li>Improve the Service and fix problems.</li>
+    <li>Provide the core game — track your runs, compute and display territory, and run leaderboards, leagues, clubs, events, and challenges.</li>
+    <li>Display your profile, posts, and territory to other players (see Section 3 for exactly what is visible).</li>
+    <li>Send notifications you have enabled (your turf was taken, a close call, streak reminders, kudos, comments, nearby events).</li>
+    <li>Keep the game fair — detect cheating, review flagged runs, and enforce our <a href="/terms">Terms</a>.</li>
+    <li>Keep the Service safe — moderate reported content, action blocks and reports, and prevent abuse.</li>
+    <li>Maintain, debug, and improve the Service.</li>
+    <li>Comply with law and protect rights and safety.</li>
   </ul>
+  <p><strong>Legal bases (EEA/UK):</strong> performance of our contract with you (running the game you signed up for), your consent (location, health data, notifications, optional profile fields — each separately revocable), our legitimate interests (anti-cheat, security, service improvement — balanced against your rights), and legal obligations.</p>
 
-  <h2>3. How we share information</h2>
+  <h2>3. What other players can see</h2>
+  <p>Stride is a competitive, social game. By design, other players can see: your username, display name, avatar, tier/level, flag, your territory (its shape, colour, and size in m²), your position on leaderboards, and the posts, comments, clubs, and events you create. Your run posts can include your route map.</p>
+  <p><strong>Your controls:</strong> set activity privacy to Everyone, Followers, or Only me; hide yourself from leaderboards; block any user (two-way — they can no longer see or contact you); report any content or user; delete any of your content at any time. Your email, date of birth, gender, health data, and safety contacts are <strong>never</strong> visible to other players.</p>
+
+  <h2>4. How we share information</h2>
   <ul>
-    <li><strong>With other players:</strong> your username, avatar, tier, territory (shape, colour, m²) and public posts are visible to others by design. Manage visibility in privacy settings.</li>
-    <li><strong>Service providers</strong> who process data on our behalf: Supabase (database, authentication, storage), Mapbox (maps), Expo/Apple (push notifications), and Sentry (crash diagnostics).</li>
-    <li><strong>Legal:</strong> when required by law or to protect rights and safety.</li>
-    <li>We <strong>do not sell</strong> your personal information.</li>
+    <li><strong>Service providers (processors)</strong> that process data on our behalf and only on our instructions: Supabase (database, authentication, file storage, realtime infrastructure), Mapbox (map tiles and rendering — receives map viewport requests), Apple and Expo (push notification delivery), Sentry (crash diagnostics), and Cloudflare (website hosting). Each is bound by contractual data-protection terms.</li>
+    <li><strong>Integrations you connect</strong> (Apple Health, Fitbit, Garmin when available): data flows only in the directions you toggle on, under that provider's own privacy policy.</li>
+    <li><strong>Legal:</strong> if required by law, subpoena, or to protect the rights, property, or safety of Stride, our users, or the public.</li>
+    <li><strong>Business transfer:</strong> if Stride is acquired or merged, your data may transfer to the successor, who must honour this Policy or notify you of changes.</li>
   </ul>
+  <p>We <strong>do not sell</strong> personal information and we <strong>do not share</strong> it for cross-context behavioural advertising (as those terms are defined in the California Consumer Privacy Act).</p>
 
-  <h2>4. Your choices & rights</h2>
+  <h2>5. Your rights &amp; choices</h2>
   <ul>
-    <li>Turn location off in iOS Settings (you can still explore; you can’t claim territory).</li>
-    <li>Set activity privacy (everyone / followers / private) and hide from leaderboards.</li>
-    <li>Access, correct, or <strong>delete your account and data</strong> in-app (Settings → Delete account), which cascades your runs and territory.</li>
-    <li>Depending on where you live (e.g., EEA/UK/California), you may have additional rights to access, port, or restrict processing — contact us to exercise them.</li>
+    <li><strong>Access, correct, export, delete:</strong> you can edit your profile in-app, and <strong>delete your account and all of its data in-app</strong> (Settings → Delete account) — this permanently removes your profile, runs, territory, posts, and connections. You can also email us for a copy of your data.</li>
+    <li><strong>Permissions:</strong> location, notifications, photos, motion, and health access can each be revoked at any time in iOS Settings; the app keeps working with reduced features.</li>
+    <li><strong>EEA/UK:</strong> you additionally have the rights of access, rectification, erasure, restriction, portability, and objection, and the right to withdraw consent at any time and to lodge a complaint with your supervisory authority.</li>
+    <li><strong>California:</strong> you have the right to know, delete, correct, and to non-discrimination for exercising your rights. We do not sell or share personal information, so there is nothing to opt out of.</li>
+    <li>To exercise any right, email <a href="mailto:privacy@striderunning.run">privacy@striderunning.run</a>. We respond within the time required by your local law (e.g., 30 days under GDPR, 45 days under CCPA) and will verify the request comes from the account holder.</li>
   </ul>
 
-  <h2>5. Data retention & security</h2>
-  <p>We keep data while your account is active and as needed for legal and security purposes, then delete or anonymise it. We use industry-standard safeguards (encryption in transit, row-level security, restricted access), but no method is 100% secure.</p>
+  <h2>6. Data retention</h2>
+  <ul>
+    <li>Account, runs, territory, and content: kept while your account is active.</li>
+    <li>Account deletion: removes your data immediately from production; residual copies leave encrypted backups within their normal rotation period (up to ~30 days).</li>
+    <li>Territory history may be retained in <strong>anonymised, aggregate</strong> form (no longer linked to you) for game-integrity statistics.</li>
+    <li>Crash diagnostics are retained per Sentry's rolling window (90 days or less).</li>
+    <li>OAuth tokens for integrations are deleted the moment you disconnect.</li>
+  </ul>
 
-  <h2>6. Children</h2>
-  <p>Stride is not directed to children under 13 (or the minimum age in your country), and we do not knowingly collect their data. If you believe a child has provided us data, contact us and we will delete it.</p>
+  <h2>7. Security</h2>
+  <p>We use industry-standard safeguards: encryption in transit (TLS) for all traffic, database row-level security so each account can only reach its own private data, server-side-only storage of integration tokens (the app never sees them), and least-privilege access. No method of transmission or storage is 100% secure; if a breach affecting your personal data occurs, we will notify you and the relevant authorities as required by law.</p>
 
-  <h2>7. International transfers</h2>
-  <p>Your information may be processed in countries other than your own, including the United States. We rely on appropriate safeguards where required.</p>
+  <h2>8. Children</h2>
+  <p>Stride is not directed to children under 13 (or the higher minimum age your country sets for consent to data processing — e.g., up to 16 in parts of the EEA), and we do not knowingly collect their data. The app asks for your date of birth and refuses sign-up below the minimum age. If you believe a child has provided us data, contact us at <a href="mailto:privacy@striderunning.run">privacy@striderunning.run</a> and we will delete it promptly.</p>
 
-  <h2>8. Changes</h2>
-  <p>We’ll update this Policy as the Service evolves and revise the “Last updated” date. Material changes will be notified in-app or by email.</p>
+  <h2>9. International transfers</h2>
+  <p>Your information may be processed in countries other than your own, including the United States, where our service providers operate. Where required, we rely on appropriate safeguards such as the EU Standard Contractual Clauses and our processors' equivalent commitments.</p>
 
-  <h2>9. Contact</h2>
-  <p>Questions or requests: <a href="mailto:privacy@striderunning.run">privacy@striderunning.run</a>.</p>
+  <h2>10. Changes to this Policy</h2>
+  <p>We will update this Policy as the Service evolves and revise the "Last updated" date above. For material changes we will notify you in-app or by email before they take effect. The current version always lives at <a href="https://striderunning.run/privacy">striderunning.run/privacy</a> and inside the app under Settings → Privacy Policy — the two are kept identical.</p>
+
+  <h2>11. Contact</h2>
+  <p>Privacy questions or requests: <a href="mailto:privacy@striderunning.run">privacy@striderunning.run</a><br/>General support: <a href="mailto:support@striderunning.run">support@striderunning.run</a></p>
 </LegalLayout>

@@ -11,8 +11,8 @@ export interface Props {
   noindex?: boolean;
 }
 const {
-  title = 'Stride — Run & Own Your City',
-  description = 'Stride turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Join the iOS waitlist.',
+  title = 'Stride — Run & Own Your City | Territory Running Game',
+  description = 'Stride turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Free territory running game for iOS — join the waitlist.',
   path = '/',
   noindex = false,
 } = Astro.props;
@@ -22,13 +22,23 @@ const canonical = new URL(path, site).href;
 // SVG renders in most link-preview unfurlers (Slack/Discord/LinkedIn/iMessage).
 // For Twitter/Facebook (raster only) export og.svg → og.png and switch this.
 const ogImage = `${site}/og.svg`;
+const keywords = 'Stride, Stride running, Stride run, Stride game, Stride play, territory running game, running game, GPS running game, run and own your city, claim territory running, competitive running app, turf running, run tracker game, iOS running game';
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
+    // brand-variant resolution: helps "stride running", "stride run",
+    // "stride play game" queries land on this site.
+    {
+      '@type': 'WebSite',
+      name: 'Stride',
+      alternateName: ['Stride Running', 'Stride Run', 'Stride Game', 'Stride Play', 'Stride — Run & Own Your City'],
+      url: site,
+    },
     {
       '@type': 'Organization',
       name: 'Stride',
+      alternateName: 'Stride Running',
       url: site,
       logo: `${site}/icon.png`,
       sameAs: [],
@@ -36,8 +46,14 @@ const jsonLd = {
     {
       '@type': 'SoftwareApplication',
       name: 'Stride — Run & Own Your City',
+      alternateName: ['Stride', 'Stride Running', 'Stride Game'],
       operatingSystem: 'iOS',
       applicationCategory: 'HealthApplication',
+      applicationSubCategory: 'Running Game',
+      genre: 'Fitness Game',
+      keywords,
+      url: site,
+      installUrl: site,
       description,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
@@ -52,6 +68,7 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="theme-color" content="#0A0E17" />

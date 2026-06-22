@@ -1,0 +1,64 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const title = 'Stride Blog — Running, Gamified';
+const description =
+  'Practical guides on making running fun, staying motivated, and turning your runs into a game. From the team building Stride — the territory running game for iOS.';
+
+// Newest first. Add an entry here when you publish a post.
+const posts = [
+  {
+    href: '/blog/how-to-make-running-fun/',
+    tag: 'Motivation',
+    title: 'How to make running fun: 9 ways to actually enjoy it',
+    excerpt:
+      'You don’t hate running — you hate how it feels. Nine practical, science-backed ways to turn the grind into something you look forward to.',
+    date: 'June 22, 2026',
+    read: '6 min',
+  },
+];
+
+const blogLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Stride Blog',
+  url: 'https://striderunning.run/blog/',
+  description,
+  blogPost: posts.map((p) => ({
+    '@type': 'BlogPosting',
+    headline: p.title,
+    url: `https://striderunning.run${p.href}`,
+  })),
+};
+---
+
+<Layout title={title} description={description} path="/blog">
+  <script type="application/ld+json" set:html={JSON.stringify(blogLd)} />
+
+  <section class="mx-auto max-w-4xl px-5 pt-32 pb-10 text-center sm:pt-36">
+    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Stride home</a>
+    <h1 class="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">
+      The <span class="text-gradient">Stride</span> blog
+    </h1>
+    <p class="mx-auto mt-4 max-w-xl text-lg text-ink-soft">
+      How to make running fun, stay motivated, and turn your runs into a game you can win.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-5 pb-24">
+    <div class="space-y-4">
+      {posts.map((p) => (
+        <a href={p.href} class="reveal glass group block rounded-2xl p-6 transition hover:border-mint/40">
+          <p class="font-mono text-xs uppercase tracking-widest text-mint">{p.tag}</p>
+          <h2 class="mt-2 font-display text-2xl font-semibold tracking-tight transition group-hover:text-mint">
+            {p.title}
+          </h2>
+          <p class="mt-2 text-ink-soft">{p.excerpt}</p>
+          <p class="mt-4 font-mono text-xs uppercase tracking-widest text-ink-faint">
+            {p.date} · {p.read} read →
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

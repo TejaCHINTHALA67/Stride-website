@@ -1,0 +1,175 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Waitlist from '../components/Waitlist.astro';
+
+const title = 'Strava Alternative — Stride Turns Running Into a Game';
+const description =
+  'Looking for a Strava alternative? Stride is a free GPS run tracker that turns every run into a live territory game — claim your city, steal rivals’ turf. iOS. Join the waitlist.';
+
+const faqs = [
+  {
+    q: 'Is there a free Strava alternative?',
+    a: 'Yes. Stride is free to play — you can run, track your pace and route, claim territory, climb leaderboards, and join clubs without paying. An optional Stride Pro subscription adds extras like a route planner and advanced analytics, but the full game is free.',
+  },
+  {
+    q: 'What makes Stride different from Strava?',
+    a: 'Strava logs your runs. Stride turns them into a game. Every loop you run claims the real area you enclose on a live map — and rivals can steal it back. You get GPS tracking like Strava, plus territory, weekly leagues, and club-vs-club battles on top.',
+  },
+  {
+    q: 'Does Stride track pace, distance, route and GPS like Strava?',
+    a: 'Yes. Stride is a full GPS run tracker: pace, splits, distance, elevation, route map and heart rate (via Apple Health). The game layer sits on top of real run tracking, not instead of it.',
+  },
+  {
+    q: 'Is Stride available to download yet?',
+    a: 'Stride launches soon on iOS. Join the waitlist and you’ll get the download link on launch day — early players claim their neighbourhood before anyone else.',
+  },
+  {
+    q: 'Is Stride on Android?',
+    a: 'Stride is launching on iOS first. Android is planned for later. Join the waitlist and we’ll let you know when it’s ready for your phone.',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const rows = [
+  ['GPS run tracking — pace, splits, route, map', true, true],
+  ['Claim real territory by running a loop', true, false],
+  ['Steal rivals’ turf — live, on the map', true, false],
+  ['Weekly leagues & global / city ranks', true, 'Segments & KOMs'],
+  ['Clubs & club-vs-club territory battles', true, 'Clubs & feed'],
+  ['XP, levels, flags & achievements', true, false],
+  ['Free to play', true, true],
+  ['Built as a game, not a logbook', true, false],
+];
+const cell = (v) =>
+  v === true ? '✓' : v === false ? '—' : v;
+---
+
+<Layout title={title} description={description} path="/strava-alternative">
+  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+
+  <!-- Hero -->
+  <section class="relative mx-auto max-w-4xl px-5 pt-32 pb-10 text-center sm:pt-36">
+    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Stride home</a>
+    <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-mint">The Strava alternative</p>
+    <h1 class="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
+      Run tracking is solved.<br /><span class="text-gradient">Running for fun isn’t.</span>
+    </h1>
+    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+      If you love Strava but your runs have started to feel like a chore, Stride is the alternative built
+      to fix that. It’s a GPS run tracker that’s secretly a <strong class="text-ink">territory game</strong>:
+      every loop you run claims the real area you enclose — and rivals try to steal it back.
+    </p>
+    <div class="mt-9"><Waitlist compact={false} /></div>
+  </section>
+
+  <!-- Why people switch -->
+  <section class="reveal mx-auto max-w-4xl px-5 py-14">
+    <h2 class="font-display text-2xl font-semibold sm:text-3xl">Why runners look for a Strava alternative</h2>
+    <p class="mt-4 max-w-2xl text-ink-soft">
+      Strava is brilliant at <em>logging</em> a run. But a logbook doesn’t get you out the door on a cold
+      Tuesday. The most common reasons runners go looking for something new:
+    </p>
+    <div class="mt-8 grid gap-4 sm:grid-cols-3">
+      {[
+        ['It got boring', 'Tracking the same loop and watching a number tick up stops being motivating.'],
+        ['Nothing’s at stake', 'There’s no reason to run <em>today</em> instead of tomorrow — no streak you’ll lose, no turf a rival will take.'],
+        ['You want to compete', 'KOMs are great for the fast few. Most of us want a game we can actually win in our own neighbourhood.'],
+      ].map(([h, p]) => (
+        <div class="glass rounded-2xl p-5">
+          <h3 class="font-display text-lg font-semibold text-mint">{h}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink-soft" set:html={p} />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section class="reveal mx-auto max-w-4xl px-5 py-14">
+    <h2 class="font-display text-2xl font-semibold sm:text-3xl">Stride vs Strava</h2>
+    <p class="mt-4 max-w-2xl text-ink-soft">
+      Stride isn’t “Strava but worse” — it keeps the run tracking you rely on and adds a real game on top.
+      Here’s how they line up.
+    </p>
+    <div class="glass mt-8 overflow-hidden rounded-2xl">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="border-b border-white/10 text-left">
+            <th class="px-4 py-4 font-display font-semibold text-ink">Feature</th>
+            <th class="px-4 py-4 text-center font-display font-semibold text-mint">Stride</th>
+            <th class="px-4 py-4 text-center font-display font-semibold text-ink-soft">Strava</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(([label, s, st], i) => (
+            <tr class={i % 2 ? 'bg-white/[0.02]' : ''}>
+              <td class="px-4 py-3.5 text-ink-soft">{label}</td>
+              <td class="px-4 py-3.5 text-center font-semibold text-mint">{cell(s)}</td>
+              <td class="px-4 py-3.5 text-center text-ink-soft">{cell(st)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-xs text-ink-faint">
+      Strava is a trademark of Strava, Inc. Stride is not affiliated with or endorsed by Strava. Comparison
+      reflects each app’s headline features and is provided for information only.
+    </p>
+  </section>
+
+  <!-- The pitch -->
+  <section class="reveal mx-auto max-w-4xl px-5 py-14">
+    <h2 class="font-display text-2xl font-semibold sm:text-3xl">You keep the tracking. You gain a game.</h2>
+    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+      {[
+        ['Run to own your city', 'Close a loop and the area inside becomes your territory, painted your colour on a live 3D map of your real streets.'],
+        ['Defend it — or lose it', 'Rivals can run over your turf and steal it. That’s the reason to lace up today, not tomorrow.'],
+        ['Climb the weekly leagues', 'Global, country and city leaderboards reset weekly, so everyone gets a fresh shot at the top.'],
+        ['Go to war with your club', 'Join a running club and fight live club-vs-club territory battles for your neighbourhood.'],
+      ].map(([h, p]) => (
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-display text-lg font-semibold">{h}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink-soft">{p}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="reveal mx-auto max-w-3xl px-5 py-14">
+    <h2 class="font-display text-2xl font-semibold sm:text-3xl">Strava alternative — FAQ</h2>
+    <div class="mt-8 space-y-3">
+      {faqs.map((f) => (
+        <details class="glass group rounded-2xl p-5">
+          <summary class="cursor-pointer list-none font-display text-base font-semibold text-ink marker:hidden">
+            {f.q}
+          </summary>
+          <p class="mt-3 text-sm leading-relaxed text-ink-soft">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="reveal mx-auto max-w-3xl px-5 pb-24 text-center">
+    <div class="glass glass-mint rounded-3xl px-6 py-12">
+      <h2 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">Claim your city first.</h2>
+      <p class="mx-auto mt-3 max-w-xl text-ink-soft">
+        Stride launches soon on iOS. Join the waitlist and you’ll get the download link on launch day —
+        early runners take their neighbourhood before anyone else shows up.
+      </p>
+      <div class="mt-8"><Waitlist compact={false} /></div>
+      <p class="mt-6 text-sm text-ink-faint">
+        Curious how it plays? <a href="/blog/how-to-make-running-fun/" class="text-mint hover:underline">Read: how to make running fun →</a>
+      </p>
+    </div>
+  </section>
+</Layout>

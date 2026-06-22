@@ -1,0 +1,167 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Waitlist from '../../components/Waitlist.astro';
+
+const title = 'How to Make Running Fun: 9 Ways to Actually Enjoy It';
+const description =
+  'Hate running? Here are 9 proven, practical ways to make running fun — from gamifying your runs to changing how you measure a “good” one — so you actually look forward to it.';
+const published = '2026-06-22';
+
+const faqs = [
+  {
+    q: 'Why is running so boring for some people?',
+    a: 'Running often feels boring because it has no feedback loop beyond distance and pace. Without variety, a goal, or something at stake, your brain has no reason to stay engaged. Adding play, music, social stakes or a game fixes the feedback gap.',
+  },
+  {
+    q: 'How do I make running fun by myself?',
+    a: 'Gamify it: turn solo runs into a challenge with a streak, a route you’re “unlocking”, or an app that gives each run a goal. Vary your route, run to a podcast or playlist, and measure effort and consistency instead of only pace.',
+  },
+  {
+    q: 'What is the easiest way to enjoy running more?',
+    a: 'Slow down. Most people who hate running are running too fast. Run easy enough to hold a conversation, and the experience changes from a fight into something you can actually enjoy and repeat.',
+  },
+];
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Article',
+      headline: title,
+      description,
+      datePublished: published,
+      dateModified: published,
+      author: { '@type': 'Organization', name: 'Stride' },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Stride',
+        logo: { '@type': 'ImageObject', url: 'https://striderunning.run/stride-logo.png' },
+      },
+      mainEntityOfPage: 'https://striderunning.run/blog/how-to-make-running-fun/',
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
+};
+---
+
+<Layout title={title} description={description} path="/blog/how-to-make-running-fun">
+  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+
+  <article class="article mx-auto max-w-3xl px-5 pt-32 pb-20">
+    <a href="/blog/" class="text-sm text-ink-faint transition hover:text-mint">← Stride blog</a>
+    <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-mint">Running, gamified</p>
+    <h1 class="mt-3 font-display text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">
+      How to make running fun: 9 ways to actually enjoy it
+    </h1>
+    <p class="mt-4 font-mono text-xs uppercase tracking-widest text-ink-faint">Updated · June 22, 2026 · 6 min read</p>
+
+    <div class="prose mt-10 space-y-5 text-[15px] leading-relaxed text-ink-soft">
+      <p>
+        Most people don’t hate running — they hate how running <em>feels</em>: a repetitive grind with no
+        payoff except a number on a screen. The good news is that “fun” isn’t a personality trait you’re
+        born with. It’s a design problem, and you can fix it. Here are nine practical ways to make running
+        fun enough that you actually look forward to it.
+      </p>
+
+      <h2>1. Slow down — a lot</h2>
+      <p>
+        The single most common reason beginners hate running is that they run too fast, turn every run into
+        a lung-burning fight, and conclude “I’m just not a runner.” Run easy enough that you could hold a
+        conversation. It feels almost too slow at first. It’s also the pace where running stops being
+        suffering and starts being something you’d do again tomorrow.
+      </p>
+
+      <h2>2. Gamify it</h2>
+      <p>
+        Your brain loves progress it can see. Plain distance is weak feedback; a <em>game</em> is strong
+        feedback. Give each run a goal beyond “go far”: a streak you’ll lose if you skip, a route you’re
+        “unlocking”, territory you’re claiming, a rival you’re chasing. The moment a run has stakes, getting
+        out the door stops being a willpower battle. (This is the entire idea behind
+        <a href="/">Stride</a> — every loop you run claims real territory on a map, and rivals can steal it.)
+      </p>
+
+      <h2>3. Change what counts as a “good” run</h2>
+      <p>
+        If the only scoreboard is pace, every slow day feels like a failure — and you quit. Track effort,
+        consistency and how you <em>felt</em> instead. A tired easy run you still showed up for is a win.
+        Reframing the scoreboard is the difference between a hobby that lasts and one that burns out in March.
+      </p>
+
+      <h2>4. Run somewhere new</h2>
+      <p>
+        Novelty is free dopamine. Same loop, same lamppost, same boredom. Explore a new neighbourhood, a
+        park you’ve never run, a route that ends at a coffee shop. Treating a run as exploration — “what’s
+        down that street?” — quietly turns a chore into a small adventure.
+      </p>
+
+      <h2>5. Build a soundtrack (or a story)</h2>
+      <p>
+        A great playlist, a gripping podcast, or an audiobook you only let yourself listen to while running
+        turns time into something you want more of. The trick is to make the audio a reward you can only
+        collect on the move.
+      </p>
+
+      <h2>6. Add other people — even invisibly</h2>
+      <p>
+        You don’t need a running buddy at 6am. Even <em>asynchronous</em> social pressure works: a leaderboard,
+        a club challenge, a friend who’ll see you skipped, a neighbour whose turf you’re trying to take. We
+        try harder when someone — anyone — might be watching.
+      </p>
+
+      <h2>7. Chase a streak, then protect it</h2>
+      <p>
+        Loss aversion is the strongest motivator in behavioural science: we hate losing something more than
+        we like gaining it. A streak you’ve built for 30 days is a thing you’ll run in the rain to protect.
+        Start one, make it visible, and let the fear of breaking it do the work.
+      </p>
+
+      <h2>8. Sign up for something</h2>
+      <p>
+        A date on the calendar — a 5K, a charity run, a friendly challenge — converts vague intentions into
+        a plan. You don’t have to race. You just need a reason that exists outside your own willpower.
+      </p>
+
+      <h2>9. Make finishing feel like winning</h2>
+      <p>
+        End every run on a small high: a sprint to your front door, a satisfying stat, a map that fills in
+        with your colour. The feeling you finish on is the feeling you’ll remember next time you’re deciding
+        whether to go. Engineer the ending and you engineer the habit.
+      </p>
+
+      <h2>The shortcut: make running a game you can win</h2>
+      <p>
+        Notice the thread running through all nine: <strong class="text-ink">stakes, progress, and a reason to
+        go today.</strong> That’s exactly what a game gives you. Stride was built on this idea — it’s a GPS run
+        tracker where every loop you run claims the real area you enclose on a live map of your city, rivals
+        steal it back, and weekly leagues keep score. It’s running, turned into a turf war.
+      </p>
+    </div>
+
+    <!-- inline CTA -->
+    <div class="glass glass-mint mt-12 rounded-3xl px-6 py-10 text-center">
+      <h2 class="font-display text-2xl font-bold sm:text-3xl">Turn your runs into a game.</h2>
+      <p class="mx-auto mt-3 max-w-lg text-ink-soft">
+        Stride launches soon on iOS. Join the waitlist and claim your neighbourhood before anyone else.
+      </p>
+      <div class="mt-7"><Waitlist compact={true} /></div>
+    </div>
+
+    <p class="mt-10 text-sm text-ink-faint">
+      Related: <a href="/strava-alternative/" class="text-mint hover:underline">the Strava alternative built around fun →</a>
+    </p>
+  </article>
+</Layout>
+
+<style is:global>
+  .article .prose h2 { @apply font-display text-2xl font-semibold text-ink mt-9 mb-1; }
+  .article .prose p { @apply text-ink-soft; }
+  .article .prose a { @apply text-mint hover:underline; }
+  .article .prose strong { @apply text-ink; }
+</style>

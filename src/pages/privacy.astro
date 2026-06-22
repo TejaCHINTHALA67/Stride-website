@@ -1,6 +1,6 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
-const updated = 'June 12, 2026';
+const updated = 'June 22, 2026';
 ---
 <LegalLayout title="Privacy Policy" updated={updated} path="/privacy" description="How Stride collects, uses, and protects your data — including location and health data used to track your runs.">
   <p>This Privacy Policy explains how <strong>Stride</strong> ("Stride", "we", "us", "our") collects, uses, shares, and protects information when you use the Stride mobile app and <a href="/">striderunning.run</a> (together, the "Service"). Stride is a location-based running game — location is core to how it works, and this Policy is written to be honest about exactly what that means. <strong>We do not sell your personal information, and we do not show ads.</strong></p>
@@ -9,7 +9,7 @@ const updated = 'June 12, 2026';
   <h2>1. Information we collect</h2>
   <h3>Information you give us</h3>
   <ul>
-    <li><strong>Account:</strong> email address, username, optional display name, avatar photo, bio, and your chosen territory colour and flag. If you sign in with Apple, we receive the identifier (and email, unless you hide it) Apple shares with us.</li>
+    <li><strong>Account:</strong> email address, username, optional display name, avatar photo, bio, and your chosen territory colour and flag. If you sign in with Apple or Google, we receive the account identifier and the email address that provider shares with us (with Apple you may choose to hide your real email and share a private relay address instead). We never receive or store your Apple or Google password.</li>
     <li><strong>About you (all optional):</strong> gender (used only to pick your in-app body silhouette), date of birth (used to verify you meet the minimum age and to tailor stats), and how often you run. You can decline these.</li>
     <li><strong>Content you create:</strong> posts, comments, photos you attach, kudos, clubs and club cover photos, events, and challenges.</li>
     <li><strong>Safety contacts (optional):</strong> names and contact details of people you choose to add. We store them only so the app can show them to you; we never contact them ourselves or use them for marketing.</li>
@@ -32,12 +32,18 @@ const updated = 'June 12, 2026';
     <li><strong>Push token:</strong> if you enable notifications, a device push token so we can deliver them. Every notification category can be turned off in Settings.</li>
     <li><strong>Motion (on-device only):</strong> the app may use the accelerometer to animate on-screen effects (for example, liquid that tilts with your phone). This sensor data is processed on your device in real time and is never recorded or transmitted.</li>
   </ul>
+  <h3>If you subscribe to Stride Pro</h3>
+  <ul>
+    <li><strong>Purchases:</strong> Stride Pro is an optional auto-renewing subscription. <strong>Apple processes the payment</strong> through your App Store account — we never see or store your card number or full payment details. We receive only confirmation of your subscription and entitlement status (in trial, active, expired) so we can unlock Pro features for your account.</li>
+    <li><strong>Paywall provider (Superwall):</strong> we use Superwall to present offers and manage subscriptions. It receives a pseudonymous app-user identifier, your subscription/entitlement status, and basic device and locale information to show the right offer and record the purchase. It does not receive your name, email, runs, location, or health data, and it is not an advertising or cross-app tracking service.</li>
+  </ul>
 
   <h2>2. How we use information</h2>
   <ul>
     <li>Provide the core game — track your runs, compute and display territory, and run leaderboards, leagues, clubs, events, and challenges.</li>
     <li>Display your profile, posts, and territory to other players (see Section 3 for exactly what is visible).</li>
     <li>Send notifications you have enabled (your turf was taken, a close call, streak reminders, kudos, comments, nearby events).</li>
+    <li>Send service and account emails (welcome, security, subscription receipts, and replies to your requests) and — unless you opt out — occasional product emails such as weekly recaps, streak reminders, and re-engagement nudges. Every product email has a one-tap unsubscribe link, and you can manage email preferences at any time; service and security emails are not marketing and are sent regardless.</li>
     <li>Keep the game fair — detect cheating, review flagged runs, and enforce our <a href="/terms/">Terms</a>.</li>
     <li>Keep the Service safe — moderate reported content, action blocks and reports, and prevent abuse.</li>
     <li>Maintain, debug, and improve the Service.</li>
@@ -51,7 +57,7 @@ const updated = 'June 12, 2026';
 
   <h2>4. How we share information</h2>
   <ul>
-    <li><strong>Service providers (processors)</strong> that process data on our behalf and only on our instructions: Supabase (database, authentication, file storage, realtime infrastructure), Mapbox (map tiles and rendering — receives map viewport requests), Apple and Expo (push notification delivery), Sentry (crash diagnostics), and Cloudflare (website hosting). Each is bound by contractual data-protection terms.</li>
+    <li><strong>Service providers (processors)</strong> that process data on our behalf and only on our instructions: Supabase (database, authentication, file storage, realtime infrastructure, and email-delivery functions), Apple and Google (sign-in, when you choose them), Mapbox (map tiles and rendering — receives map viewport requests), Apple and Expo (push notification delivery), Superwall (subscription paywall and entitlement management), Apple (payment processing for subscriptions), Resend (transactional and product email delivery), Sentry (crash diagnostics), and Cloudflare (website hosting). Each is bound by contractual data-protection terms.</li>
     <li><strong>Apple Health, if you connect it:</strong> data flows only in the directions described above, on your device, under Apple's HealthKit rules.</li>
     <li><strong>Legal:</strong> if required by law, subpoena, or to protect the rights, property, or safety of Stride, our users, or the public.</li>
     <li><strong>Business transfer:</strong> if Stride is acquired or merged, your data may transfer to the successor, who must honour this Policy or notify you of changes.</li>
@@ -64,6 +70,7 @@ const updated = 'June 12, 2026';
     <li><strong>Permissions:</strong> location, notifications, photos, motion, and health access can each be revoked at any time in iOS Settings; the app keeps working with reduced features.</li>
     <li><strong>EEA/UK:</strong> you additionally have the rights of access, rectification, erasure, restriction, portability, and objection, and the right to withdraw consent at any time and to lodge a complaint with your supervisory authority.</li>
     <li><strong>California:</strong> you have the right to know, delete, correct, and to non-discrimination for exercising your rights. We do not sell or share personal information, so there is nothing to opt out of.</li>
+    <li><strong>California — sensitive personal information:</strong> precise geolocation, and any health data you connect, are "sensitive personal information" under the CPRA. We use them <strong>only</strong> to provide and secure the features you ask for (tracking your runs, computing territory, showing effort) — never to infer characteristics about you and never for advertising. Because our use is already limited to those purposes, the CPRA right to "limit the use of my sensitive personal information" does not change how we treat it; you can still revoke location or Apple Health access at any time in iOS Settings.</li>
     <li>To exercise any right, email <a href="mailto:privacy@striderunning.run">privacy@striderunning.run</a>. We respond within the time required by your local law (e.g., 30 days under GDPR, 45 days under CCPA) and will verify the request comes from the account holder.</li>
   </ul>
 

@@ -1,0 +1,109 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const faqs = [
+  {
+    q: 'How long does couch to 5K take?',
+    a: 'Most couch-to-5K plans take 8 to 9 weeks, running 3 times a week. There’s no prize for rushing — if a week feels hard, repeat it before moving on. Consistency matters far more than speed.',
+  },
+  {
+    q: 'Can a total beginner run 5K?',
+    a: 'Yes. The couch-to-5K method works because it alternates running and walking, building your endurance gradually so you’re never overwhelmed. Thousands of people who “couldn’t run for a bus” finish a 5K this way.',
+  },
+  {
+    q: 'Is couch to 5K free?',
+    a: 'The plan itself is completely free — you can follow the week-by-week structure below with nothing but a watch or phone timer. Plenty of free apps will also coach you through the intervals.',
+  },
+  {
+    q: 'How fast should I run during couch to 5K?',
+    a: 'Slowly — a conversational pace where you could talk in full sentences. Going too fast is the number-one reason beginners burn out. If you can’t talk, slow down or walk.',
+  },
+];
+
+const plan = [
+  ['1', 'Brisk 5-min walk, then alternate 60s jog / 90s walk × 8', '3 ×'],
+  ['2', '5-min walk, then 90s jog / 2-min walk × 6', '3 ×'],
+  ['3', '5-min walk, then [90s jog, 90s walk, 3-min jog, 3-min walk] × 2', '3 ×'],
+  ['4', '5-min walk, then 3-min jog, 90s walk, 5-min jog, 2.5-min walk, repeat', '3 ×'],
+  ['5', 'Building to a 20-min continuous jog by the end of the week', '3 ×'],
+  ['6', '5-min walk, then 10-min jog / short walks, building to 25 min', '3 ×'],
+  ['7', '5-min walk, then 25-min continuous jog', '3 ×'],
+  ['8', '5-min walk, then 28-min continuous jog', '3 ×'],
+  ['9', '5-min walk, then 30-min jog — that’s your 5K', '3 ×'],
+];
+---
+
+<BlogPost
+  title="Couch to 5K: A Beginner’s Guide to Running Your First 5K"
+  description="A free, beginner-friendly couch to 5K plan with a week-by-week schedule, the run-walk method, and tips to actually finish. Go from the sofa to 5K in 9 weeks."
+  path="/blog/couch-to-5k-beginners-guide"
+  published="2026-06-22"
+  tag="Beginners"
+  readTime="7 min"
+  faqs={faqs}
+  related={{ href: '/blog/how-to-stay-motivated-to-run/', label: 'How to stay motivated to run' }}
+>
+  <p>
+    Couch to 5K (often written “C25K”) is the most reliable way for a complete beginner to start running. The
+    secret is simple: instead of trying to run non-stop and burning out on day one, you <strong>alternate
+    running and walking</strong>, slowly tipping the balance toward running over about nine weeks. By the end,
+    a 30-minute run — roughly 5 kilometres — feels achievable. Here’s exactly how to do it.
+  </p>
+
+  <h2>How couch to 5K works</h2>
+  <p>
+    You run three times a week, with a rest day between each. Every session starts with a 5-minute brisk walk
+    to warm up, then alternates jogging and walking intervals that get longer (running) and shorter (walking)
+    as the weeks go on. Go at a <strong>conversational pace</strong> — slow enough to talk in full sentences.
+    Going too fast is the single biggest reason beginners quit.
+  </p>
+
+  <h2>The 9-week plan</h2>
+  <p>Do each week’s session three times. If a week feels too hard, repeat it before moving on — there’s no prize for rushing.</p>
+  <div class="glass mt-6 overflow-hidden rounded-2xl">
+    <table class="w-full border-collapse text-sm">
+      <thead>
+        <tr class="border-b border-white/10 text-left">
+          <th class="px-4 py-3 font-display font-semibold text-mint">Week</th>
+          <th class="px-4 py-3 font-display font-semibold text-ink">Each session (after a 5-min warm-up walk)</th>
+          <th class="px-4 py-3 font-display font-semibold text-ink-soft">Per week</th>
+        </tr>
+      </thead>
+      <tbody>
+        {plan.map(([w, s, n], i) => (
+          <tr class={i % 2 ? 'bg-white/[0.02]' : ''}>
+            <td class="px-4 py-3 font-semibold text-mint align-top">{w}</td>
+            <td class="px-4 py-3 text-ink-soft">{s}</td>
+            <td class="px-4 py-3 text-ink-soft align-top">{n}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="text-xs text-ink-faint">
+    A general guide based on the popular run-walk method. It’s not medical advice — if you have a health
+    condition, are pregnant, or have been inactive, check with a doctor before starting.
+  </p>
+
+  <h2>5 tips that decide whether you finish</h2>
+  <ol>
+    <li><strong>Go slow.</strong> If you can’t talk, you’re going too fast. Slow down or walk — it’s not cheating.</li>
+    <li><strong>Never skip rest days.</strong> Your fitness is built while you recover, not just while you run. Rest days prevent injury.</li>
+    <li><strong>Same days, every week.</strong> Pick three fixed days and protect them. Consistency beats intensity every time.</li>
+    <li><strong>Repeat a week if you need to.</strong> The plan is a guide, not a deadline. Moving up before you’re ready is how people get hurt and quit.</li>
+    <li><strong>Get shoes that fit.</strong> You don’t need expensive gear, but a pair of proper running shoes saves your knees and shins.</li>
+  </ol>
+
+  <h2>The hard part isn’t your legs — it’s showing up</h2>
+  <p>
+    Physically, almost anyone can finish couch to 5K. The challenge is motivation across nine weeks. That’s why
+    it helps to give your runs stakes and visible progress beyond the plan — a streak, a friend doing it with
+    you, or a <a href="/blog/best-running-games/">running game</a> that makes finishing feel like winning. If
+    you want a reason to run <em>today</em>, that’s exactly what <a href="/">Stride</a> is built for: every loop
+    you run claims real territory you can see fill in on the map.
+  </p>
+  <p>
+    Print the table, lace up, and do week 1, session 1. In nine weeks you’ll be a runner — and you’ll wonder
+    why you ever thought you weren’t.
+  </p>
+</BlogPost>

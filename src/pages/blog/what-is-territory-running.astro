@@ -1,0 +1,74 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const faqs = [
+  {
+    q: 'What is territory running?',
+    a: 'Territory running is a style of running game where the area you enclose by running a loop becomes “yours” on a map. Instead of just logging distance, you claim real-world territory, and other runners can steal it back by running over it — turning your city into a live game board.',
+  },
+  {
+    q: 'How do you claim territory by running?',
+    a: 'You run a loop that returns to where it started. The real-world area inside that loop is captured and painted your colour on the map. Bigger or smarter loops claim more ground; overlapping a rival’s area takes it from them.',
+  },
+  {
+    q: 'Is territory running the same as Pokémon GO?',
+    a: 'They share location-based DNA, but the goal is different. Pokémon GO is about catching creatures at places; territory running is about controlling area through the act of running, with rivalry and leaderboards built around real fitness.',
+  },
+];
+---
+
+<BlogPost
+  title="What Is Territory Running? The Game Turning Cities Into Turf"
+  description="Territory running is the running game where the area you enclose by running a loop becomes yours — and rivals can steal it. Here’s how it works and why it’s so addictive."
+  path="/blog/what-is-territory-running"
+  published="2026-06-22"
+  tag="The game"
+  readTime="5 min"
+  faqs={faqs}
+  related={{ href: '/blog/best-running-games/', label: 'Best running games that make you run' }}
+>
+  <p>
+    <strong>Territory running</strong> is a style of running game where the ground you cover becomes ground you
+    <em>own</em>. Instead of a run being just a line on a map and a number for distance, you run a loop and the
+    real-world area inside it becomes your territory — painted your colour on a live map of your city. Rivals
+    can run over it to steal it back. Your daily run stops being a chore and becomes a move in an ongoing game.
+  </p>
+
+  <h2>How territory running works</h2>
+  <p>The rules are simple, which is exactly why it’s addictive:</p>
+  <ul>
+    <li><strong>Run a loop</strong> that returns to where it started. The area enclosed is captured and becomes yours.</li>
+    <li><strong>Claim more by running more</strong> — bigger and smarter loops take more ground.</li>
+    <li><strong>Steal a rival’s turf</strong> by running a loop that overlaps theirs; the overlap flips to your colour.</li>
+    <li><strong>Defend what’s yours</strong> — if you stop running, others will come and take it.</li>
+  </ul>
+  <p>
+    The map becomes a living scoreboard. You can see your empire grow, watch a rival creep into your
+    neighbourhood, and feel the very real urge to go reclaim a street before they lock it down.
+  </p>
+
+  <h2>Why it works when plain tracking doesn’t</h2>
+  <p>
+    Ordinary run trackers give weak feedback: a number that ticks up. Territory running adds the three things
+    behavioural science says actually build a habit — a clear goal, visible progress, and something at stake.
+    The combination is powerful. Losing turf you earned hurts (loss aversion), seeing your colour spread feels
+    great (visible progress), and there’s always a reason to run <em>today</em> rather than someday (stakes).
+  </p>
+
+  <h2>Territory running vs other running games</h2>
+  <p>
+    Story-driven apps like Zombies, Run! immerse you in a narrative. Virtual-challenge apps like The Conqueror
+    move you along a famous route. Territory running is different: it’s <strong>competitive and spatial</strong>
+    — your real neighbourhood is the board, and other real runners are your opponents. It’s the closest thing
+    to a multiplayer video game played with your legs on actual streets.
+  </p>
+
+  <h2>How to start</h2>
+  <p>
+    You don’t need to be fast. A 10-minute loop around your block claims your first territory; from there it’s
+    about consistency and clever routes. <a href="/">Stride</a> is a territory running game launching soon on
+    iOS — a GPS run tracker where every loop you run claims real area on a live 3D map of your city, rivals
+    steal it back, and weekly leagues keep score. Pick <a href="/run/">your city</a> and you can be the first
+    to claim it.
+  </p>
+</BlogPost>

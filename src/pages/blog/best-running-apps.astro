@@ -1,0 +1,84 @@
+---
+import BlogPost from '../../layouts/BlogPost.astro';
+
+const faqs = [
+  {
+    q: 'What is the best running app in 2026?',
+    a: 'For pure tracking, Strava and Nike Run Club lead. For structured training, Runna is excellent. For motivation — the thing most runners actually lack — a game-based app like Stride works best, because it gives every run a goal and something at stake.',
+  },
+  {
+    q: 'What is the best free running app?',
+    a: 'Nike Run Club is fully free and well-coached. Strava has a capable free tier. Stride is free to play, with the whole territory game — tracking, leaderboards and clubs — available without paying.',
+  },
+  {
+    q: 'Which running app is best for beginners?',
+    a: 'Beginners do best with a couch-to-5K app or a coach like Nike Run Club, paired with something that keeps them coming back. The hardest part for beginners isn’t the running — it’s the motivation to keep going, which is where a game helps most.',
+  },
+];
+---
+
+<BlogPost
+  title="Best Running Apps in 2026 (Free & Paid, Honestly Reviewed)"
+  description="The best running apps in 2026 — for tracking, training, and actually staying motivated. Honest picks including Strava, Nike Run Club, Runna, and the game-based newcomer Stride."
+  path="/blog/best-running-apps"
+  published="2026-06-22"
+  tag="Apps"
+  readTime="8 min"
+  faqs={faqs}
+  related={{ href: '/blog/best-running-games/', label: 'Best running games that make you run' }}
+>
+  <p>
+    There are hundreds of running apps. Most do the same thing — record a GPS line and show you a pace. The
+    real question isn’t “which app tracks best” (they’re all fine) but “which app gets me out the door.” Here
+    are the best running apps in 2026, grouped by what you actually need.
+  </p>
+
+  <h2>Best for tracking: Strava</h2>
+  <p>
+    Still the default. Strava nails the social feed, segments and KOM/QOM crowns, and works with every watch.
+    The free tier is usable; the subscription unlocks deeper analysis. If competition through course records
+    motivates you, it’s hard to beat — though if that loop has gone stale, it’s exactly the gap a
+    <a href="/strava-alternative/">territory-based alternative</a> fills.
+  </p>
+
+  <h2>Best free coach: Nike Run Club</h2>
+  <p>
+    Completely free, with guided runs, audio coaching and beginner plans. If you want a friendly voice in your
+    ear and structure without a subscription, NRC is the easiest place to start.
+  </p>
+
+  <h2>Best for structured training: Runna</h2>
+  <p>
+    The standout for runners with a goal race. Runna builds adaptive, personalised plans for a 5K, 10K, half
+    or full marathon, and adjusts as you go. It’s a paid app, but for focused training it’s worth it.
+  </p>
+
+  <h2>Best for steps & walking: Pacer / StepsApp</h2>
+  <p>
+    If your goal is daily movement more than performance, a clean pedometer like Pacer or StepsApp does the job
+    without overwhelming you with metrics.
+  </p>
+
+  <h2>Best for motivation: Stride</h2>
+  <p>
+    Here’s the honest truth most app round-ups skip: the reason people stop running isn’t bad tracking — it’s
+    lost motivation. That’s the problem <a href="/">Stride</a> is built to solve. It’s a full GPS run tracker
+    (pace, splits, route, map, heart rate) where every loop you run <strong>claims the real area you
+    enclose</strong> on a live map of your city. Rivals steal it back, weekly leagues keep score, and clubs go
+    to war. It turns the daily “should I run?” into “someone’s about to take my turf.” Launching soon on iOS —
+    <a href="/">join the waitlist</a>.
+  </p>
+
+  <h2>How to choose</h2>
+  <ul>
+    <li><strong>You just want to log runs and chase records:</strong> Strava.</li>
+    <li><strong>You want free coaching:</strong> Nike Run Club.</li>
+    <li><strong>You’re training for a race:</strong> Runna.</li>
+    <li><strong>You want steps, not performance:</strong> Pacer or StepsApp.</li>
+    <li><strong>You struggle to stay motivated:</strong> a game like Stride.</li>
+  </ul>
+  <p>
+    The best running app is the one you’ll still open in week six. For most people who quit, that means picking
+    the one that makes running feel less like a task and more like a game worth playing.
+  </p>
+</BlogPost>

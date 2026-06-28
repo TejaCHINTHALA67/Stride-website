@@ -26,6 +26,7 @@ const entries: Entry[] = [
   ...blogPosts.map((slug) => ({ path: `/blog/${slug}/`, changefreq: 'monthly', priority: '0.8' })),
   { path: '/privacy/', changefreq: 'monthly', priority: '0.4' },
   { path: '/terms/', changefreq: 'monthly', priority: '0.4' },
+  { path: '/delete-account/', changefreq: 'monthly', priority: '0.3' },
   { path: '/disclaimer/', changefreq: 'monthly', priority: '0.4' },
 ];
 

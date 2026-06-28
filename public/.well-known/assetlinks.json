@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.teja.stride",
+      "sha256_cert_fingerprints": [
+        "6D:A0:07:05:DE:E7:16:11:85:0C:25:AC:AB:BA:34:CD:C9:BA:07:63:92:AF:95:18:0B:E8:09:59:3C:5C:77:6C"
+      ]
+    }
+  }
+]

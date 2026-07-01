@@ -2,7 +2,7 @@
 <!--
   Stride link fallback page — served for /e/* /c/* /u/* /r/* via _redirects.
   iPhones WITH the app never see this (universal links open the app directly).
-  Everyone else: we try the stride:// scheme once, then show the waitlist CTA.
+  Everyone else: we try the stride:// scheme once, then show the App Store CTA.
 -->
 <html lang="en">
 <head>
@@ -27,7 +27,7 @@
 <div class="card">
   <h1><span>STRIDE</span></h1>
   <p id="msg">Opening in the Stride app…</p>
-  <a class="btn" id="cta" href="/">Join the waitlist</a>
+  <a class="btn" id="cta" href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395">Download on the App Store</a>
   <p class="small">Run. Claim. Own your city.</p>
 </div>
 <script>
@@ -42,7 +42,7 @@
     location.href = 'stride:///' + path;
   }
   if (/iPhone|iPad|Android/i.test(navigator.userAgent)) setTimeout(tryApp, 350);
-  // TODO when the App Store listing is live: point the CTA at the store URL.
+  // If the app doesn't handle the scheme, the CTA above sends users to the live App Store listing.
 </script>
 </body>
 </html>

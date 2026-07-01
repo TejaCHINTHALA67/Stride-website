@@ -4,7 +4,7 @@ import { cities } from '../../data/cities';
 
 const title = 'Run & Own Your City — Pick Yours | Stride';
 const description =
-  'Stride turns running into a territory game in your city. Pick your city to see the best places to run and claim your streets first. Free for iOS — join the waitlist.';
+  'Stride turns running into a territory game in your city. Pick your city to see the best places to run and claim your streets first. Free for iPhone — download now on the App Store.';
 
 // group cities by country for a tidy directory
 const byCountry = cities.reduce((acc, c) => {
@@ -40,7 +40,7 @@ const countries = Object.keys(byCountry).sort();
       </div>
     ))}
     <p class="mt-12 text-center text-sm text-ink-faint">
-      Don’t see your city? It’s still unclaimed — <a href="/#waitlist" class="text-mint hover:underline">join the waitlist</a> and play anywhere.
+      Don’t see your city? It’s still unclaimed — <a href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395" target="_blank" rel="noopener" class="text-mint hover:underline">download Stride</a> and play anywhere.
     </p>
   </section>
 </Layout>

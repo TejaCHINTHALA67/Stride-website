@@ -5,13 +5,13 @@ Includes the app deeplink plumbing: `public/.well-known/apple-app-site-associati
 (Team ID KD2JWLL2YZ), `public/go.html` app-open fallback, `public/_redirects`
 (/e /c /u /r → go.html), `public/_headers` (AASA JSON content-type + security).
 
-## Live waitlist counter
-Displays **2,678 + real signups** (baseline in `src/components/Waitlist.astro`
-→ `BASELINE`). The real count comes from the `waitlist_count()` RPC —
-**run `supabase/waitlist.sql` once in the app's Supabase SQL editor**
-(idempotent; also creates the table/policies if missing). Until the RPC exists
-the counter just shows the baseline. Successful signups tick the counter +1
-with a pulse and tell the user their spot number.
+## Primary CTA — App Store download
+Stride is LIVE on the App Store. The primary call-to-action across the whole
+site is the **"Download on the App Store"** badge in `src/components/AppStore.astro`,
+linking to the live listing:
+`https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395`.
+(The old pre-launch waitlist form + Supabase `waitlist_count()` counter has been
+removed now that the app is downloadable.)
 
 ## Deploy — option A: direct (fastest, works today)
 ```powershell

@@ -12,7 +12,7 @@ export interface Props {
 }
 const {
   title = 'Stride — Run & Own Your City | Territory Running Game',
-  description = 'Stride turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Free territory running game for iOS — join the waitlist.',
+  description = 'Stride turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Free territory running game — download now on the App Store for iPhone.',
   path = '/',
   noindex = false,
 } = Astro.props;
@@ -59,7 +59,8 @@ const jsonLd = {
       genre: 'Fitness Game',
       keywords,
       url: site,
-      installUrl: site,
+      installUrl: 'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395',
+      downloadUrl: 'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395',
       description,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },

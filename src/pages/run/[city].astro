@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import Waitlist from '../../components/Waitlist.astro';
+import AppStore from '../../components/AppStore.astro';
 import { cities } from '../../data/cities';
 
 export function getStaticPaths() {
@@ -9,12 +9,12 @@ export function getStaticPaths() {
 
 const { city } = Astro.props;
 const title = `Run & Own ${city.name} — Running Game | Stride`;
-const description = `Turn your runs in ${city.name} into a game. Claim the real area you enclose, steal rivals’ turf, and own your streets on a live map. Free GPS run tracker for iOS — join the waitlist.`;
+const description = `Turn your runs in ${city.name} into a game. Claim the real area you enclose, steal rivals’ turf, and own your streets on a live map. Free GPS run tracker — download now on the App Store for iPhone.`;
 
 const faqs = [
   {
     q: `Is there a running game for ${city.name}?`,
-    a: `Yes — Stride is a GPS running game that works anywhere, including all of ${city.name}. Every loop you run claims the real area you enclose on a live map of the city, and other runners can steal it back. It launches soon on iOS; join the waitlist to play in ${city.name} first.`,
+    a: `Yes — Stride is a GPS running game that works anywhere, including all of ${city.name}. Every loop you run claims the real area you enclose on a live map of the city, and other runners can steal it back. It’s live now on iPhone — download Stride from the App Store to play in ${city.name}.`,
   },
   {
     q: `Where are the best places to run in ${city.name}?`,
@@ -49,7 +49,7 @@ const faqLd = {
       enclose on a live map — and rivals try to steal it back. <strong class="text-ink">The streets are
       unclaimed. For now.</strong>
     </p>
-    <div class="mt-9"><Waitlist compact={false} /></div>
+    <div class="mt-9 flex justify-center [&_.as-cta]:items-center [&_.as-social]:justify-center"><AppStore compact={false} /></div>
   </section>
 
   <!-- Best places to run -->
@@ -105,10 +105,10 @@ const faqLd = {
     <div class="glass glass-mint rounded-3xl px-6 py-12">
       <h2 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">Claim {city.name} first.</h2>
       <p class="mx-auto mt-3 max-w-xl text-ink-soft">
-        Stride launches soon on iOS. Join the waitlist and you’ll get the download link on launch day — the
-        first runners in {city.name} take their neighbourhoods before anyone else shows up.
+        Stride is live on iPhone. Download it free from the App Store — the first runners in {city.name}
+        take their neighbourhoods before anyone else shows up.
       </p>
-      <div class="mt-8"><Waitlist compact={false} /></div>
+      <div class="mt-8 flex justify-center [&_.as-cta]:items-center [&_.as-social]:justify-center"><AppStore compact={false} /></div>
       <p class="mt-6 text-sm text-ink-faint">
         New to running? <a href="/blog/couch-to-5k-beginners-guide/" class="text-mint hover:underline">Start with our couch-to-5K guide →</a>
       </p>

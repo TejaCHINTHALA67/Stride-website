@@ -28,11 +28,12 @@
 - Free to play. No pay-to-win territory.
 
 ## Availability
-- iOS first (in active development, onboarding a waitlist). Android planned later.
-- Join the waitlist at https://striderunning.run
+- iOS first: Stride is live now on the Apple App Store for iPhone. Android planned later.
+- Download on the App Store: https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395
 
 ## Pages
-- Home / waitlist: https://striderunning.run
+- Home: https://striderunning.run
+- Download on the App Store: https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395
 - Privacy Policy: https://striderunning.run/privacy
 - Terms of Service: https://striderunning.run/terms
 - Safety Disclaimer: https://striderunning.run/disclaimer

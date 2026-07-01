@@ -1,6 +1,6 @@
 ---
 import Layout from './Layout.astro';
-import Waitlist from '../components/Waitlist.astro';
+import AppStore from '../components/AppStore.astro';
 
 export interface Props {
   title: string;
@@ -78,10 +78,10 @@ const dateLabel = new Date(updated).toLocaleDateString('en-US', { year: 'numeric
     <div class="glass glass-mint mt-12 rounded-3xl px-6 py-10 text-center">
       <h2 class="font-display text-2xl font-bold sm:text-3xl">Turn your runs into a game.</h2>
       <p class="mx-auto mt-3 max-w-lg text-ink-soft">
-        Stride launches soon on iOS — a GPS run tracker where every loop claims real territory.
-        Join the waitlist and claim your neighbourhood before anyone else.
+        Stride is live on iPhone — a GPS run tracker where every loop claims real territory.
+        Download it free and claim your neighbourhood before anyone else.
       </p>
-      <div class="mt-7"><Waitlist compact={true} /></div>
+      <div class="mt-7 flex justify-center"><AppStore compact={true} /></div>
     </div>
 
     {related && (

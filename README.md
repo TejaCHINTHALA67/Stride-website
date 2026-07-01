@@ -1,4 +1,4 @@
-# Stride — marketing & waitlist site (striderunning.run)
+# Stride — marketing & waitlist site (striderunning.run).
 
 A fast, SEO- and AI-optimized landing site for **Stride — Run & Own Your City**.
 Built with **Astro + Tailwind**, static output, deployed on **Cloudflare Pages**.

@@ -7,7 +7,7 @@ code (`apps/mobile`)..
 
 ---
 
-## 1. Local development
+## 1. Local development,
 ```bash
 cd website
 npm install

@@ -3,7 +3,7 @@
 A fast, SEO- and AI-optimized landing site for **Stride — Run & Own Your City**.
 Built with **Astro + Tailwind**, static output, deployed on **Cloudflare Pages**.
 The primary CTA links to the live **App Store** listing. Separate from the app
-code (`apps/mobile`).
+code (`apps/mobile`)..
 
 ---
 

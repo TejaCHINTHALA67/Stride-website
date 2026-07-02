@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AppStore from '../components/AppStore.astro';
+import Showcase from '../components/Showcase.astro';
 
 const steps = [
   { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself — your block, a park, your neighbourhood.', c: '#06D6A0' },
@@ -169,6 +170,9 @@ const faqJsonLd = {
       ))}
     </div>
   </section>
+
+  <!-- SEE IT IN ACTION — real app screenshots -->
+  <Showcase />
 
   <!-- THE GAME (bento) -->
   <section id="game" class="relative mx-auto max-w-6xl px-5 pt-28">

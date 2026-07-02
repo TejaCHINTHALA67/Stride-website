@@ -1,8 +1,8 @@
-# Stride — marketing & waitlist site (striderunning.run)
+# Stride — marketing & App Store landing site (striderunning.run).
 
 A fast, SEO- and AI-optimized landing site for **Stride — Run & Own Your City**.
 Built with **Astro + Tailwind**, static output, deployed on **Cloudflare Pages**.
-Waitlist emails go to your existing **Supabase** project. Separate from the app
+The primary CTA links to the live **App Store** listing. Separate from the app
 code (`apps/mobile`).
 
 ---

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex" />
+  <title>Returning to Stride…</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: #0B0F0D; color: #E8FFF4;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      padding: 24px;
+    }
+    .card { max-width: 340px; }
+    .dot {
+      width: 54px; height: 54px; margin: 0 auto 20px; border-radius: 16px;
+      background: #16E08B; box-shadow: 0 8px 30px rgba(22,224,139,.4);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 26px; color: #04120B;
+    }
+    h1 { font-size: 19px; margin: 0 0 8px; font-weight: 700; }
+    p { font-size: 14px; line-height: 1.5; color: #9FB4A9; margin: 0 0 22px; }
+    a.btn {
+      display: inline-block; text-decoration: none; font-weight: 700; font-size: 15px;
+      color: #04120B; background: #16E08B; padding: 13px 26px; border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="dot">S</div>
+    <h1>Connecting Strava…</h1>
+    <p>Taking you back to Stride. If nothing happens, tap the button below.</p>
+    <a class="btn" id="return" href="#">Return to Stride</a>
+  </div>
+  <script>
+    // Forward the OAuth result (code/state/scope/error) to the app via its
+    // custom scheme so the in-app auth session captures it.
+    (function () {
+      var target = 'stride://strava-callback' + (window.location.search || '');
+      document.getElementById('return').setAttribute('href', target);
+      // Auto-forward immediately.
+      window.location.replace(target);
+    })();
+  </script>
+</body>
+</html>

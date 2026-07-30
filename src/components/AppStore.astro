@@ -1,12 +1,13 @@
 ---
-// "Download on the App Store" CTA — replaces the old waitlist form now that
-// Stride is LIVE in the App Store. Faithful black Apple badge (Apple logo +
-// "Download on the App Store") linking to the live listing, plus optional
-// social-proof row. Drop-in replacement for the old <Waitlist /> (same props).
+// Store CTAs — Stride is LIVE on BOTH stores (Android approved 2026-07-30).
+// Faithful black badges, Apple first (it is the older, larger platform), Google
+// Play beside it. Drop-in replacement for the old <Waitlist /> (same props).
 const APP_STORE_URL = 'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.teja.stride';
 const { compact = false } = Astro.props;
 ---
 <div class="as-cta inline-flex flex-col items-start gap-4">
+  <div class="flex flex-wrap items-center gap-3">
   <a
     href={APP_STORE_URL}
     target="_blank"
@@ -23,6 +24,27 @@ const { compact = false } = Astro.props;
       <span class="mt-0.5 font-display text-xl font-semibold tracking-tight">App Store</span>
     </span>
   </a>
+
+  <a
+    href={PLAY_STORE_URL}
+    target="_blank"
+    rel="noopener"
+    aria-label="Get Stride on Google Play"
+    class="as-badge group inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-black px-5 py-3.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-mint/70"
+  >
+    <!-- Google Play mark — the four-colour triangle -->
+    <svg viewBox="0 0 24 24" class="h-8 w-8 shrink-0" aria-hidden="true">
+      <path d="M3.6 2.4a1.2 1.2 0 0 0-.6 1.05v17.1a1.2 1.2 0 0 0 .6 1.05l9.05-9.6L3.6 2.4z" fill="#00D2FF" />
+      <path d="M17.1 8.55 13.7 6.6 3.6 2.4c-.06-.03-.12-.05-.18-.07l9.23 9.67 4.45-3.45z" fill="#00E676" />
+      <path d="m17.1 15.45-4.45-3.45 4.45-3.45 3.35 1.93c.86.5.86 1.54 0 2.04l-3.35 1.93z" fill="#FFCE00" />
+      <path d="M3.42 21.67c.06-.02.12-.04.18-.07l10.1-4.2 3.4-1.95-4.45-3.45-9.23 9.67z" fill="#FF3A44" />
+    </svg>
+    <span class="flex flex-col leading-none text-white">
+      <span class="text-[11px] font-medium tracking-wide text-white/80">GET IT ON</span>
+      <span class="mt-0.5 font-display text-xl font-semibold tracking-tight">Google Play</span>
+    </span>
+  </a>
+  </div>
 
   {!compact && (
     <div class="as-social flex items-center gap-3">
@@ -42,7 +64,7 @@ const { compact = false } = Astro.props;
       </div>
       <p class="text-sm text-ink-soft">
         <span class="font-display font-semibold text-mint">Live now</span>
-        <span> · Free on iPhone</span>
+        <span> · Free on iPhone &amp; Android</span>
         <span class="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-mint align-middle animate-pulse-glow" aria-hidden="true"></span>
       </p>
     </div>

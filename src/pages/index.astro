@@ -70,7 +70,7 @@ const faqJsonLd = {
   <section class="relative overflow-hidden pt-28 sm:pt-36">
     <div class="aurora pointer-events-none absolute inset-0" aria-hidden="true"></div>
     <div class="dot-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"></div>
-    <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[1.05fr_0.95fr]">
+    <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5">
       <div>
         <div class="reveal flex items-center gap-2 text-sm font-medium text-mint">
           <span class="h-2 w-2 rounded-full bg-mint animate-pulse-glow"></span>
@@ -94,60 +94,6 @@ const faqJsonLd = {
         </div>
       </div>
 
-      <!-- the war map, framed in a phone -->
-      <div class="reveal relative mx-auto w-full max-w-[340px]" style="animation-delay:.1s">
-        <div class="phone ring-grad relative aspect-[9/19] w-full rounded-[2.6rem] glass p-2.5">
-          <div class="relative h-full w-full overflow-hidden rounded-[2.1rem] bg-canvas">
-            <!-- notch -->
-            <div class="absolute left-1/2 top-2 z-20 h-5 w-24 -translate-x-1/2 rounded-full bg-black/80"></div>
-            <div class="dot-grid absolute inset-0 opacity-40"></div>
-            <svg viewBox="0 0 300 600" class="relative h-full w-full" role="img" aria-label="The Stride map: a runner draws a loop, the territory floods in, a rival's turf gets stolen">
-              <!-- streets -->
-              <g stroke="rgba(255,255,255,0.07)" stroke-width="1.5">
-                <path d="M0 120 H300 M0 220 H300 M0 320 H300 M0 420 H300 M0 520 H300 M60 60 V600 M150 60 V600 M240 60 V600" />
-              </g>
-              <!-- rival turf (gets bitten) -->
-              <polygon points="160,300 268,288 282,420 196,440" fill="#FF6B35" opacity="0.22" />
-              <polygon points="160,300 268,288 282,420 196,440" fill="none" stroke="#FF6B35" stroke-width="2" opacity="0.6" />
-              <!-- your territory -->
-              <polygon class="claim-fill" points="48,170 210,150 246,330 196,440 60,392" fill="#06D6A0" />
-              <polygon class="claim-line" points="48,170 210,150 246,330 196,440 60,392"
-                fill="none" stroke="#06D6A0" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" pathLength="100" />
-              <!-- the runner -->
-              <circle r="6.5" fill="#06D6A0" class="runner">
-                <animateMotion dur="4.2s" repeatCount="indefinite" rotate="auto"
-                  path="M48,170 L210,150 L246,330 L196,440 L60,392 Z" />
-              </circle>
-              <!-- planted flag -->
-              <g class="flag" transform="translate(210,150)">
-                <rect x="-1" y="-36" width="2.5" height="36" fill="#cbd5e1" />
-                <path d="M1,-36 h24 l-7,8 l7,8 h-24 z" fill="#06D6A0" />
-              </g>
-            </svg>
-            <!-- HUD: live territory chip -->
-            <div class="absolute bottom-16 left-4 right-4 flex items-center justify-between rounded-xl glass glass-mint px-4 py-3">
-              <div>
-                <div class="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Territory claimed</div>
-                <div class="font-display text-xl font-semibold text-mint claim-count" data-target="48250">0 m²</div>
-              </div>
-              <div class="grid h-9 w-9 place-items-center rounded-lg bg-mint/15 ring-1 ring-mint/40">
-                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2z" stroke="#06D6A0" stroke-width="1.6" stroke-linejoin="round"/></svg>
-              </div>
-            </div>
-            <!-- HUD: steal toast (slides in mid-loop) -->
-            <div class="steal-toast absolute left-4 right-4 top-12 flex items-center gap-2.5 rounded-xl border border-flame/40 bg-canvas/85 px-3.5 py-2.5 backdrop-blur">
-              <span class="grid h-7 w-7 place-items-center rounded-lg bg-flame/15">
-                <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none"><path d="M4 20L20 4M6 4l4 4M14 16l4 4" stroke="#FF6B35" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </span>
-              <div class="min-w-0">
-                <div class="truncate text-xs font-semibold text-ink">Stolen from @rival_km</div>
-                <div class="font-mono text-[10px] text-flame">+1,260 m² captured</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="pointer-events-none absolute -inset-8 -z-10 animate-pulse-glow rounded-full bg-mint/10 blur-3xl"></div>
-      </div>
     </div>
   </section>
 
@@ -284,48 +230,9 @@ const faqJsonLd = {
       0% { transform: translate3d(0,0,0) scale(1); }
       100% { transform: translate3d(0,-3%,0) scale(1.08); }
     }
-    .phone { box-shadow: 0 30px 80px -30px rgba(0,0,0,0.8), 0 0 60px -20px rgba(6,214,160,0.25); }
-    /* draw the loop, then flood the territory, on a loop */
-    .claim-line { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 4.2s ease-in-out infinite; filter: drop-shadow(0 0 6px #06D6A0); }
-    .claim-fill { opacity: 0; animation: flood 4.2s ease-in-out infinite; }
-    .runner { filter: drop-shadow(0 0 8px #06D6A0); }
-    .flag { opacity: 0; transform-box: fill-box; transform-origin: bottom; animation: plant 4.2s ease-in-out infinite; }
-    .steal-toast { opacity: 0; transform: translateY(-12px); animation: toast 4.2s ease-in-out infinite; }
-    @keyframes draw { 0% { stroke-dashoffset: 100; } 55% { stroke-dashoffset: 0; } 92% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0.25; } }
-    @keyframes flood { 0%, 50% { opacity: 0; } 70%, 92% { opacity: 0.28; } 100% { opacity: 0.12; } }
-    @keyframes plant { 0%, 55% { opacity: 0; transform: scaleY(0); } 64% { opacity: 1; transform: scaleY(1.1); } 70%, 100% { opacity: 1; transform: scaleY(1); } }
-    @keyframes toast { 0%, 60% { opacity: 0; transform: translateY(-12px); } 70%, 90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-6px); } }
     @media (prefers-reduced-motion: reduce) {
       .aurora { animation: none; }
-      .claim-line { stroke-dashoffset: 0; animation: none; }
-      .claim-fill { opacity: 0.24; animation: none; }
-      .flag { opacity: 1; transform: none; animation: none; }
-      .steal-toast { opacity: 1; transform: none; animation: none; }
-      .runner { display: none; }
     }
   </style>
 
-  <!-- count-up for the claimed-area chip -->
-  <script is:inline>
-    (() => {
-      const el = document.querySelector('.claim-count');
-      if (!el) return;
-      const target = +el.dataset.target;
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = target.toLocaleString() + ' m²'; return; }
-      let started = false;
-      const run = () => {
-        if (started) return; started = true;
-        const t0 = performance.now();
-        const tick = (t) => {
-          const p = Math.min(1, (t - t0) / 1400);
-          const e = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(target * e).toLocaleString() + ' m²';
-          if (p < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      };
-      const io = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && run()), { threshold: 0.4 });
-      io.observe(el);
-    })();
-  </script>
 </Layout>

@@ -147,6 +147,24 @@ const included = [
 </Layout>
 
 <!--
+  ⚠️ REHYDRATE THE ACCOUNT ID BEFORE ANYTHING READS IT. `remember()` sets
+  `window.__terrarunUserId`, but a window global does not survive a navigation —
+  and this page is reached BY navigation, from /signup. Without this, somebody
+  who already has an account clicks "Get Pro", is found to have no id, and is
+  sent to /signup; /signup's non-Paddle fallback sends them back here; and the
+  two pages bounce the same person between them forever.
+
+  This is a plain module script, not `is:inline`, so it can import from the same
+  module that wrote the value — the alternative is hardcoding the sessionStorage
+  key in two files and waiting for one of them to drift.
+-->
+<script>
+  import { recall } from '../lib/account';
+  const acc = recall();
+  if (acc) (window as any).__terrarunUserId = acc.userId;
+</script>
+
+<!--
   ⚠️ PADDLE.JS IS ONLY LOADED WHEN IT IS CONFIGURED. Injecting a third-party
   script tag on every visit to satisfy a checkout that cannot run yet costs every
   visitor a request and a cookie banner conversation for nothing.
@@ -214,6 +232,21 @@ const included = [
             });
           });
         });
+
+        // ⚠️ THEY ALREADY CHOSE. /signup sends people back here with ?plan= when
+        // it could not open the checkout itself (Paddle blocked, slow, or an ad
+        // blocker). Making somebody who has signed up *in order to pay* pick the
+        // same plan a second time is a step that only loses people, so if the
+        // account is known the checkout opens on arrival.
+        var wanted = new URLSearchParams(location.search).get('plan');
+        var known = window.__terrarunUserId || null;
+        if (wanted && known && (wanted === PRICE_MONTHLY || wanted === PRICE_YEARLY)) {
+          window.Paddle.Checkout.open({
+            items: [{ priceId: wanted, quantity: 1 }],
+            customData: { app_user_id: known },
+            settings: { displayMode: 'overlay', theme: 'light', successUrl: 'https://striderunning.run/welcome/' },
+          });
+        }
       };
       document.head.appendChild(s);
     })();

@@ -24,7 +24,10 @@ const entries: Entry[] = [
   ...cities.map((c) => ({ path: `/run/${c.slug}/`, changefreq: 'monthly', priority: '0.7' })),
   { path: '/blog/', changefreq: 'weekly', priority: '0.7' },
   ...blogPosts.map((slug) => ({ path: `/blog/${slug}/`, changefreq: 'monthly', priority: '0.8' })),
+  // The page Pro is actually sold on — high priority, it is a money page.
+  { path: '/pricing/', changefreq: 'weekly', priority: '0.9' },
   { path: '/privacy/', changefreq: 'monthly', priority: '0.4' },
+  { path: '/refunds/', changefreq: 'monthly', priority: '0.4' },
   { path: '/terms/', changefreq: 'monthly', priority: '0.4' },
   { path: '/delete-account/', changefreq: 'monthly', priority: '0.3' },
   { path: '/disclaimer/', changefreq: 'monthly', priority: '0.4' },

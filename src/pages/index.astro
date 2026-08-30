@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import AppStore from '../components/AppStore.astro';
 import Showcase from '../components/Showcase.astro';
+import WorldGlobe from '../components/WorldGlobe.astro';
 
 const steps = [
   { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself — your block, a park, your neighbourhood.', c: '#06D6A0' },
@@ -41,16 +42,16 @@ const plays = [
 ];
 
 const faqs = [
-  { q: 'What is Stride?', a: 'Stride is a competitive territory-running game for iOS. You run a loop outdoors and the real-world area your route encloses becomes your territory on a shared, live 3D map — you can steal rivals’ territory, defend your own, and climb weekly leagues.' },
-  { q: 'Is Stride available now?', a: 'Yes — Stride is live on the App Store for iPhone and on Google Play for Android. Download it free, pick your colour, and claim your first block today.' },
+  { q: 'What is Terrarun?', a: 'Terrarun is a competitive territory-running game for iOS. You run a loop outdoors and the real-world area your route encloses becomes your territory on a shared, live 3D map — you can steal rivals’ territory, defend your own, and climb weekly leagues.' },
+  { q: 'Is Terrarun available now?', a: 'Yes — Terrarun is live on the App Store for iPhone and on Google Play for Android. Download it free, pick your colour, and claim your first block today.' },
   { q: 'How do you actually “own” territory?', a: 'When your GPS route closes into a loop, the area it encloses is captured as a polygon and becomes yours on the shared map. Other runners can take it by enclosing it themselves, and you can take theirs.' },
-  { q: 'Is it free?', a: 'Yes. Stride is free to play. A future optional membership may add cosmetic and convenience perks — never pay-to-win territory.' },
+  { q: 'Is it free?', a: 'Yes. Terrarun is free to play. A future optional membership may add cosmetic and convenience perks — never pay-to-win territory.' },
   { q: 'What stops cheaters in cars?', a: 'Every run goes through anti-cheat: physics checks on speed, GPS quality and movement patterns, plus a second-pass automatic review. Vehicle-speed runs are saved as workouts only — no territory, no XP.' },
-  { q: 'Do I need to share my location?', a: 'Stride needs GPS while you run to track your route, like any running app. You control privacy settings, and you can run in explore mode without claiming. See our Privacy Policy.' },
-  { q: 'Is there an Android version?', a: 'Yes. Stride is live on Google Play for Android, and on the App Store for iPhone. Both are free to download.' },
-  { q: 'What makes Stride different from other running apps?', a: 'Most running apps just log a run and hand you stats. Stride turns running into a competitive game: the real area you enclose on a loop becomes territory you own on a shared live map, you steal and defend turf against real rivals, and you climb tiers and weekly leagues. It’s a run tracker with a scoreboard — built for people who want a reason to lace up, not just another step counter.' },
-  { q: 'Is Stride a good alternative to Strava?', a: 'If you love the social, competitive side of running but find leaderboards and segments stale, Stride is built for you. You still get GPS tracking, splits, pace, distance and a full run history like any serious running app — plus a live territory war, flags, leagues and steal/defend mechanics that give every run real stakes. Many runners use Stride alongside their existing tracker.' },
-  { q: 'Is Stride a real GPS run tracker?', a: 'Yes. Stride records your route with GPS, shows pace, distance, splits and elevation, keeps a full run history, and (on supported devices) reads heart rate and calories from Apple Health. The territory game is layered on top of a proper, accurate run tracker.' },
+  { q: 'Do I need to share my location?', a: 'Terrarun needs GPS while you run to track your route, like any running app. You control privacy settings, and you can run in explore mode without claiming. See our Privacy Policy.' },
+  { q: 'Is there an Android version?', a: 'Yes. Terrarun is live on Google Play for Android, and on the App Store for iPhone. Both are free to download.' },
+  { q: 'What makes Terrarun different from other running apps?', a: 'Most running apps just log a run and hand you stats. Terrarun turns running into a competitive game: the real area you enclose on a loop becomes territory you own on a shared live map, you steal and defend turf against real rivals, and you climb tiers and weekly leagues. It’s a run tracker with a scoreboard — built for people who want a reason to lace up, not just another step counter.' },
+  { q: 'Is Terrarun a good alternative to Strava?', a: 'If you love the social, competitive side of running but find leaderboards and segments stale, Terrarun is built for you. You still get GPS tracking, splits, pace, distance and a full run history like any serious running app — plus a live territory war, flags, leagues and steal/defend mechanics that give every run real stakes. Many runners use Terrarun alongside their existing tracker.' },
+  { q: 'Is Terrarun a real GPS run tracker?', a: 'Yes. Terrarun records your route with GPS, shows pace, distance, splits and elevation, keeps a full run history, and (on supported devices) reads heart rate and calories from Apple Health. The territory game is layered on top of a proper, accurate run tracker.' },
 ];
 
 const faqJsonLd = {
@@ -72,7 +73,7 @@ const faqJsonLd = {
     <div class="dot-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"></div>
     <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[1.05fr_0.95fr]">
       <div>
-        <div class="reveal flex items-center gap-2 text-sm font-medium text-mint">
+        <div class="reveal flex items-center gap-2 text-sm font-medium text-band-mid">
           <span class="h-2 w-2 rounded-full bg-mint animate-pulse-glow"></span>
           <span class="uppercase tracking-[0.18em] text-xs">Live on the App Store &amp; Google Play</span>
         </div>
@@ -80,73 +81,43 @@ const faqJsonLd = {
           Run a loop.<br /><span class="text-gradient">Own the block.</span>
         </h1>
         <p class="reveal mt-6 max-w-md text-lg leading-relaxed text-ink-soft" style="animation-delay:.12s">
-          Stride turns your city into a turf war. The area you enclose on a run becomes your territory. Claim it, defend it, and steal your rivals’ on a living 3D map.
+          Terrarun turns your city into a turf war. The area you enclose on a run becomes your territory. Claim it, defend it, and steal your rivals’ on a living 3D map.
         </p>
-        <div class="reveal mt-8" id="download-top" style="animation-delay:.18s">
+        <div class="reveal mt-8 flex flex-wrap items-center gap-3" style="animation-delay:.18s">
+          <a href="/pricing/" class="btn-primary">Start claiming ground</a>
+          <a href="#how" class="btn-ghost">See how it works</a>
+        </div>
+        <div class="reveal mt-6" id="download-top" style="animation-delay:.22s">
+          <p class="mb-3 font-mono text-[11px] uppercase tracking-widest text-ink-faint">Free to play — get the app</p>
           <AppStore />
         </div>
-        <div class="reveal mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-faint" style="animation-delay:.24s">
-          <span>Free to play</span>
-          <span class="text-ink-faint/50">·</span>
-          <span>Real area, not hexes</span>
-          <span class="text-ink-faint/50">·</span>
-          <span>Live 3D map</span>
-        </div>
+
+        {/* ⚠️ REAL NUMBERS, PULLED FROM THE LIVE DATABASE — never a rating badge.
+            The App Store average is 4.7 from THREE ratings; printing a star score
+            off a sample that small is a claim we cannot stand behind, and it is
+            exactly the kind of thing a merchant of record drops an account for.
+            Ground actually claimed is both true and a better argument. */}
+        <dl class="reveal mt-9 grid grid-cols-3 gap-px overflow-hidden rounded-xl bg-sunken" style="animation-delay:.28s">
+          <div class="bg-canvas px-4 py-4">
+            <dt class="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Ground claimed</dt>
+            <dd class="mt-1 font-display text-2xl font-bold text-ink" id="stat-km2">126 km²</dd>
+          </div>
+          <div class="bg-canvas px-4 py-4">
+            <dt class="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Runners</dt>
+            <dd class="mt-1 font-display text-2xl font-bold text-ink">680+</dd>
+          </div>
+          <div class="bg-canvas px-4 py-4">
+            <dt class="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Territories</dt>
+            <dd class="mt-1 font-display text-2xl font-bold text-ink">76</dd>
+          </div>
+        </dl>
       </div>
 
-      <!-- the war map, framed in a phone -->
-      <div class="reveal relative mx-auto w-full max-w-[340px]" style="animation-delay:.1s">
-        <div class="phone ring-grad relative aspect-[9/19] w-full rounded-[2.6rem] glass p-2.5">
-          <div class="relative h-full w-full overflow-hidden rounded-[2.1rem] bg-canvas">
-            <!-- notch -->
-            <div class="absolute left-1/2 top-2 z-20 h-5 w-24 -translate-x-1/2 rounded-full bg-black/80"></div>
-            <div class="dot-grid absolute inset-0 opacity-40"></div>
-            <svg viewBox="0 0 300 600" class="relative h-full w-full" role="img" aria-label="The Stride map: a runner draws a loop, the territory floods in, a rival's turf gets stolen">
-              <!-- streets -->
-              <g stroke="rgba(255,255,255,0.07)" stroke-width="1.5">
-                <path d="M0 120 H300 M0 220 H300 M0 320 H300 M0 420 H300 M0 520 H300 M60 60 V600 M150 60 V600 M240 60 V600" />
-              </g>
-              <!-- rival turf (gets bitten) -->
-              <polygon points="160,300 268,288 282,420 196,440" fill="#FF6B35" opacity="0.22" />
-              <polygon points="160,300 268,288 282,420 196,440" fill="none" stroke="#FF6B35" stroke-width="2" opacity="0.6" />
-              <!-- your territory -->
-              <polygon class="claim-fill" points="48,170 210,150 246,330 196,440 60,392" fill="#06D6A0" />
-              <polygon class="claim-line" points="48,170 210,150 246,330 196,440 60,392"
-                fill="none" stroke="#06D6A0" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" pathLength="100" />
-              <!-- the runner -->
-              <circle r="6.5" fill="#06D6A0" class="runner">
-                <animateMotion dur="4.2s" repeatCount="indefinite" rotate="auto"
-                  path="M48,170 L210,150 L246,330 L196,440 L60,392 Z" />
-              </circle>
-              <!-- planted flag -->
-              <g class="flag" transform="translate(210,150)">
-                <rect x="-1" y="-36" width="2.5" height="36" fill="#cbd5e1" />
-                <path d="M1,-36 h24 l-7,8 l7,8 h-24 z" fill="#06D6A0" />
-              </g>
-            </svg>
-            <!-- HUD: live territory chip -->
-            <div class="absolute bottom-16 left-4 right-4 flex items-center justify-between rounded-xl glass glass-mint px-4 py-3">
-              <div>
-                <div class="font-mono text-[10px] uppercase tracking-widest text-ink-faint">Territory claimed</div>
-                <div class="font-display text-xl font-semibold text-mint claim-count" data-target="48250">0 m²</div>
-              </div>
-              <div class="grid h-9 w-9 place-items-center rounded-lg bg-mint/15 ring-1 ring-mint/40">
-                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7L12 2z" stroke="#06D6A0" stroke-width="1.6" stroke-linejoin="round"/></svg>
-              </div>
-            </div>
-            <!-- HUD: steal toast (slides in mid-loop) -->
-            <div class="steal-toast absolute left-4 right-4 top-12 flex items-center gap-2.5 rounded-xl border border-flame/40 bg-canvas/85 px-3.5 py-2.5 backdrop-blur">
-              <span class="grid h-7 w-7 place-items-center rounded-lg bg-flame/15">
-                <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none"><path d="M4 20L20 4M6 4l4 4M14 16l4 4" stroke="#FF6B35" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </span>
-              <div class="min-w-0">
-                <div class="truncate text-xs font-semibold text-ink">Stolen from @rival_km</div>
-                <div class="font-mono text-[10px] text-flame">+1,260 m² captured</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="pointer-events-none absolute -inset-8 -z-10 animate-pulse-glow rounded-full bg-mint/10 blur-3xl"></div>
+      {/* THE WORLD, TURNING. Real territory from the live database landing one
+          claim at a time — the one thing on this site nobody else can copy,
+          because it is not an illustration. */}
+      <div class="reveal mx-auto w-full max-w-[440px]" style="animation-delay:.3s">
+        <WorldGlobe />
       </div>
     </div>
   </section>
@@ -163,7 +134,7 @@ const faqJsonLd = {
           <div class="font-mono text-sm" style={`color:${s.c}`}>{s.n}</div>
           <h3 class="mt-4 font-display text-2xl font-semibold">{s.t}</h3>
           <p class="mt-3 text-sm leading-relaxed text-ink-soft">{s.d}</p>
-          <div class="mt-6 h-1 w-full rounded-full bg-white/5">
+          <div class="mt-6 h-1 w-full rounded-full bg-sunken">
             <div class="h-1 rounded-full transition-all duration-700 group-hover:w-full" style={`width:34%;background:${s.c};box-shadow:0 0 16px ${s.c}`}></div>
           </div>
         </div>
@@ -207,7 +178,7 @@ const faqJsonLd = {
           <div class="font-mono text-[11px] uppercase tracking-[0.22em]" style={`color:${p.c}`}>{p.k}</div>
           <h3 class="mt-3 font-display text-2xl font-semibold leading-snug">{p.t}</h3>
           <p class="mt-3 flex-1 text-sm leading-relaxed text-ink-soft">{p.d}</p>
-          <div class="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-white/8">
+          <div class="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-sunken">
             <div class="bg-canvas/70 p-3.5">
               <div class="font-display text-lg font-semibold" style={`color:${p.c}`}>{p.stat}</div>
               <div class="mt-0.5 text-[11px] leading-tight text-ink-faint">{p.statLabel}</div>
@@ -264,7 +235,7 @@ const faqJsonLd = {
       <div class="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 animate-pulse-glow rounded-full bg-mint/15 blur-3xl"></div>
       <div class="relative">
         <h2 class="font-display text-4xl font-bold tracking-tight sm:text-5xl">Claim your city.</h2>
-        <p class="mx-auto mt-4 max-w-md text-ink-soft">Stride is live. Download it free, run your first loop, and take your block before your rivals do.</p>
+        <p class="mx-auto mt-4 max-w-md text-ink-soft">Terrarun is live. Download it free, run your first loop, and take your block before your rivals do.</p>
         <div class="mt-8 flex justify-center [&_.as-cta]:items-center [&_.as-social]:justify-center"><AppStore /></div>
       </div>
     </div>
@@ -284,48 +255,9 @@ const faqJsonLd = {
       0% { transform: translate3d(0,0,0) scale(1); }
       100% { transform: translate3d(0,-3%,0) scale(1.08); }
     }
-    .phone { box-shadow: 0 30px 80px -30px rgba(0,0,0,0.8), 0 0 60px -20px rgba(6,214,160,0.25); }
-    /* draw the loop, then flood the territory, on a loop */
-    .claim-line { stroke-dasharray: 100; stroke-dashoffset: 100; animation: draw 4.2s ease-in-out infinite; filter: drop-shadow(0 0 6px #06D6A0); }
-    .claim-fill { opacity: 0; animation: flood 4.2s ease-in-out infinite; }
-    .runner { filter: drop-shadow(0 0 8px #06D6A0); }
-    .flag { opacity: 0; transform-box: fill-box; transform-origin: bottom; animation: plant 4.2s ease-in-out infinite; }
-    .steal-toast { opacity: 0; transform: translateY(-12px); animation: toast 4.2s ease-in-out infinite; }
-    @keyframes draw { 0% { stroke-dashoffset: 100; } 55% { stroke-dashoffset: 0; } 92% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0.25; } }
-    @keyframes flood { 0%, 50% { opacity: 0; } 70%, 92% { opacity: 0.28; } 100% { opacity: 0.12; } }
-    @keyframes plant { 0%, 55% { opacity: 0; transform: scaleY(0); } 64% { opacity: 1; transform: scaleY(1.1); } 70%, 100% { opacity: 1; transform: scaleY(1); } }
-    @keyframes toast { 0%, 60% { opacity: 0; transform: translateY(-12px); } 70%, 90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-6px); } }
     @media (prefers-reduced-motion: reduce) {
       .aurora { animation: none; }
-      .claim-line { stroke-dashoffset: 0; animation: none; }
-      .claim-fill { opacity: 0.24; animation: none; }
-      .flag { opacity: 1; transform: none; animation: none; }
-      .steal-toast { opacity: 1; transform: none; animation: none; }
-      .runner { display: none; }
     }
   </style>
 
-  <!-- count-up for the claimed-area chip -->
-  <script is:inline>
-    (() => {
-      const el = document.querySelector('.claim-count');
-      if (!el) return;
-      const target = +el.dataset.target;
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = target.toLocaleString() + ' m²'; return; }
-      let started = false;
-      const run = () => {
-        if (started) return; started = true;
-        const t0 = performance.now();
-        const tick = (t) => {
-          const p = Math.min(1, (t - t0) / 1400);
-          const e = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(target * e).toLocaleString() + ' m²';
-          if (p < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      };
-      const io = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && run()), { threshold: 0.4 });
-      io.observe(el);
-    })();
-  </script>
 </Layout>

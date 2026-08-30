@@ -63,7 +63,7 @@ const plan = [
   <div class="glass mt-6 overflow-hidden rounded-2xl">
     <table class="w-full border-collapse text-sm">
       <thead>
-        <tr class="border-b border-white/10 text-left">
+        <tr class="border-b border-ink/10 text-left">
           <th class="px-4 py-3 font-display font-semibold text-mint">Week</th>
           <th class="px-4 py-3 font-display font-semibold text-ink">Each session (after a 5-min warm-up walk)</th>
           <th class="px-4 py-3 font-display font-semibold text-ink-soft">Per week</th>
@@ -71,7 +71,7 @@ const plan = [
       </thead>
       <tbody>
         {plan.map(([w, s, n], i) => (
-          <tr class={i % 2 ? 'bg-white/[0.02]' : ''}>
+          <tr class={i % 2 ? 'bg-sunken/50' : ''}>
             <td class="px-4 py-3 font-semibold text-mint align-top">{w}</td>
             <td class="px-4 py-3 text-ink-soft">{s}</td>
             <td class="px-4 py-3 text-ink-soft align-top">{n}</td>
@@ -99,7 +99,7 @@ const plan = [
     Physically, almost anyone can finish couch to 5K. The challenge is motivation across nine weeks. That’s why
     it helps to give your runs stakes and visible progress beyond the plan — a streak, a friend doing it with
     you, or a <a href="/blog/best-running-games/">running game</a> that makes finishing feel like winning. If
-    you want a reason to run <em>today</em>, that’s exactly what <a href="/">Stride</a> is built for: every loop
+    you want a reason to run <em>today</em>, that’s exactly what <a href="/">Terrarun</a> is built for: every loop
     you run claims real territory you can see fill in on the map.
   </p>
   <p>

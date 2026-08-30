@@ -1,6 +1,6 @@
 // City landing-page data. Each city renders /run/<slug> via src/pages/run/[city].astro.
 // Real running spots per city keep every page genuinely useful + unique (not a thin
-// doorway page). Cities span the markets Stride is localised for (US/GB/CA/AU/DE/ES/FR/IT/BR/JP/KR).
+// doorway page). Cities span the markets Terrarun is localised for (US/GB/CA/AU/DE/ES/FR/IT/BR/JP/KR).
 
 export interface RunSpot { name: string; note: string }
 export interface City {

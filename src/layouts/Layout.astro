@@ -11,8 +11,8 @@ export interface Props {
   noindex?: boolean;
 }
 const {
-  title = 'Stride — Run & Own Your City | Territory Running Game',
-  description = 'Stride turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Free territory running game — download now on the App Store for iPhone.',
+  title = 'Terrarun — Run & Own Your City | Territory Running Game',
+  description = 'Terrarun turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Free territory running game — download now on the App Store for iPhone.',
   path = '/',
   noindex = false,
 } = Astro.props;
@@ -27,7 +27,7 @@ const canonical = new URL(normalizedPath, site).href;
 // SVG renders in most link-preview unfurlers (Slack/Discord/LinkedIn/iMessage).
 // For Twitter/Facebook (raster only) export og.svg → og.png and switch this.
 const ogImage = `${site}/og.svg`;
-const keywords = 'Stride, Stride running, Stride run, Stride game, Stride play, best running app, running app, GPS running app, run tracker app, fitness app, Strava alternative, competitive running app, territory running game, running game, GPS running game, run and own your city, claim territory running, turf running, run tracker game, iOS running game, gamified running app, running game iPhone';
+const keywords = 'Terrarun, Terrarun running, Terrarun run, Terrarun game, Terrarun play, best running app, running app, GPS running app, run tracker app, fitness app, Strava alternative, competitive running app, territory running game, running game, GPS running game, run and own your city, claim territory running, turf running, run tracker game, iOS running game, gamified running app, running game iPhone';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -36,14 +36,14 @@ const jsonLd = {
     // "stride play game" queries land on this site.
     {
       '@type': 'WebSite',
-      name: 'Stride',
-      alternateName: ['Stride Running', 'Stride Run', 'Stride Game', 'Stride Play', 'Stride — Run & Own Your City'],
+      name: 'Terrarun',
+      alternateName: ['Terrarun Running', 'Terrarun Run', 'Terrarun Game', 'Terrarun Play', 'Terrarun — Run & Own Your City'],
       url: site,
     },
     {
       '@type': 'Organization',
-      name: 'Stride',
-      alternateName: 'Stride Running',
+      name: 'Terrarun',
+      alternateName: 'Terrarun Running',
       url: site,
       logo: `${site}/stride-logo.png`,
       email: 'hello@striderunning.run',
@@ -51,8 +51,8 @@ const jsonLd = {
     },
     {
       '@type': 'SoftwareApplication',
-      name: 'Stride — Run & Own Your City',
-      alternateName: ['Stride', 'Stride Running', 'Stride Game'],
+      name: 'Terrarun — Run & Own Your City',
+      alternateName: ['Terrarun', 'Terrarun Running', 'Terrarun Game'],
       operatingSystem: 'iOS, Android',
       applicationCategory: 'HealthApplication',
       applicationSubCategory: 'Running Game',
@@ -84,7 +84,7 @@ const jsonLd = {
 
     <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Stride" />
+    <meta property="og:site_name" content="Terrarun" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />

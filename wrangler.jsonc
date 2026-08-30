@@ -1,0 +1,27 @@
+/**
+ * Cloudflare Workers deploy config for the marketing site.
+ *
+ * ⚠️ THIS FILE IS WHAT MAKES `npx wrangler deploy` WORK. The Cloudflare project
+ * runs `npm run build` then `npx wrangler deploy`, and without an `assets`
+ * directory here wrangler has no idea the built site in ./dist is what it is
+ * meant to upload. Cloudflare generated it on its own `cloudflare/workers-
+ * autoconfig` branch and merged it straight into the deploy repo, which is why
+ * it existed on the remote while this directory had never heard of it.
+ *
+ * ⚠️ IT LIVES HERE, IN THE SOURCE REPO, ON PURPOSE. The site is published with
+ * `git subtree push --prefix=website stride-web main`, which replays THIS
+ * directory over the remote. Anything that exists only on the remote is deleted
+ * by the next push — so a config that lives only there survives exactly until
+ * somebody deploys, and then takes the whole site down.
+ *
+ * `name` must keep matching the existing Worker (`stridewebsite`) or a deploy
+ * creates a second one and the domain keeps serving the old build.
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stridewebsite",
+  "compatibility_date": "2026-07-07",
+  "assets": {
+    "directory": "./dist"
+  }
+}

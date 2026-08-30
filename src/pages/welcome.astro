@@ -1,0 +1,123 @@
+---
+/**
+ * /welcome — where Paddle returns after a successful payment.
+ *
+ * ⚠️ ARRIVING HERE MEANS "PAID". IT DOES NOT MEAN "ENTITLED." Paddle redirects
+ * the browser the moment the charge succeeds; Pro is granted by the webhook,
+ * server-side, a beat later. Those are different events and the gap is real —
+ * so this page WAITS for the entitlement to actually appear on the account
+ * instead of congratulating somebody on something that has not happened yet.
+ *
+ * That distinction is the same rule the iOS side already follows: the client
+ * saying "I paid" must never set `is_premium` (migration 033 locks the column to
+ * the service role). A success page that asserts Pro on the strength of a
+ * redirect is a page that lies whenever the webhook is slow or has failed — and
+ * the person it lies to opens the app, finds nothing, and charges back.
+ *
+ * The three honest states:
+ *   waiting  — paid, unlocking (poll)
+ *   ready    — the account really is Pro
+ *   slow     — it has taken too long; say so, and give them a way to reach us
+ */
+import Layout from '../layouts/Layout.astro';
+import AppStore from '../components/AppStore.astro';
+---
+
+<Layout
+  title="You're in — Terrarun"
+  description="Your Terrarun Pro subscription is active. Download the app and sign in."
+  path="/welcome"
+  noindex={true}
+>
+  <section class="mx-auto max-w-xl px-5 pt-28 pb-24 text-center">
+
+    <!-- WAITING — paid, webhook not seen yet -->
+    <div id="w-waiting">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full" style="background:#DDE3E0">
+        <span class="block h-6 w-6 animate-spin rounded-full border-2 border-ink-faint border-t-transparent"></span>
+      </div>
+      <h1 class="mt-7 font-display text-3xl font-bold tracking-tight">Payment received.</h1>
+      <p class="mt-3 text-[15px] leading-relaxed text-ink-soft">
+        Unlocking Pro on your account — this usually takes a couple of seconds.
+      </p>
+    </div>
+
+    <!-- READY — the account really is Pro -->
+    <div id="w-ready" class="hidden">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
+        style="background:linear-gradient(180deg,#14D694,#059669 34%,#02513A);box-shadow:0 3px 6px rgba(15,23,20,0.22)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h1 class="mt-7 font-display text-4xl font-bold leading-[1.05] tracking-tight">
+        You're <span class="text-gradient">Pro</span>.
+      </h1>
+      <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        Every metre you claim is yours to keep now. Download Terrarun and sign in with
+        <strong id="w-email" class="text-ink">the email you just used</strong> — Pro is already on,
+        there is nothing to restore and nothing to enter.
+      </p>
+
+      <div class="mt-9">
+        <AppStore />
+      </div>
+
+      <div class="glass mt-10 p-6 text-left">
+        <h2 class="font-display text-lg font-semibold text-ink">What happens next</h2>
+        <ol class="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
+          <li><strong class="text-ink">1.</strong> Open the app and sign in with the same email.</li>
+          <li><strong class="text-ink">2.</strong> A short tutorial teaches the one move that matters — close a loop, keep the ground inside.</li>
+          <li><strong class="text-ink">3.</strong> Go for a run. The first loop you close is on the map before you have caught your breath.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- SLOW — do not pretend, and do not leave them stranded -->
+    <div id="w-slow" class="hidden">
+      <h1 class="font-display text-3xl font-bold tracking-tight">Payment received.</h1>
+      <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        Pro is taking longer than usual to appear on your account. Your payment went
+        through and nothing is lost — it almost always lands within a few minutes.
+      </p>
+      <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        If it still is not there, email
+        <a class="font-semibold text-band-mid hover:underline" href="mailto:support@striderunning.run">support@striderunning.run</a>
+        and we will sort it out the same day.
+      </p>
+      <div class="mt-8"><AppStore /></div>
+    </div>
+
+  </section>
+</Layout>
+
+<script>
+  import { recall, isPro, configured } from '../lib/account';
+
+  const waiting = document.getElementById('w-waiting')!;
+  const ready = document.getElementById('w-ready')!;
+  const slow = document.getElementById('w-slow')!;
+
+  const show = (el: HTMLElement) => {
+    [waiting, ready, slow].forEach((n) => n.classList.add('hidden'));
+    el.classList.remove('hidden');
+  };
+
+  const acc = recall();
+  if (!configured || !acc) {
+    // Landed here without a session — a shared link, a new browser, private mode.
+    // We cannot verify anything, so we claim nothing.
+    show(slow);
+  } else {
+    const emailEl = document.getElementById('w-email');
+    if (emailEl && acc.email) emailEl.textContent = acc.email;
+
+    // Poll with a widening gap: fast at the start because the webhook usually
+    // wins the race, then backing off rather than hammering the API for a minute.
+    const DELAYS = [800, 1200, 1800, 2500, 3500, 5000, 6000, 8000, 10000];
+    let i = 0;
+    (async function poll() {
+      if (await isPro(acc.userId, acc.token)) { show(ready); return; }
+      if (i >= DELAYS.length) { show(slow); return; }
+      setTimeout(poll, DELAYS[i++]);
+    })();
+  }
+</script>

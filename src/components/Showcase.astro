@@ -3,16 +3,16 @@
 // App Store screenshots (already caption-baked marketing shots). Arrows + dots
 // + drag + gentle auto-advance (all reduced-motion aware) and scroll-reveal.
 const shots = [
-  { src: '/shots/01.jpg', n: '01', label: 'The living 3D map', alt: 'Stride app map screen — your running territory painted mint across a tilted 3D map of Manhattan with rival territories in orange and pink.' },
-  { src: '/shots/02.jpg', n: '02', label: 'Start a run', alt: 'Stride pre-run screen showing 3.20 km² of territory, a 128-day streak, run modes and a big START button.' },
-  { src: '/shots/03.jpg', n: '03', label: 'Real GPS tracking', alt: 'Stride run summary with distance, time, average pace, elevation and a per-kilometre split chart.' },
-  { src: '/shots/04.jpg', n: '04', label: 'Steal & defend turf', alt: 'Stride 3D war map where a rival is stealing territory, shown as a shrinking mint area with a yellow contested block.' },
-  { src: '/shots/05.jpg', n: '05', label: 'Weekly leagues', alt: 'Stride ranks screen with a Titan tier badge and a global leaderboard of runners ranked by territory in km².' },
-  { src: '/shots/06.jpg', n: '06', label: 'Social feed', alt: 'Stride community feed with a shared run, kudos, comments, a challenge button and a live event card.' },
-  { src: '/shots/07.jpg', n: '07', label: 'Run clubs', alt: 'Stride clubs list with run clubs, their combined territory in km² and member counts for club-vs-club battles.' },
-  { src: '/shots/08.jpg', n: '08', label: 'Turf wars & events', alt: 'Stride events tab showing live and upcoming area-blitz turf war races you can join.' },
-  { src: '/shots/09.jpg', n: '09', label: 'Deep analytics', alt: 'Stride analytics with a 30-day distance trend line, a consistency ring, weekly totals and best-effort insights.' },
-  { src: '/shots/10.jpg', n: '10', label: 'Level up', alt: 'Stride profile with a hex avatar, Titan rank, 128-day streak, XP bar, followers and weekly activity.' },
+  { src: '/shots/01.jpg', n: '01', label: 'The living 3D map', alt: 'Terrarun app map screen — your running territory painted mint across a tilted 3D map of Manhattan with rival territories in orange and pink.' },
+  { src: '/shots/02.jpg', n: '02', label: 'Start a run', alt: 'Terrarun pre-run screen showing 3.20 km² of territory, a 128-day streak, run modes and a big START button.' },
+  { src: '/shots/03.jpg', n: '03', label: 'Real GPS tracking', alt: 'Terrarun run summary with distance, time, average pace, elevation and a per-kilometre split chart.' },
+  { src: '/shots/04.jpg', n: '04', label: 'Steal & defend turf', alt: 'Terrarun 3D war map where a rival is stealing territory, shown as a shrinking mint area with a yellow contested block.' },
+  { src: '/shots/05.jpg', n: '05', label: 'Weekly leagues', alt: 'Terrarun ranks screen with a Titan tier badge and a global leaderboard of runners ranked by territory in km².' },
+  { src: '/shots/06.jpg', n: '06', label: 'Social feed', alt: 'Terrarun community feed with a shared run, kudos, comments, a challenge button and a live event card.' },
+  { src: '/shots/07.jpg', n: '07', label: 'Run clubs', alt: 'Terrarun clubs list with run clubs, their combined territory in km² and member counts for club-vs-club battles.' },
+  { src: '/shots/08.jpg', n: '08', label: 'Turf wars & events', alt: 'Terrarun events tab showing live and upcoming area-blitz turf war races you can join.' },
+  { src: '/shots/09.jpg', n: '09', label: 'Deep analytics', alt: 'Terrarun analytics with a 30-day distance trend line, a consistency ring, weekly totals and best-effort insights.' },
+  { src: '/shots/10.jpg', n: '10', label: 'Level up', alt: 'Terrarun profile with a hex avatar, Titan rank, 128-day streak, XP bar, followers and weekly activity.' },
 ];
 ---
 <section id="screens" class="relative mx-auto max-w-6xl px-5 pt-28">
@@ -30,7 +30,7 @@ const shots = [
           class="sc-card reveal snap-start shrink-0"
           style={`animation-delay:${Math.min(i, 5) * 0.06}s`}
         >
-          <div class="sc-frame group relative overflow-hidden rounded-[1.9rem] border border-white/10 bg-surface/40 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.85)] ring-1 ring-white/5 transition duration-500 hover:-translate-y-1.5 hover:border-mint/30 hover:shadow-glow">
+          <div class="sc-frame group relative overflow-hidden rounded-[1.9rem] border border-ink/10 bg-elevated shadow-[0_24px_60px_-24px_rgba(0,0,0,0.85)] ring-1 ring-ink/5 transition duration-500 hover:-translate-y-1.5 hover:border-mint/30 hover:shadow-glow">
             <img
               src={s.src}
               alt={s.alt}
@@ -62,7 +62,7 @@ const shots = [
     <!-- dots -->
     <div class="sc-dots mt-2 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Screen navigation">
       {shots.map((s, i) => (
-        <button type="button" class="sc-dot h-2 w-2 rounded-full bg-white/20 transition-all duration-300 hover:bg-white/40" data-i={i} aria-label={`Go to ${s.label}`}></button>
+        <button type="button" class="sc-dot h-2 w-2 rounded-full bg-ink/20 transition-all duration-300 hover:bg-ink/40" data-i={i} aria-label={`Go to ${s.label}`}></button>
       ))}
     </div>
   </div>

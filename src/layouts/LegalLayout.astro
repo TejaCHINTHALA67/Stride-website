@@ -3,9 +3,9 @@ import Layout from './Layout.astro';
 export interface Props { title: string; updated: string; path: string; description?: string }
 const { title, updated, path, description } = Astro.props;
 ---
-<Layout title={`${title} — Stride`} description={description ?? `${title} for Stride — Run & Own Your City.`} path={path} noindex={false}>
+<Layout title={`${title} — Terrarun`} description={description ?? `${title} for Terrarun — Run & Own Your City.`} path={path} noindex={false}>
   <article class="mx-auto max-w-3xl px-5 pt-28">
-    <a href="/" class="text-sm text-ink-faint hover:text-mint">← Back to Stride</a>
+    <a href="/" class="text-sm text-ink-faint hover:text-band-mid">← Back to Terrarun</a>
     <h1 class="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">{title}</h1>
     <p class="mt-3 font-mono text-xs uppercase tracking-widest text-ink-faint">Last updated · {updated}</p>
     <div class="legal mt-10 space-y-6 text-[15px] leading-relaxed text-ink-soft">
@@ -19,6 +19,6 @@ const { title, updated, path, description } = Astro.props;
   .legal h3 { @apply font-display text-lg font-semibold text-ink mt-6 mb-1; }
   .legal p { @apply text-ink-soft; }
   .legal ul { @apply list-disc space-y-1.5 pl-5 text-ink-soft; }
-  .legal a { @apply text-mint hover:underline; }
+  .legal a { @apply text-band-mid font-medium hover:underline; }
   .legal strong { @apply text-ink; }
 </style>

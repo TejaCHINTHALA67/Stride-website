@@ -1,9 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 
-const title = 'Stride Blog — Running, Gamified';
+const title = 'Terrarun Blog — Running, Gamified';
 const description =
-  'Practical guides on making running fun, staying motivated, and turning your runs into a game. From the team building Stride — the territory running game for iOS.';
+  'Practical guides on making running fun, staying motivated, and turning your runs into a game. From the team building Terrarun — the territory running game for iOS.';
 
 // Newest first. Add an entry here when you publish a post.
 const posts = [
@@ -21,7 +21,7 @@ const posts = [
     tag: 'Apps',
     title: 'Best running apps in 2026 (free & paid, honestly reviewed)',
     excerpt:
-      'The best running apps for tracking, training, and actually staying motivated — honest picks including Strava, Nike Run Club, Runna, and Stride.',
+      'The best running apps for tracking, training, and actually staying motivated — honest picks including Strava, Nike Run Club, Runna, and Terrarun.',
     date: 'June 22, 2026',
     read: '8 min',
   },
@@ -48,7 +48,7 @@ const posts = [
     tag: 'Games',
     title: 'Best running games that actually make you run (2026)',
     excerpt:
-      'The running games and apps worth your time — from Zombies, Run! to territory games like Stride — and exactly who each one is best for.',
+      'The running games and apps worth your time — from Zombies, Run! to territory games like Terrarun — and exactly who each one is best for.',
     date: 'June 22, 2026',
     read: '7 min',
   },
@@ -66,7 +66,7 @@ const posts = [
 const blogLd = {
   '@context': 'https://schema.org',
   '@type': 'Blog',
-  name: 'Stride Blog',
+  name: 'Terrarun Blog',
   url: 'https://striderunning.run/blog/',
   description,
   blogPost: posts.map((p) => ({
@@ -81,9 +81,9 @@ const blogLd = {
   <script type="application/ld+json" set:html={JSON.stringify(blogLd)} />
 
   <section class="mx-auto max-w-4xl px-5 pt-32 pb-10 text-center sm:pt-36">
-    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Stride home</a>
+    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Terrarun home</a>
     <h1 class="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">
-      The <span class="text-gradient">Stride</span> blog
+      The <span class="text-gradient">Terrarun</span> blog
     </h1>
     <p class="mx-auto mt-4 max-w-xl text-lg text-ink-soft">
       How to make running fun, stay motivated, and turn your runs into a game you can win.

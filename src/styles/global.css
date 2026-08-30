@@ -2,57 +2,152 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * RELIEF ON THE WEB — the app's material language, ported.
+ *
+ * ⚠️ THE CLASS NAMES ARE THE OLD ONES ON PURPOSE. `.glass`, `.glass-mint`,
+ * `.btn-primary`, `.text-gradient`, `.dot-grid` and `.ring-grad` are used ~40
+ * times across 28 pages. Keeping the names and changing the MEANING reskins the
+ * whole site — blog posts and city landers included — from this one file. A
+ * rename would have meant touching every page and would let the two drift.
+ *
+ * The idea, from apps/mobile/src/theme: the interface is CARVED FROM ONE GROUND.
+ * Nothing floats. A raised thing shows the neumorphic pair (ink bottom-right,
+ * white top-left); a selected or inset thing shows that same pair inverted and
+ * drawn inside. Depth is the state channel, colour is semantic only.
+ *
+ * ⚠️ AND NO GLOW. The old site's mint bloom is exactly what the app banned (and
+ * now machine-checks). Colour lives in the FACE of a thing, never in the air
+ * around it.
+ */
+
 @layer base {
-  :root { color-scheme: dark; }
+  /* ⚠️ Was `dark`. The whole site is a light clubhouse ground now — leaving this
+     dark makes browsers paint dark form controls, scrollbars and autofill onto a
+     near-white page. */
+  :root { color-scheme: light; }
+
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
   body {
     @apply bg-canvas text-ink font-sans antialiased;
-    background-image:
-      radial-gradient(900px 600px at 80% -10%, rgba(6,214,160,0.10), transparent 60%),
-      radial-gradient(800px 500px at -10% 20%, rgba(255,107,53,0.08), transparent 55%);
+    /* The ground is one continuous surface with a barely-there lift toward the
+       top — enough that the neumorphic shadows have something to sit on, far
+       too little to read as a gradient. The old mint/flame radial glows are
+       gone with the rest of the bloom. */
+    background-image: radial-gradient(1200px 700px at 50% -20%, #EEF2F0, transparent 70%);
+    background-attachment: fixed;
     overflow-x: hidden;
   }
-  ::selection { background: rgba(6,214,160,0.35); color: #04231B; }
+
+  ::selection { background: rgba(6, 214, 160, 0.30); color: #04231B; }
   h1, h2, h3, .display { @apply font-display tracking-tight; }
   a { -webkit-tap-highlight-color: transparent; }
 }
 
 @layer components {
-  /* faint tactical dot-grid (echoes the app map) */
+  /* The map's dot grid, inverted for a light ground (was white-on-dark). */
   .dot-grid {
-    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(15, 23, 20, 0.055) 1px, transparent 1px);
     background-size: 22px 22px;
   }
-  /* frosted glass panel */
+
+  /* ── `.glass` IS NO LONGER GLASS ────────────────────────────────────────
+     It is a panel EXTRUDED from the ground: same colour as the page, raised by
+     the shadow pair alone. No blur, no border, no translucency — a frosted
+     panel implies something behind it, and in relief there is nothing behind
+     anything. */
   .glass {
-    background: linear-gradient(150deg, rgba(31,41,55,0.55), rgba(12,17,28,0.72));
-    border: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: #E7ECEA;
+    border-radius: 18px;
+    box-shadow:
+      6px 7px 16px rgba(160, 176, 169, 0.55),
+      -6px -7px 16px rgba(255, 255, 255, 0.95);
   }
-  .glass-mint { border-color: rgba(6,214,160,0.30); box-shadow: 0 0 36px -14px rgba(6,214,160,0.5); }
-  /* gradient hairline border */
+
+  /* ── `.glass-mint` IS THE BAND ──────────────────────────────────────────
+     The app's ONE green surface. ⚠️ The ramp is deeper than brand mint because
+     white on flat #06D6A0 is 1.89:1; every stop here clears 4.8:1, so any text
+     on it lands AA wherever it falls on the diagonal. */
+  .glass-mint {
+    background: linear-gradient(150deg, #04815F, #046B4D 55%, #03503A);
+    border: 0;
+    color: #FFFFFF;
+    box-shadow: 0 6px 18px rgba(4, 40, 30, 0.28);
+  }
+  .glass-mint .text-ink,
+  .glass-mint p,
+  .glass-mint li { color: rgba(255, 255, 255, 0.86); }
+  .glass-mint h1, .glass-mint h2, .glass-mint h3 { color: #FFFFFF; }
+
+  /* A well carved INTO the ground — inputs, selected chips, code blocks. */
+  .well {
+    background: #DDE3E0;
+    border-radius: 14px;
+    box-shadow:
+      inset 3px 4px 8px rgba(160, 176, 169, 0.55),
+      inset -3px -4px 8px rgba(255, 255, 255, 0.90);
+  }
+
+  /* The seam: the ground creased, not a line drawn on it. Two hairlines, dark
+     over light — the same divider the app uses between rail slots. */
+  .seam {
+    height: 2px;
+    border: 0;
+    background: linear-gradient(rgba(160, 176, 169, 0.45) 0 1px, rgba(255, 255, 255, 0.90) 1px 2px);
+  }
+
+  /* ── keys ───────────────────────────────────────────────────────────────
+     ⚠️ The primary face is a GRADIENT with a high mid stop, not a flat mint
+     fill: white on flat #06D6A0 is 1.89:1, while the label here sits on the
+     deep body at ~6:1. Never replace this with one colour. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 font-semibold;
+    background: linear-gradient(180deg, #14D694 0%, #059669 34%, #02513A 100%);
+    color: #FFFFFF;
+    box-shadow: 0 3px 4px rgba(15, 23, 20, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.30);
+    transition: transform .14s cubic-bezier(.16,1,.3,1), box-shadow .14s cubic-bezier(.16,1,.3,1);
+  }
+  /* Pressed SINKS — scale, shadow distance and blur move together, which is what
+     makes it read as a physical key rather than a button that shrinks. */
+  .btn-primary:active { transform: scale(0.975); box-shadow: 0 1px 2px rgba(15, 23, 20, 0.28); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 8px rgba(15, 23, 20, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.30); }
+
+  /* The secondary key: the ground itself, raised. */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 font-semibold text-ink;
+    background: linear-gradient(180deg, #F4F8F6, #EEF2F0 40%, #E4E9E7);
+    box-shadow: 3px 4px 8px rgba(160, 176, 169, 0.60), -3px -4px 8px rgba(255, 255, 255, 0.95);
+    transition: transform .14s cubic-bezier(.16,1,.3,1), box-shadow .14s cubic-bezier(.16,1,.3,1);
+  }
+  .btn-ghost:active {
+    transform: scale(0.978);
+    box-shadow: inset 2px 3px 5px rgba(160, 176, 169, 0.55), inset -2px -3px 5px rgba(255, 255, 255, 0.90);
+  }
+
+  /* ⚠️ `.ring-grad` was a glowing gradient border. On a carved ground a rim is a
+     hairline catching the light, not a coloured halo. */
   .ring-grad { position: relative; }
   .ring-grad::before {
     content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-    background: linear-gradient(135deg, rgba(6,214,160,0.6), rgba(255,107,53,0.4), transparent 70%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(160,176,169,0.35) 70%);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
   }
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-mint px-6 py-3.5 font-semibold text-[#04231B] transition;
-    box-shadow: 0 0 0 0 rgba(6,214,160,0.6);
+
+  /* ⚠️ Retuned for a LIGHT ground. The old ramp ended in #FBBF24 gold, which is
+     ~1.9:1 here — invisible. This runs deep green → mint and stays legible. */
+  .text-gradient {
+    background: linear-gradient(120deg, #03503A, #059669 55%, #06D6A0);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  .btn-primary:hover { box-shadow: 0 10px 40px -10px rgba(6,214,160,0.8); transform: translateY(-1px); }
-  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/12 px-6 py-3.5 font-semibold text-ink transition hover:border-mint/50 hover:text-mint; }
-  /* moving sheen for the wordmark / chips */
+
   .sheen { position: relative; overflow: hidden; }
   .sheen::after {
     content: ''; position: absolute; inset: 0; transform: translateX(-120%);
-    background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+    background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
     animation: sheen 4.5s ease-in-out infinite;
   }
-  .text-gradient { background: linear-gradient(120deg, #06D6A0, #7CF2D2 60%, #FBBF24); -webkit-background-clip: text; background-clip: text; color: transparent; }
 }
 
 /* on-scroll reveal (no JS framework needed — IntersectionObserver toggles .in) */

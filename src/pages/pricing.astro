@@ -1,0 +1,221 @@
+---
+/**
+ * /pricing — the page Paddle verifies, and the page that will take the money.
+ *
+ * ⚠️ THIS IS THE FRONT DOOR, NOT A BROCHURE. Google Play forbids the Android app
+ * from leading users to any payment method other than Play Billing, and all
+ * three programmes that permit it (US, EEA, Japan) require a registered
+ * business. So this page is where Pro is actually sold, and people reach it from
+ * the web and from email — never from a button inside the Android app.
+ *
+ * ⚠️ PRICES ARE NEVER HARDCODED. They come from Paddle at runtime via
+ * `Paddle.PricePreview`, which also localises the currency for the visitor. Two
+ * separate incidents in this project shipped stale hardcoded prices (a 3.1.2
+ * risk on iOS), and a price in the markup is a price that will be wrong.
+ *
+ * Until PUBLIC_PADDLE_* are set the page renders honestly — the plans, what they
+ * include, and "pricing loads in your currency" — rather than inventing numbers.
+ * That is still a valid pricing page for Paddle's website review, which is
+ * checking that you describe what you sell.
+ */
+import Layout from '../layouts/Layout.astro';
+
+const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN ?? '';
+const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV ?? 'sandbox';
+const PRICE_MONTHLY = import.meta.env.PUBLIC_PADDLE_PRICE_MONTHLY ?? '';
+const PRICE_YEARLY = import.meta.env.PUBLIC_PADDLE_PRICE_YEARLY ?? '';
+const configured = Boolean(PADDLE_TOKEN && PRICE_MONTHLY && PRICE_YEARLY);
+
+const included = [
+  ['Every metre you claim', 'No cap on territory, no banked ground waiting to be unlocked.'],
+  ['The full leaderboards', 'Every rival on your streets, not the top five.'],
+  ['Route planner', 'Draw the loop before you run it, and follow it turn by turn.'],
+  ['Clubs, events and races', 'Run with a faction, and join real races on their real ground.'],
+  ['Deep analytics', 'Pace, splits, elevation, heart rate and territory over time.'],
+  ['Apple Watch', 'Start, run and finish from your wrist — phone optional.'],
+  ['No ads', 'On Android, Pro removes them everywhere.'],
+];
+---
+
+<Layout
+  title="Pricing — Terrarun Pro"
+  description="Terrarun Pro: claim every metre, see every rival, plan your routes, and run without ads. Monthly or yearly, cancel any time."
+  path="/pricing"
+>
+  <section class="mx-auto max-w-5xl px-5 pt-28 pb-24">
+    <header class="max-w-2xl">
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-ink-faint">Terrarun Pro</p>
+      <h1 class="mt-3 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
+        Take the whole city, <span class="text-gradient">not a corner of it</span>.
+      </h1>
+      <p class="mt-5 text-[17px] leading-relaxed text-ink-soft">
+        Terrarun is free to run. Pro is for the runners who want the map to keep
+        every metre they earn — and who would rather not lose ground to somebody
+        with more of it unlocked.
+      </p>
+    </header>
+
+    <!-- ── the two plans ────────────────────────────────────────────────── -->
+    <div class="mt-12 grid gap-6 sm:grid-cols-2">
+      <div class="glass p-7">
+        <p class="font-mono text-xs uppercase tracking-widest text-ink-faint">Monthly</p>
+        <p class="mt-3 font-display text-3xl font-bold" data-price="monthly">
+          {configured ? '—' : 'Loads in your currency'}
+        </p>
+        <p class="mt-2 text-sm text-ink-faint">Cancel any time.</p>
+        <button
+          class="btn-primary mt-6 w-full"
+          data-checkout={PRICE_MONTHLY}
+          disabled={!configured}
+        >Get Pro monthly</button>
+      </div>
+
+      <!-- The band is the app's ONE green surface. Used here for the plan we
+           recommend — a single emphasised object, not decoration. -->
+      <div class="glass-mint rounded-[18px] p-7">
+        <div class="flex items-center justify-between">
+          <p class="font-mono text-xs uppercase tracking-widest" style="color:#5FF3C0">Yearly</p>
+          <span class="rounded-full px-2.5 py-1 text-[11px] font-bold" style="background:rgba(0,0,0,0.26);color:#5FF3C0" data-saving>Best value</span>
+        </div>
+        <p class="mt-3 font-display text-3xl font-bold" data-price="yearly">
+          {configured ? '—' : 'Loads in your currency'}
+        </p>
+        <!-- The per-month equivalent, filled in from the same PricePreview
+             response. It is the number that makes the yearly plan legible —
+             nobody compares 44.99 to 9.99 in their head — and like every other
+             price on this page it is never written into the markup. -->
+        <p class="mt-1 text-sm" style="color:rgba(255,255,255,0.80)" data-permonth></p>
+        <p class="mt-2 text-sm" style="color:rgba(255,255,255,0.80)">Billed once a year. Cancel any time.</p>
+        <button
+          class="btn-ghost mt-6 w-full"
+          data-checkout={PRICE_YEARLY}
+          disabled={!configured}
+        >Get Pro yearly</button>
+      </div>
+    </div>
+
+    <p class="mt-5 text-sm text-ink-faint">
+      Prices are shown in your local currency and include any tax due where you live.
+      Payments are handled by Paddle, our authorised reseller.
+    </p>
+
+    <hr class="seam my-14" />
+
+    <!-- ── what you are actually buying ─────────────────────────────────── -->
+    <h2 class="font-display text-2xl font-bold tracking-tight">What Pro includes</h2>
+    <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+      {included.map(([name, detail]) => (
+        <li class="glass p-5">
+          <p class="font-semibold text-ink">{name}</p>
+          <p class="mt-1 text-sm leading-relaxed text-ink-faint">{detail}</p>
+        </li>
+      ))}
+    </ul>
+
+    <hr class="seam my-14" />
+
+    <!-- ── how it reaches the app ───────────────────────────────────────── -->
+    <h2 class="font-display text-2xl font-bold tracking-tight">How it works</h2>
+    <ol class="mt-6 space-y-4 text-[15px] leading-relaxed text-ink-soft">
+      <li><strong class="text-ink">1.</strong> Create your Terrarun account here and choose a plan.</li>
+      <li><strong class="text-ink">2.</strong> Download Terrarun and sign in with the same account.</li>
+      <li><strong class="text-ink">3.</strong> Pro is already on. Nothing to restore, nothing to enter.</li>
+    </ol>
+
+    <div class="glass mt-10 p-6">
+      <h3 class="font-display text-lg font-semibold text-ink">Questions people actually ask</h3>
+      <dl class="mt-4 space-y-4 text-sm leading-relaxed text-ink-soft">
+        <div>
+          <dt class="font-semibold text-ink">Do I need Pro to play?</dt>
+          <dd class="mt-1">No. Terrarun is free, and the whole game — running, claiming, stealing, clubs — works without it.</dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-ink">What happens if I cancel?</dt>
+          <dd class="mt-1">You keep Pro until the end of the period you have paid for, then the account returns to free. You never lose your runs, and your territory stays on the map.</dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-ink">Can I get a refund?</dt>
+          <dd class="mt-1">Yes — see our <a class="font-semibold" style="color:#046B4D" href="/refunds/">refund policy</a>.</dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-ink">I already subscribed on iPhone.</dt>
+          <dd class="mt-1">Then you already have Pro everywhere — it lives on your account, not on the device. Do not buy it twice.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</Layout>
+
+<!--
+  ⚠️ PADDLE.JS IS ONLY LOADED WHEN IT IS CONFIGURED. Injecting a third-party
+  script tag on every visit to satisfy a checkout that cannot run yet costs every
+  visitor a request and a cookie banner conversation for nothing.
+-->
+{configured && (
+  <script is:inline define:vars={{ PADDLE_TOKEN, PADDLE_ENV, PRICE_MONTHLY, PRICE_YEARLY }}>
+    (function () {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+      s.onload = function () {
+        if (PADDLE_ENV !== 'production') window.Paddle.Environment.set(PADDLE_ENV);
+        window.Paddle.Initialize({ token: PADDLE_TOKEN });
+
+        // Prices come from Paddle, localised to the visitor. Never from markup.
+        window.Paddle.PricePreview({
+          items: [{ priceId: PRICE_MONTHLY, quantity: 1 }, { priceId: PRICE_YEARLY, quantity: 1 }],
+        }).then(function (res) {
+          var raw = {};
+          var currency = res.data.currencyCode;
+          (res.data.details.lineItems || []).forEach(function (li) {
+            var key = li.price.id === PRICE_YEARLY ? 'yearly' : 'monthly';
+            var el = document.querySelector('[data-price="' + key + '"]');
+            if (el) el.textContent = li.formattedTotals.total;
+            raw[key] = Number(li.totals.total);
+          });
+
+          // ── the comparison, computed from what Paddle just returned ──────
+          // ⚠️ Both figures are MINOR UNITS in the SAME currency, so the ratio
+          // needs no decimal handling at all and is correct in every market —
+          // including the ones where the two plans carry different PPP factors.
+          if (raw.monthly > 0 && raw.yearly > 0) {
+            var pct = Math.round((1 - raw.yearly / (raw.monthly * 12)) * 100);
+            var badge = document.querySelector('[data-saving]');
+            if (badge && pct > 0) badge.textContent = 'Save ' + pct + '%';
+
+            // ⚠️ THE PER-MONTH FIGURE DOES need decimal handling: minor units
+            // are hundredths in most currencies but WHOLE UNITS in JPY, KRW,
+            // HUF and TWD — all four of which we price in. Asking Intl for the
+            // currency's own fraction digits is the only way to divide by the
+            // right power of ten without shipping a table that goes stale.
+            try {
+              var f = new Intl.NumberFormat(navigator.language || 'en', { style: 'currency', currency: currency });
+              var dp = f.resolvedOptions().maximumFractionDigits;
+              var per = document.querySelector('[data-permonth]');
+              if (per) per.textContent = f.format(raw.yearly / 12 / Math.pow(10, dp)) + ' a month';
+            } catch (e) { /* an unknown currency code just leaves the line empty */ }
+          }
+        }).catch(function () { /* leave the honest fallback text in place */ });
+
+        document.querySelectorAll('[data-checkout]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var priceId = btn.getAttribute('data-checkout');
+            if (!priceId) return;
+            // ⚠️ `customData.app_user_id` IS THE WHOLE INTEGRATION. It is the only
+            // thread tying a payment to a Terrarun account — without it somebody
+            // pays and the webhook has no idea whose entitlement to grant. It is
+            // written by the signup step; a checkout with no account attached is
+            // sent to signup first rather than opened.
+            var uid = window.__terrarunUserId || null;
+            if (!uid) { window.location.href = '/signup/?plan=' + encodeURIComponent(priceId); return; }
+            window.Paddle.Checkout.open({
+              items: [{ priceId: priceId, quantity: 1 }],
+              customData: { app_user_id: uid },
+              settings: { displayMode: 'overlay', theme: 'light', successUrl: 'https://striderunning.run/welcome/' },
+            });
+          });
+        });
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
+)}

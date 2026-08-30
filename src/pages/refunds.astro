@@ -1,0 +1,59 @@
+---
+/**
+ * /refunds — required by Paddle's website verification, and genuinely load-bearing.
+ *
+ * ⚠️ THE MERCHANT OF RECORD IS THE SELLER, NOT US. Paddle charges the customer,
+ * owes the tax, and issues the refund — so this page must describe how to reach
+ * *Paddle*, not only us, or a customer who cannot find their money is a
+ * chargeback. Chargebacks are the fastest way to lose an MoR account.
+ *
+ * ⚠️ It also has to be honest about the split: a subscription bought on the
+ * App Store is Apple's to refund, and nothing we write here can change that.
+ * Saying "email us for a refund" to somebody who paid Apple sends them in a
+ * circle.
+ */
+import LegalLayout from '../layouts/LegalLayout.astro';
+const updated = 'August 29, 2026';
+---
+<LegalLayout
+  title="Refund Policy"
+  updated={updated}
+  path="/refunds"
+  description="How refunds work for Terrarun Pro, including your statutory cancellation rights."
+>
+  <p>This policy covers <strong>Terrarun Pro</strong> bought on this website. It sits alongside our <a href="/terms/">Terms of Service</a>.</p>
+
+  <h2>1. Who you bought from</h2>
+  <p>When you buy Terrarun Pro on striderunning.run, the seller of record is <strong>Paddle.com Market Ltd</strong>, our authorised reseller. Paddle takes the payment, charges any tax due where you live, and issues refunds. Your card or bank statement will show Paddle, not Terrarun.</p>
+  <p>If you bought Terrarun Pro <strong>inside the iPhone app</strong>, Apple is the seller and refunds are handled by Apple — see section 5.</p>
+
+  <h2>2. Your right to cancel</h2>
+  <p>You can cancel a Terrarun Pro subscription at any time. Cancelling stops the next renewal; it does not end the period you have already paid for. You keep Pro until that period ends, and then the account returns to the free tier.</p>
+  <p><strong>You never lose anything by cancelling.</strong> Your runs, your history and your territory stay exactly as they are — Pro changes what the map will let you keep going forward, not what you have already run.</p>
+
+  <h2>3. Refunds</h2>
+  <p>We would rather fix the problem than keep money from somebody who is not getting value. We will refund in full when:</p>
+  <ul>
+    <li>you bought within the last <strong>14 days</strong> and have barely used Pro;</li>
+    <li>you were charged twice, or charged after cancelling;</li>
+    <li>you bought Pro on the web while already subscribed on iPhone (do not pay twice — write to us and we will refund one of them);</li>
+    <li>a fault on our side stopped Pro from working and we could not fix it.</li>
+  </ul>
+  <p>Outside those cases we look at each request on its merits. Part-used periods are normally not refunded, because you had the thing you paid for during them.</p>
+
+  <h2>4. Statutory rights (EU, UK and elsewhere)</h2>
+  <p>If you are a consumer in the EU or UK you have a <strong>14-day right to withdraw</strong> from a distance contract. Digital services are an exception where you have asked for the service to start immediately and acknowledged that you lose the withdrawal right by doing so — which is what happens when Pro is activated on your account at purchase. Where the right still applies, we honour it in full. Nothing in this policy limits any right you have under the law of your country.</p>
+
+  <h2>5. Bought on the App Store?</h2>
+  <p>Subscriptions bought inside the iPhone app are billed by Apple, and <strong>only Apple can refund them</strong> — we have no ability to reverse an App Store charge. Request a refund at <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>, and manage or cancel the subscription in Settings → your name → Subscriptions.</p>
+
+  <h2>6. How to ask</h2>
+  <p>Email <a href="mailto:support@striderunning.run">support@striderunning.run</a> with the email address you used and roughly when you bought. You can also contact Paddle directly at <a href="https://paddle.net">paddle.net</a>, which is the fastest route for a purely billing question.</p>
+  <p>We reply to refund requests within <strong>3 business days</strong>. Approved refunds are returned by Paddle to the original payment method, and usually appear within 5–10 business days depending on your bank.</p>
+
+  <h2>7. Chargebacks</h2>
+  <p>Please write to us before disputing a charge with your bank. A chargeback takes weeks and locks the account while it is investigated, where an email usually settles it the same week. We do not penalise anyone for asking for their money back.</p>
+
+  <h2>8. Changes</h2>
+  <p>If we change this policy we will post the new version here with a new date. The version in force when you bought is the one that applies to that purchase.</p>
+</LegalLayout>

@@ -1,0 +1,213 @@
+---
+/**
+ * /signup — web onboarding. Account, name, colour, then straight to checkout.
+ *
+ * ⚠️ THIS IS THE FRONT DOOR, AND IT IS THE ONLY ONE. Google Play forbids the
+ * Android app from linking users to any payment method other than Play Billing,
+ * so a Pro purchase can only begin here. People arrive from /pricing, from
+ * email, from search — never from a button inside the app.
+ *
+ * ⚠️ IT COLLECTS EXACTLY WHAT THE APP WOULD HAVE ASKED FOR, AND NOTHING MORE:
+ * name and colour. It deliberately does NOT set `onboarded_at`, so the app still
+ * runs the tutorial — that is where somebody learns the game, and skipping it for
+ * the people who paid would be exactly backwards.
+ *
+ * ⚠️ Email confirmation is OFF on this project (`mailer_autoconfirm: true`), so
+ * signup returns a session immediately and the flow can continue into checkout
+ * without a round trip through an inbox. `account.ts` says the true thing if that
+ * ever changes rather than failing halfway.
+ */
+import Layout from '../layouts/Layout.astro';
+import { PALETTE } from '../lib/account';
+
+const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN ?? '';
+const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV ?? 'sandbox';
+const paddleReady = Boolean(PADDLE_TOKEN);
+---
+
+<Layout
+  title="Create your account — Terrarun"
+  description="Create your Terrarun account, pick the colour the city will know you by, and start claiming ground."
+  path="/signup"
+  noindex={true}
+>
+  <section class="mx-auto max-w-lg px-5 pt-28 pb-24">
+    <a href="/pricing/" class="text-sm text-ink-faint hover:text-band-mid">← Back to pricing</a>
+
+    <h1 class="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight">
+      Claim your <span class="text-gradient">name</span>.
+    </h1>
+    <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+      One account works everywhere — the website, iPhone and Android. Take about a minute,
+      then the whole map is yours to run at.
+    </p>
+
+    <form id="signup-form" class="glass mt-8 space-y-5 p-6" novalidate>
+      <div>
+        <label for="su-email" class="block text-sm font-semibold text-ink">Email</label>
+        <input id="su-email" name="email" type="email" autocomplete="email" required
+          class="well mt-2 w-full px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-faint"
+          placeholder="you@example.com" />
+      </div>
+
+      <div>
+        <label for="su-pass" class="block text-sm font-semibold text-ink">Password</label>
+        <input id="su-pass" name="password" type="password" autocomplete="new-password" required minlength="8"
+          class="well mt-2 w-full px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-faint"
+          placeholder="At least 8 characters" />
+      </div>
+
+      <div>
+        <label for="su-name" class="block text-sm font-semibold text-ink">Runner name</label>
+        <input id="su-name" name="username" type="text" autocomplete="username" required
+          class="well mt-2 w-full px-4 py-3 font-mono text-[15px] text-ink outline-none placeholder:text-ink-faint"
+          placeholder="lowercase, numbers, _" />
+        <p id="su-name-hint" class="mt-2 text-xs text-ink-faint">3–20 characters. This is how the city will know you.</p>
+      </div>
+
+      <div>
+        <span class="block text-sm font-semibold text-ink">Your colour</span>
+        <p class="mt-1 text-xs text-ink-faint">Every metre you claim is drawn in it, for everyone.</p>
+        <div id="su-colors" class="mt-3 grid grid-cols-6 gap-2.5">
+          {PALETTE.map((c, i) => (
+            <button type="button" data-color={c} aria-label={`Colour ${i + 1}`}
+              class="su-swatch h-10 rounded-xl transition"
+              style={`background:${c}`}></button>
+          ))}
+        </div>
+      </div>
+
+      <p id="su-error" class="hidden rounded-xl px-4 py-3 text-sm" style="background:rgba(229,72,77,0.10);color:#A3282C"></p>
+
+      <button id="su-submit" type="submit" class="btn-primary w-full">Create account</button>
+
+      <p class="text-center text-xs leading-relaxed text-ink-faint">
+        By creating an account you agree to our <a class="font-medium text-band-mid hover:underline" href="/terms/">Terms</a>
+        and <a class="font-medium text-band-mid hover:underline" href="/privacy/">Privacy Policy</a>.
+      </p>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-ink-soft">
+      Already have an account?
+      <button id="su-signin" class="font-semibold text-band-mid hover:underline">Sign in instead</button>
+    </p>
+  </section>
+</Layout>
+
+<script>
+  import { signUp, signIn, setProfile, usernameAvailable, remember, HANDLE_RE, PALETTE, configured } from '../lib/account';
+
+  const form = document.getElementById('signup-form') as HTMLFormElement | null;
+  if (form && configured) {
+    const err = document.getElementById('su-error')!;
+    const submit = document.getElementById('su-submit') as HTMLButtonElement;
+    const nameEl = document.getElementById('su-name') as HTMLInputElement;
+    const hint = document.getElementById('su-name-hint')!;
+    let colour = PALETTE[0];
+    let mode: 'signup' | 'signin' = 'signup';
+
+    // ── colour ────────────────────────────────────────────────────────────
+    const swatches = Array.from(document.querySelectorAll<HTMLButtonElement>('.su-swatch'));
+    const paint = () => swatches.forEach((s) => {
+      const on = s.dataset.color === colour;
+      // Selection is a DEBOSSED WELL, not a border — the app's one rule for
+      // "chosen": depth is the state channel, colour is not.
+      s.style.boxShadow = on
+        ? 'inset 0 0 0 3px rgba(255,255,255,0.92), 0 0 0 2px rgba(15,23,20,0.28)'
+        : 'inset 0 -2px 4px rgba(0,0,0,0.18)';
+      s.style.transform = on ? 'scale(0.94)' : 'scale(1)';
+    });
+    swatches.forEach((s) => s.addEventListener('click', () => { colour = s.dataset.color!; paint(); }));
+    paint();
+
+    // ── name: normalise as they type, then check availability when they pause ──
+    let checkTimer: number | undefined;
+    nameEl.addEventListener('input', () => {
+      // Same normalisation the app applies, so what they see here is what they get.
+      const v = nameEl.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+      if (v !== nameEl.value) nameEl.value = v;
+      hint.textContent = '3–20 characters. This is how the city will know you.';
+      hint.style.color = '';
+      window.clearTimeout(checkTimer);
+      if (!HANDLE_RE.test(v)) return;
+      checkTimer = window.setTimeout(async () => {
+        const free = await usernameAvailable(v);
+        hint.textContent = free ? `${v} is free.` : `${v} is taken — try another.`;
+        hint.style.color = free ? '#046B4D' : '#A3282C';
+      }, 350);
+    });
+
+    // ── sign in instead ───────────────────────────────────────────────────
+    document.getElementById('su-signin')!.addEventListener('click', () => {
+      mode = mode === 'signup' ? 'signin' : 'signup';
+      const signingIn = mode === 'signin';
+      submit.textContent = signingIn ? 'Sign in' : 'Create account';
+      // The name and colour belong to an account that already has them.
+      (document.getElementById('su-name')!.parentElement as HTMLElement).style.display = signingIn ? 'none' : '';
+      (document.getElementById('su-colors')!.parentElement as HTMLElement).style.display = signingIn ? 'none' : '';
+      (document.getElementById('su-signin') as HTMLElement).textContent = signingIn ? 'Create one instead' : 'Sign in instead';
+    });
+
+    const fail = (m: string) => {
+      err.textContent = m;
+      err.classList.remove('hidden');
+      submit.disabled = false;
+      submit.textContent = mode === 'signin' ? 'Sign in' : 'Create account';
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.classList.add('hidden');
+      const email = (document.getElementById('su-email') as HTMLInputElement).value.trim();
+      const password = (document.getElementById('su-pass') as HTMLInputElement).value;
+      const username = nameEl.value.trim();
+
+      if (!email || !password) return fail('Email and password are both needed.');
+      if (mode === 'signup') {
+        if (password.length < 8) return fail('Passwords need at least 8 characters.');
+        if (!HANDLE_RE.test(username)) return fail('Runner name: 3–20 characters, lowercase letters, numbers and underscores.');
+      }
+
+      submit.disabled = true;
+      submit.textContent = mode === 'signin' ? 'Signing in…' : 'Creating…';
+
+      try {
+        const acc = mode === 'signin' ? await signIn(email, password) : await signUp(email, password);
+        if (mode === 'signup') await setProfile(acc, username, colour);
+        remember(acc);
+
+        // ⚠️ Straight into checkout when they arrived with a plan chosen. Sending
+        // somebody who has just decided to pay back to a pricing page to decide
+        // again is where funnels die.
+        const plan = new URLSearchParams(location.search).get('plan');
+        if (plan && (window as any).Paddle) {
+          (window as any).Paddle.Checkout.open({
+            items: [{ priceId: plan, quantity: 1 }],
+            customData: { app_user_id: acc.userId },
+            settings: { displayMode: 'overlay', theme: 'light', successUrl: location.origin + '/welcome/' },
+          });
+          submit.disabled = false;
+          submit.textContent = 'Opening checkout…';
+          return;
+        }
+        location.href = plan ? `/pricing/?plan=${encodeURIComponent(plan)}` : '/pricing/';
+      } catch (e: any) {
+        fail(e?.message || 'Something went wrong. Please try again.');
+      }
+    });
+  }
+</script>
+
+{paddleReady && (
+  <script is:inline define:vars={{ PADDLE_TOKEN, PADDLE_ENV }}>
+    (function () {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+      s.onload = function () {
+        if (PADDLE_ENV !== 'production') window.Paddle.Environment.set(PADDLE_ENV);
+        window.Paddle.Initialize({ token: PADDLE_TOKEN });
+      };
+      document.head.appendChild(s);
+    })();
+  </script>
+)}

@@ -2,9 +2,9 @@
 import Layout from '../../layouts/Layout.astro';
 import { cities } from '../../data/cities';
 
-const title = 'Run & Own Your City — Pick Yours | Stride';
+const title = 'Run & Own Your City — Pick Yours | Terrarun';
 const description =
-  'Stride turns running into a territory game in your city. Pick your city to see the best places to run and claim your streets first. Free for iPhone — download now on the App Store.';
+  'Terrarun turns running into a territory game in your city. Pick your city to see the best places to run and claim your streets first. Free for iPhone — download now on the App Store.';
 
 // group cities by country for a tidy directory
 const byCountry = cities.reduce((acc, c) => {
@@ -16,7 +16,7 @@ const countries = Object.keys(byCountry).sort();
 
 <Layout title={title} description={description} path="/run">
   <section class="mx-auto max-w-4xl px-5 pt-32 pb-10 text-center sm:pt-36">
-    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Stride home</a>
+    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Terrarun home</a>
     <h1 class="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">
       Run &amp; own <span class="text-gradient">your city</span>.
     </h1>
@@ -40,7 +40,7 @@ const countries = Object.keys(byCountry).sort();
       </div>
     ))}
     <p class="mt-12 text-center text-sm text-ink-faint">
-      Don’t see your city? It’s still unclaimed — <a href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395" target="_blank" rel="noopener" class="text-mint hover:underline">download Stride</a> and play anywhere.
+      Don’t see your city? It’s still unclaimed — <a href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395" target="_blank" rel="noopener" class="text-mint hover:underline">download Terrarun</a> and play anywhere.
     </p>
   </section>
 </Layout>

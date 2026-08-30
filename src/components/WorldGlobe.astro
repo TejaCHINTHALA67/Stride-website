@@ -1,0 +1,223 @@
+---
+/**
+ * WorldGlobe — the hero. A slowly turning Earth with REAL territory landing on
+ * it, one claim at a time, in each owner's own colour.
+ *
+ * This is the one thing on the site that no competitor can copy, because it is
+ * not an illustration — it is the live database. Every dot is ground somebody
+ * actually ran around.
+ *
+ * ⚠️ IT IS LAZY, AND THAT IS NOT AN OPTIMISATION. Mapbox GL is ~200 KB gzipped
+ * plus tiles. Loading it eagerly on a landing page whose job is to be fast would
+ * cost the LCP that the entire funnel depends on. It loads only when the hero is
+ * actually in view, and only when the visitor has not asked for reduced motion.
+ *
+ * ⚠️ IT ALWAYS DEGRADES TO SOMETHING FINISHED. A painted globe sits underneath
+ * from the first frame — so a slow connection, a blocked CDN, a missing token or
+ * a failed fetch leaves a still, deliberate hero rather than an empty box or a
+ * spinner that never resolves. A hero that can fail to appear is worse than one
+ * that never moves.
+ *
+ * ⚠️ PRIVACY. `get_territory_overview` returns a POINT, an area and the owner's
+ * colour — no usernames, no shapes, no routes. It already excludes anyone who
+ * opted out of the boards. Nothing here identifies a person, and nothing here
+ * should ever be changed to.
+ */
+const MAPBOX_TOKEN = import.meta.env.PUBLIC_MAPBOX_TOKEN ?? '';
+const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
+const SUPABASE_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+const live = Boolean(MAPBOX_TOKEN && SUPABASE_URL && SUPABASE_KEY);
+---
+
+<div class="relative">
+  <!-- The painted fallback. Always rendered, always first — the globe fades in
+       on top of it if and when it is ready. -->
+  <div
+    id="globe-still"
+    class="relative aspect-square w-full overflow-hidden rounded-full"
+    style="background:
+      radial-gradient(circle at 34% 30%, #14324A 0%, #0C2135 42%, #061523 68%, #04101B 100%);
+      box-shadow: 0 30px 80px -30px rgba(4,26,20,0.55), inset -18px -22px 60px rgba(0,0,0,0.55), inset 12px 14px 40px rgba(120,200,180,0.10);"
+  >
+    <div class="dot-grid absolute inset-0 opacity-[0.35]"></div>
+    <!-- A few painted claims so the still frame still tells the story. -->
+    <div class="absolute left-[30%] top-[36%] h-3 w-3 rounded-full" style="background:#06D6A0;box-shadow:0 0 0 6px rgba(6,214,160,0.18)"></div>
+    <div class="absolute left-[58%] top-[30%] h-2.5 w-2.5 rounded-full" style="background:#FF5C5C;box-shadow:0 0 0 5px rgba(255,92,92,0.16)"></div>
+    <div class="absolute left-[46%] top-[58%] h-2 w-2 rounded-full" style="background:#FBBF24;box-shadow:0 0 0 5px rgba(251,191,36,0.16)"></div>
+    <div class="absolute left-[68%] top-[54%] h-2 w-2 rounded-full" style="background:#7C9CFF;box-shadow:0 0 0 4px rgba(124,156,255,0.16)"></div>
+  </div>
+
+  {live && <div id="globe" class="absolute inset-0 rounded-full opacity-0 transition-opacity duration-1000" style="overflow:hidden"></div>}
+
+  <!-- The live counter. Real number, from the same fetch — never a decoration. -->
+  <div id="globe-stat" class="pointer-events-none absolute inset-x-0 -bottom-3 flex justify-center opacity-0 transition-opacity duration-700">
+    <div class="glass px-4 py-2">
+      <p class="font-mono text-[11px] uppercase tracking-widest text-ink-faint">
+        <span id="globe-count" class="font-bold text-ink">0</span> km² claimed worldwide
+      </p>
+    </div>
+  </div>
+</div>
+
+{live && (
+<script is:inline define:vars={{ MAPBOX_TOKEN, SUPABASE_URL, SUPABASE_KEY }}>
+(function () {
+  var host = document.getElementById('globe');
+  if (!host) return;
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var started = false;
+
+  // Only pay for Mapbox when the hero is actually on screen.
+  var io = new IntersectionObserver(function (entries) {
+    if (!entries.some(function (e) { return e.isIntersecting; }) || started) return;
+    started = true;
+    io.disconnect();
+    boot();
+  }, { rootMargin: '120px' });
+  io.observe(host);
+
+  function loadOnce(tag, attrs) {
+    return new Promise(function (res, rej) {
+      var el = document.createElement(tag);
+      Object.keys(attrs).forEach(function (k) { el[k] = attrs[k]; });
+      el.onload = res; el.onerror = rej;
+      document.head.appendChild(el);
+    });
+  }
+
+  async function boot() {
+    try {
+      await Promise.all([
+        loadOnce('link', { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css' }),
+        loadOnce('script', { src: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js' }),
+      ]);
+      if (!window.mapboxgl) return;               // blocked → the still frame stays
+      window.mapboxgl.accessToken = MAPBOX_TOKEN;
+
+      var map = new window.mapboxgl.Map({
+        container: 'globe',
+        style: 'mapbox://styles/mapbox/dark-v11',
+        projection: 'globe',
+        center: [8, 26],
+        zoom: 1.45,
+        attributionControl: false,
+        // The hero is a picture, not a tool: no scroll-jacking, no rotation
+        // handles. A drag is allowed because people will try, and a globe that
+        // refuses to move under a finger feels broken.
+        scrollZoom: false, boxZoom: false, doubleClickZoom: false, touchZoomRotate: false,
+      });
+
+      map.on('style.load', function () {
+        map.setFog({
+          color: 'rgb(14, 28, 38)',
+          'high-color': 'rgb(20, 60, 80)',
+          'horizon-blend': 0.06,
+          'space-color': 'rgb(231, 236, 234)',   // the page ground, so it sits ON it
+          'star-intensity': 0.0,                  // no stars: the page is LIGHT
+        });
+
+        map.addSource('claims', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        // Scaled by ground held, so a 36 km² empire reads bigger than a block.
+        map.addLayer({
+          id: 'claims-glow', type: 'circle', source: 'claims',
+          paint: {
+            'circle-color': ['get', 'color'],
+            'circle-opacity': 0.20,
+            'circle-radius': ['interpolate', ['linear'], ['get', 'r'], 0, 8, 1, 30],
+            'circle-blur': 0.9,
+          },
+        });
+        map.addLayer({
+          id: 'claims-core', type: 'circle', source: 'claims',
+          paint: {
+            'circle-color': ['get', 'color'],
+            'circle-opacity': 0.92,
+            'circle-radius': ['interpolate', ['linear'], ['get', 'r'], 0, 2.5, 1, 8],
+            'circle-stroke-width': 1,
+            'circle-stroke-color': 'rgba(255,255,255,0.65)',
+          },
+        });
+
+        host.style.opacity = '1';
+        fetchClaims(map);
+        if (!reduced) spin(map);
+      });
+    } catch (e) { /* the painted globe is already on screen — say nothing */ }
+  }
+
+  async function fetchClaims(map) {
+    try {
+      var res = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_territory_overview', {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ min_lng: -180, min_lat: -85, max_lng: 180, max_lat: 85, p_limit: 600 }),
+      });
+      var rows = await res.json();
+      if (!Array.isArray(rows) || !rows.length) return;
+
+      var maxA = Math.max.apply(null, rows.map(function (r) { return r.area_m2 || 0; })) || 1;
+      var feats = rows.filter(function (r) { return r.lng != null && r.lat != null; }).map(function (r) {
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [r.lng, r.lat] },
+          // sqrt, not linear: area grows with the square of a loop, so a linear
+          // scale makes one big empire swallow the whole map and hides the rest.
+          properties: { color: r.owner_color || '#06D6A0', r: Math.sqrt((r.area_m2 || 0) / maxA) },
+        };
+      });
+
+      var totalKm2 = rows.reduce(function (a, r) { return a + (r.area_m2 || 0); }, 0) / 1e6;
+      var stat = document.getElementById('globe-stat');
+      var count = document.getElementById('globe-count');
+
+      // ⚠️ Reduced motion gets the finished picture immediately — the point of
+      // that setting is that nothing arrives one piece at a time on a timer.
+      if (reduced) {
+        map.getSource('claims').setData({ type: 'FeatureCollection', features: feats });
+        if (count) count.textContent = totalKm2.toFixed(0);
+        if (stat) stat.style.opacity = '1';
+        return;
+      }
+
+      var shown = [];
+      var i = 0;
+      if (stat) stat.style.opacity = '1';
+      (function land() {
+        if (i >= feats.length) return;
+        shown.push(feats[i++]);
+        map.getSource('claims').setData({ type: 'FeatureCollection', features: shown });
+        if (count) {
+          var so = shown.reduce(function (a, f) { return a + f.properties.r; }, 0);
+          var all = feats.reduce(function (a, f) { return a + f.properties.r; }, 0) || 1;
+          count.textContent = (totalKm2 * (so / all)).toFixed(0);
+        }
+        // Fast enough to feel like a world filling up, slow enough to watch a
+        // single claim land. Eases out so the tail does not drag.
+        setTimeout(land, i < 40 ? 110 : 45);
+      })();
+    } catch (e) { /* no claims layer — the globe still turns */ }
+  }
+
+  /** Mapbox's own spinning-globe recipe: nudge the centre, ease linearly, repeat
+   *  on moveend. One full turn every ~90s — Earth-slow, not carousel-fast. */
+  function spin(map) {
+    var SECS_PER_REV = 90, STEP = 1000, on = true;
+    function turn() {
+      if (!on) return;
+      var c = map.getCenter();
+      c.lng -= 360 / SECS_PER_REV * (STEP / 1000);
+      map.easeTo({ center: c, duration: STEP, easing: function (n) { return n; } });
+    }
+    map.on('moveend', turn);
+    // A finger on the globe stops it, and it resumes once let go — a hero that
+    // keeps sliding under a drag is fighting the person looking at it.
+    map.on('mousedown', function () { on = false; });
+    map.on('touchstart', function () { on = false; });
+    map.on('mouseup', function () { on = true; turn(); });
+    map.on('touchend', function () { on = true; turn(); });
+    turn();
+  }
+})();
+</script>
+)}

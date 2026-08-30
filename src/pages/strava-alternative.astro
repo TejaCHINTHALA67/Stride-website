@@ -2,30 +2,30 @@
 import Layout from '../layouts/Layout.astro';
 import AppStore from '../components/AppStore.astro';
 
-const title = 'Strava Alternative — Stride Turns Running Into a Game';
+const title = 'Strava Alternative — Terrarun Turns Running Into a Game';
 const description =
-  'Looking for a Strava alternative? Stride is a free GPS run tracker that turns every run into a live territory game — claim your city, steal rivals’ turf. Download now on the App Store for iPhone.';
+  'Looking for a Strava alternative? Terrarun is a free GPS run tracker that turns every run into a live territory game — claim your city, steal rivals’ turf. Download now on the App Store for iPhone.';
 
 const faqs = [
   {
     q: 'Is there a free Strava alternative?',
-    a: 'Yes. Stride is free to play — you can run, track your pace and route, claim territory, climb leaderboards, and join clubs without paying. An optional Stride Pro subscription adds extras like a route planner and advanced analytics, but the full game is free.',
+    a: 'Yes. Terrarun is free to play — you can run, track your pace and route, claim territory, climb leaderboards, and join clubs without paying. An optional Terrarun Pro subscription adds extras like a route planner and advanced analytics, but the full game is free.',
   },
   {
-    q: 'What makes Stride different from Strava?',
-    a: 'Strava logs your runs. Stride turns them into a game. Every loop you run claims the real area you enclose on a live map — and rivals can steal it back. You get GPS tracking like Strava, plus territory, weekly leagues, and club-vs-club battles on top.',
+    q: 'What makes Terrarun different from Strava?',
+    a: 'Strava logs your runs. Terrarun turns them into a game. Every loop you run claims the real area you enclose on a live map — and rivals can steal it back. You get GPS tracking like Strava, plus territory, weekly leagues, and club-vs-club battles on top.',
   },
   {
-    q: 'Does Stride track pace, distance, route and GPS like Strava?',
-    a: 'Yes. Stride is a full GPS run tracker: pace, splits, distance, elevation, route map and heart rate (via Apple Health). The game layer sits on top of real run tracking, not instead of it.',
+    q: 'Does Terrarun track pace, distance, route and GPS like Strava?',
+    a: 'Yes. Terrarun is a full GPS run tracker: pace, splits, distance, elevation, route map and heart rate (via Apple Health). The game layer sits on top of real run tracking, not instead of it.',
   },
   {
-    q: 'Is Stride available to download yet?',
-    a: 'Yes — Stride is live on the App Store for iPhone. Download it free and claim your neighbourhood today; early players take their turf before anyone else shows up.',
+    q: 'Is Terrarun available to download yet?',
+    a: 'Yes — Terrarun is live on the App Store for iPhone. Download it free and claim your neighbourhood today; early players take their turf before anyone else shows up.',
   },
   {
-    q: 'Is Stride on Android?',
-    a: 'Stride is on iOS first — available now on the App Store for iPhone. Android is planned for later.',
+    q: 'Is Terrarun on Android?',
+    a: 'Terrarun is on iOS first — available now on the App Store for iPhone. Android is planned for later.',
   },
 ];
 
@@ -58,13 +58,13 @@ const cell = (v) =>
 
   <!-- Hero -->
   <section class="relative mx-auto max-w-4xl px-5 pt-32 pb-10 text-center sm:pt-36">
-    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Stride home</a>
+    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Terrarun home</a>
     <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-mint">The Strava alternative</p>
     <h1 class="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
       Run tracking is solved.<br /><span class="text-gradient">Running for fun isn’t.</span>
     </h1>
     <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
-      If you love Strava but your runs have started to feel like a chore, Stride is the alternative built
+      If you love Strava but your runs have started to feel like a chore, Terrarun is the alternative built
       to fix that. It’s a GPS run tracker that’s secretly a <strong class="text-ink">territory game</strong>:
       every loop you run claims the real area you enclose — and rivals try to steal it back.
     </p>
@@ -94,23 +94,23 @@ const cell = (v) =>
 
   <!-- Comparison -->
   <section class="reveal mx-auto max-w-4xl px-5 py-14">
-    <h2 class="font-display text-2xl font-semibold sm:text-3xl">Stride vs Strava</h2>
+    <h2 class="font-display text-2xl font-semibold sm:text-3xl">Terrarun vs Strava</h2>
     <p class="mt-4 max-w-2xl text-ink-soft">
-      Stride isn’t “Strava but worse” — it keeps the run tracking you rely on and adds a real game on top.
+      Terrarun isn’t “Strava but worse” — it keeps the run tracking you rely on and adds a real game on top.
       Here’s how they line up.
     </p>
     <div class="glass mt-8 overflow-hidden rounded-2xl">
       <table class="w-full border-collapse text-sm">
         <thead>
-          <tr class="border-b border-white/10 text-left">
+          <tr class="border-b border-ink/10 text-left">
             <th class="px-4 py-4 font-display font-semibold text-ink">Feature</th>
-            <th class="px-4 py-4 text-center font-display font-semibold text-mint">Stride</th>
+            <th class="px-4 py-4 text-center font-display font-semibold text-mint">Terrarun</th>
             <th class="px-4 py-4 text-center font-display font-semibold text-ink-soft">Strava</th>
           </tr>
         </thead>
         <tbody>
           {rows.map(([label, s, st], i) => (
-            <tr class={i % 2 ? 'bg-white/[0.02]' : ''}>
+            <tr class={i % 2 ? 'bg-sunken/50' : ''}>
               <td class="px-4 py-3.5 text-ink-soft">{label}</td>
               <td class="px-4 py-3.5 text-center font-semibold text-mint">{cell(s)}</td>
               <td class="px-4 py-3.5 text-center text-ink-soft">{cell(st)}</td>
@@ -120,7 +120,7 @@ const cell = (v) =>
       </table>
     </div>
     <p class="mt-4 text-xs text-ink-faint">
-      Strava is a trademark of Strava, Inc. Stride is not affiliated with or endorsed by Strava. Comparison
+      Strava is a trademark of Strava, Inc. Terrarun is not affiliated with or endorsed by Strava. Comparison
       reflects each app’s headline features and is provided for information only.
     </p>
   </section>
@@ -163,7 +163,7 @@ const cell = (v) =>
     <div class="glass glass-mint rounded-3xl px-6 py-12">
       <h2 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">Claim your city.</h2>
       <p class="mx-auto mt-3 max-w-xl text-ink-soft">
-        Stride is live on iPhone. Download it free from the App Store —
+        Terrarun is live on iPhone. Download it free from the App Store —
         early runners take their neighbourhood before anyone else shows up.
       </p>
       <div class="mt-8 flex justify-center [&_.as-cta]:items-center [&_.as-social]:justify-center"><AppStore compact={false} /></div>

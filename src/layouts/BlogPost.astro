@@ -25,10 +25,10 @@ const ld = {
       description,
       datePublished: published,
       dateModified: updated,
-      author: { '@type': 'Organization', name: 'Stride' },
+      author: { '@type': 'Organization', name: 'Terrarun' },
       publisher: {
         '@type': 'Organization',
-        name: 'Stride',
+        name: 'Terrarun',
         logo: { '@type': 'ImageObject', url: 'https://striderunning.run/stride-logo.png' },
       },
       mainEntityOfPage: url,
@@ -52,7 +52,7 @@ const dateLabel = new Date(updated).toLocaleDateString('en-US', { year: 'numeric
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
 
   <article class="article mx-auto max-w-3xl px-5 pt-32 pb-20">
-    <a href="/blog/" class="text-sm text-ink-faint transition hover:text-mint">← Stride blog</a>
+    <a href="/blog/" class="text-sm text-ink-faint transition hover:text-mint">← Terrarun blog</a>
     <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-mint">{tag}</p>
     <h1 class="mt-3 font-display text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">{title}</h1>
     <p class="mt-4 font-mono text-xs uppercase tracking-widest text-ink-faint">Updated · {dateLabel} · {readTime} read</p>
@@ -78,7 +78,7 @@ const dateLabel = new Date(updated).toLocaleDateString('en-US', { year: 'numeric
     <div class="glass glass-mint mt-12 rounded-3xl px-6 py-10 text-center">
       <h2 class="font-display text-2xl font-bold sm:text-3xl">Turn your runs into a game.</h2>
       <p class="mx-auto mt-3 max-w-lg text-ink-soft">
-        Stride is live on iPhone — a GPS run tracker where every loop claims real territory.
+        Terrarun is live on iPhone — a GPS run tracker where every loop claims real territory.
         Download it free and claim your neighbourhood before anyone else.
       </p>
       <div class="mt-7 flex justify-center"><AppStore compact={true} /></div>

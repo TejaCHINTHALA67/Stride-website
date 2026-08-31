@@ -47,7 +47,16 @@ const live = Boolean(MAPBOX_TOKEN && SUPABASE_URL && SUPABASE_KEY);
     <div class="absolute left-[68%] top-[54%] h-2 w-2 rounded-full" style="background:#7C9CFF;box-shadow:0 0 0 4px rgba(124,156,255,0.16)"></div>
   </div>
 
-  {live && <div id="globe" class="absolute inset-0 rounded-full opacity-0 transition-opacity duration-1000" style="overflow:hidden"></div>}
+  {/* WARNING: THE POSITIONING IS INLINE ON PURPOSE — DO NOT MOVE IT TO CLASSES.
+      Mapbox adds `.mapboxgl-map` to this container, and mapbox-gl.css declares
+      `.mapboxgl-map { position: relative }`. That stylesheet loads after
+      Tailwind, so at equal specificity it WINS: the class `absolute` computes to
+      `relative`, `inset-0` stops applying, the container falls into normal flow
+      below the still frame with a height of zero, and `overflow:hidden` clips
+      the entire map away. The map is running perfectly the whole time — there is
+      no error anywhere — it is simply being drawn into a 0px box.
+      An inline declaration outranks any stylesheet, so it cannot be overridden. */}
+  {live && <div id="globe" class="rounded-full opacity-0 transition-opacity duration-1000" style="position:absolute;inset:0;overflow:hidden"></div>}
 
   <!-- The live counter. Real number, from the same fetch — never a decoration. -->
   <div id="globe-stat" class="pointer-events-none absolute inset-x-0 -bottom-3 flex justify-center opacity-0 transition-opacity duration-700">
@@ -140,6 +149,9 @@ const live = Boolean(MAPBOX_TOKEN && SUPABASE_URL && SUPABASE_KEY);
         });
 
         host.style.opacity = '1';
+        // The container is sized by CSS, not by us, so re-measure after the
+        // reveal rather than trusting whatever it was at construction time.
+        try { map.resize(); } catch (e) { /* the map is already gone */ }
         fetchClaims(map);
         if (!reduced) spin(map);
       });

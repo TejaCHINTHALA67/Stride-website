@@ -120,6 +120,31 @@
     box-shadow: 3px 4px 8px rgba(160, 176, 169, 0.60), -3px -4px 8px rgba(255, 255, 255, 0.95);
     transition: transform .14s cubic-bezier(.16,1,.3,1), box-shadow .14s cubic-bezier(.16,1,.3,1);
   }
+  /* ── A KEY STANDING ON THE BAND ────────────────────────────────────────
+     WARNING: NEVER PUT `.btn-ghost` ON `.glass-mint`. The neumorphic pair is a
+     LIGHT-ground device: its `rgba(255,255,255,0.95)` highlight is the lit edge
+     of a surface raised out of a pale floor. On the dark green band there is
+     nothing for it to be an edge of, so it stops reading as an edge and reads
+     as a lamp burning behind the button — and the ghost's own pale face then
+     leaves near-white text on a near-white fill. That is exactly what shipped
+     on the yearly plan: a glowing white slab with an unreadable label.
+
+     On the band a key is a solid white face with dark green text and ONE soft
+     ink shadow. It is also the strongest control on the page, which is correct:
+     it belongs to the plan we actually recommend. */
+  .btn-on-band {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 font-semibold;
+    background: linear-gradient(180deg, #FFFFFF, #F1F6F3);
+    color: #04553D;
+    box-shadow: 0 6px 16px rgba(2, 26, 19, 0.30);
+    transition: transform .14s cubic-bezier(.16,1,.3,1), box-shadow .14s cubic-bezier(.16,1,.3,1);
+  }
+  .btn-on-band:hover { box-shadow: 0 9px 22px rgba(2, 26, 19, 0.36); }
+  .btn-on-band:active {
+    transform: scale(0.978);
+    box-shadow: inset 0 2px 5px rgba(2, 26, 19, 0.28);
+  }
+
   .btn-ghost:active {
     transform: scale(0.978);
     box-shadow: inset 2px 3px 5px rgba(160, 176, 169, 0.55), inset -2px -3px 5px rgba(255, 255, 255, 0.90);

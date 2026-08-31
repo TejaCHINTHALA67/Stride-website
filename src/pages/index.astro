@@ -94,12 +94,26 @@ const faqJsonLd = {
             the paywall before the first run and activation fell from 56% to 5%.
             Nothing sells Pro before somebody has ground worth defending. The
             price is one click away in the nav for anyone who came looking. */}
-        <div class="reveal mt-8" id="download-top" style="animation-delay:.18s">
-          <p class="mb-3 font-mono text-[11px] uppercase tracking-widest text-ink-faint">Free to play — get the app</p>
-          <AppStore />
-        </div>
-        <div class="reveal mt-6 flex flex-wrap items-center gap-3" style="animation-delay:.24s">
+        {/* ⚠️ THE PRIMARY ASKS FOR AN ACCOUNT, NOT A PAYMENT. It used to say
+            "Start claiming ground" and point at /pricing — a request for money
+            from somebody who has not run a metre, sitting directly above the
+            words "Free to play". Removing it outright was the other mistake:
+            that left the page with no way in at all, just two store badges.
+
+            Creating an account is free, takes a minute, and is the step that
+            actually starts the funnel — it captures the email, works across web,
+            iPhone and Android, and means the app has something to sign into
+            rather than a cold start. The price is one click away in the nav for
+            anyone who came looking for it. */}
+        <div class="reveal mt-8 flex flex-wrap items-center gap-3" style="animation-delay:.18s">
+          <a href="/signup/" class="btn-primary">Get started — it's free</a>
           <a href="#how" class="btn-ghost">See how it works</a>
+        </div>
+        {/* Straight to the store for anyone who does not want an account first.
+            The funnel is the recommendation, never a toll gate. */}
+        <div class="reveal mt-7" id="download-top" style="animation-delay:.24s">
+          <p class="mb-3 font-mono text-[11px] uppercase tracking-widest text-ink-faint">Or just get the app — free to play</p>
+          <AppStore />
         </div>
 
         {/* ⚠️ REAL NUMBERS, PULLED FROM THE LIVE DATABASE — never a rating badge.

@@ -42,6 +42,49 @@ import AppStore from '../components/AppStore.astro';
       </p>
     </div>
 
+    <!-- ACCOUNT — step 2 of the free funnel. Signed up, has NOT paid.
+
+         ⚠️ THIS STATE EXISTS BECAUSE THE PAGE WOULD OTHERWISE LIE TO NEW USERS.
+         Everything else here is built around a Paddle redirect, so a plain
+         sign-up would have fallen into the polling branch, spent ~39 seconds
+         waiting for an entitlement nobody bought, and then shown the "this is
+         taking too long, contact us" screen to somebody whose account was
+         created perfectly. It never polls. -->
+    <div id="w-account" class="hidden">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
+        style="background:linear-gradient(180deg,#14D694,#059669 34%,#02513A);box-shadow:0 3px 6px rgba(15,23,20,0.22)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h1 class="mt-7 font-display text-4xl font-bold leading-[1.05] tracking-tight">
+        You're <span class="text-gradient">in</span>.
+      </h1>
+      <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        Your account is ready. Get the app and sign in with
+        <strong id="w-acc-email" class="text-ink">the email you just used</strong> —
+        your name and colour are already waiting on the map.
+      </p>
+
+      <div class="mt-9"><AppStore /></div>
+
+      <div class="glass mt-10 p-6 text-left">
+        <h2 class="font-display text-lg font-semibold text-ink">What happens next</h2>
+        <ol class="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
+          <li><strong class="text-ink">1.</strong> Open the app and sign in with the same email.</li>
+          <li><strong class="text-ink">2.</strong> A short tutorial teaches the one move that matters — close a loop, keep the ground inside.</li>
+          <li><strong class="text-ink">3.</strong> Go for a run. The first loop you close is on the map before you have caught your breath.</li>
+        </ol>
+      </div>
+
+      {/* ⚠️ Pro is mentioned ONCE, quietly, at the bottom, as a line of text —
+          not a card and not a button. They have not run yet, so there is no
+          ground to lose and nothing here can honestly argue for it. The pitch
+          belongs after the first loop, which is where the app makes it. */}
+      <p class="mt-8 text-sm text-ink-faint">
+        The whole game is free. If you later want every metre you claim to stick,
+        there is <a class="font-semibold" style="color:#046B4D" href="/pricing/">Terrarun Pro</a>.
+      </p>
+    </div>
+
     <!-- READY — the account really is Pro -->
     <div id="w-ready" class="hidden">
       <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full"
@@ -95,14 +138,24 @@ import AppStore from '../components/AppStore.astro';
   const waiting = document.getElementById('w-waiting')!;
   const ready = document.getElementById('w-ready')!;
   const slow = document.getElementById('w-slow')!;
+  const account = document.getElementById('w-account')!;
 
   const show = (el: HTMLElement) => {
-    [waiting, ready, slow].forEach((n) => n.classList.add('hidden'));
+    [waiting, ready, slow, account].forEach((n) => n.classList.add('hidden'));
     el.classList.remove('hidden');
   };
 
   const acc = recall();
-  if (!configured || !acc) {
+
+  // ⚠️ `?new=1` means "came from a free sign-up", and it must be answered BEFORE
+  // the polling branch. Nobody bought anything, so there is no entitlement on
+  // the way and waiting for one can only end in the failure screen.
+  const isNew = new URLSearchParams(location.search).get('new') === '1';
+  if (isNew && acc) {
+    const em = document.getElementById('w-acc-email');
+    if (em && acc.email) em.textContent = acc.email;
+    show(account);
+  } else if (!configured || !acc) {
     // Landed here without a session — a shared link, a new browser, private mode.
     // We cannot verify anything, so we claim nothing.
     show(slow);

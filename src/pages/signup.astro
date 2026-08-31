@@ -32,7 +32,29 @@ const paddleReady = Boolean(PADDLE_TOKEN);
   noindex={true}
 >
   <section class="mx-auto max-w-lg px-5 pt-28 pb-24">
-    <a href="/pricing/" class="text-sm text-ink-faint hover:text-band-mid">← Back to pricing</a>
+    <a href="/" class="text-sm text-ink-faint hover:text-band-mid">← Back</a>
+
+    {/* ⚠️ A FUNNEL HAS TO SAY WHERE YOU ARE AND WHERE IT ENDS. Without it this
+        page reads as an unbounded form on a site that had, a moment ago, been
+        free — and "how much more of this is there" is the question that loses
+        people on step one. Three steps, the last one named, so the shape of the
+        commitment is visible before it is made. */}
+    <ol class="mt-6 flex items-center gap-2.5" aria-label="Progress: step 1 of 3">
+      <li class="flex items-center gap-2.5">
+        <span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold" style="background:#046B4D;color:#fff">1</span>
+        <span class="text-sm font-semibold text-ink">Account</span>
+      </li>
+      <li aria-hidden="true" class="h-px w-6" style="background:rgba(10,40,30,0.16)"></li>
+      <li class="flex items-center gap-2.5">
+        <span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold" style="background:rgba(10,40,30,0.10);color:#3F5B50">2</span>
+        <span class="text-sm text-ink-faint">Get the app</span>
+      </li>
+      <li aria-hidden="true" class="h-px w-6" style="background:rgba(10,40,30,0.16)"></li>
+      <li class="flex items-center gap-2.5">
+        <span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold" style="background:rgba(10,40,30,0.10);color:#3F5B50">3</span>
+        <span class="text-sm text-ink-faint">Run</span>
+      </li>
+    </ol>
 
     <h1 class="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight">
       Claim your <span class="text-gradient">name</span>.
@@ -190,7 +212,13 @@ const paddleReady = Boolean(PADDLE_TOKEN);
           submit.textContent = 'Opening checkout…';
           return;
         }
-        location.href = plan ? `/pricing/?plan=${encodeURIComponent(plan)}` : '/pricing/';
+        // ⚠️ NEVER SEND A PLAIN SIGN-UP TO /pricing. Somebody who just made a
+        // free account has not asked to buy anything, and landing them on a
+        // price sheet is the "pay before you have run" mistake one screen later.
+        // They go to step 2 — get the app — and the offer waits until there is
+        // territory worth defending. A signup that CAME from a plan still
+        // carries it, because that person did ask.
+        location.href = plan ? `/pricing/?plan=${encodeURIComponent(plan)}` : '/welcome/?new=1';
       } catch (e: any) {
         fail(e?.message || 'Something went wrong. Please try again.');
       }

@@ -115,7 +115,26 @@ const jsonLd = {
     </main>
     <Footer />
 
-    <!-- on-scroll reveals (vanilla, respects reduced motion) -->
+    <!-- on-scroll reveals (vanilla, respects reduced motion)
+
+         WARNING: `.reveal` IS `opacity: 0` IN CSS, SO EVERY SECTION OF THIS SITE
+         IS INVISIBLE UNTIL JAVASCRIPT SAYS OTHERWISE. That is a nice effect and
+         a bad failure mode: anything that stops this script leaves a blank white
+         page, which is exactly what gets reported. Two guards below, both of
+         which exist because of a real way it breaks:
+
+         1. THRESHOLD 0, NOT 0.14. A threshold is a fraction of the ELEMENT's own
+            area, so a section taller than about 7 viewports can never reach 14%
+            however far you scroll, and stays blank forever. Firing on the top
+            edge crossing 88% of the viewport is height-independent and looks the
+            same on everything that does work today.
+
+         2. A SWEEP. IntersectionObserver delivers nothing while a tab is hidden,
+            so a page opened in a background tab starts blank; normally the
+            callbacks arrive on focus, but a throttled or restored tab does not
+            always get them. The sweep reveals anything already on screen when
+            the page becomes visible and once shortly after load. It only touches
+            elements in view, so the scroll effect further down is preserved. -->
     <script is:inline>
       (() => {
         const els = document.querySelectorAll('.reveal');
@@ -125,8 +144,17 @@ const jsonLd = {
         }
         const io = new IntersectionObserver((entries) => {
           entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-        }, { threshold: 0.14 });
+        }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
         els.forEach((e) => io.observe(e));
+
+        const sweep = () => {
+          document.querySelectorAll('.reveal:not(.in)').forEach((e) => {
+            const r = e.getBoundingClientRect();
+            if (r.top < innerHeight && r.bottom > 0) { e.classList.add('in'); io.unobserve(e); }
+          });
+        };
+        addEventListener('visibilitychange', () => { if (!document.hidden) sweep(); });
+        setTimeout(sweep, 1200);
       })();
     </script>
   </body>

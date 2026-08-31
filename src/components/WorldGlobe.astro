@@ -183,6 +183,17 @@ const live = Boolean(MAPBOX_TOKEN && SUPABASE_URL && SUPABASE_KEY);
       var stat = document.getElementById('globe-stat');
       var count = document.getElementById('globe-count');
 
+      // WARNING: THE HERO STATS COME FROM THIS SAME RESPONSE, so they can never
+      // disagree with the globe standing next to them. They used to be typed
+      // into the markup - "126 km2" and "76 territories" - and had drifted to
+      // 129 and 81 while the globe beside them counted the truth. Two numbers
+      // contradicting each other is a strange thing for a page whose whole job
+      // is to be trusted with a card.
+      var km2El = document.getElementById('stat-km2');
+      var terrEl = document.getElementById('stat-territories');
+      if (km2El) km2El.textContent = Math.round(totalKm2) + ' km²';
+      if (terrEl) terrEl.textContent = String(rows.length);
+
       // ⚠️ Reduced motion gets the finished picture immediately — the point of
       // that setting is that nothing arrives one piece at a time on a timer.
       if (reduced) {

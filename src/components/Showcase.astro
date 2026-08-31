@@ -2,17 +2,24 @@
 // Premium "see every screen" showcase — a scroll-snap carousel of the real
 // App Store screenshots (already caption-baked marketing shots). Arrows + dots
 // + drag + gentle auto-advance (all reduced-motion aware) and scroll-reveal.
+//
+// WARNING: THESE MUST BE REGENERATED WHENEVER THE STORE SET CHANGES. They are
+// copies of the en-US folder in "terrarun screenshots/AppStoreFinal", halved
+// and JPEG'd, and nothing links the two — the site sat on July's build while
+// the app was redesigned twice, so the marketing page was advertising a UI that
+// no longer existed. The order and subjects below follow that folder exactly;
+// if a slide is renamed there, rename it here.
 const shots = [
-  { src: '/shots/01.jpg', n: '01', label: 'The living 3D map', alt: 'Terrarun app map screen — your running territory painted mint across a tilted 3D map of Manhattan with rival territories in orange and pink.' },
-  { src: '/shots/02.jpg', n: '02', label: 'Start a run', alt: 'Terrarun pre-run screen showing 3.20 km² of territory, a 128-day streak, run modes and a big START button.' },
-  { src: '/shots/03.jpg', n: '03', label: 'Real GPS tracking', alt: 'Terrarun run summary with distance, time, average pace, elevation and a per-kilometre split chart.' },
-  { src: '/shots/04.jpg', n: '04', label: 'Steal & defend turf', alt: 'Terrarun 3D war map where a rival is stealing territory, shown as a shrinking mint area with a yellow contested block.' },
-  { src: '/shots/05.jpg', n: '05', label: 'Weekly leagues', alt: 'Terrarun ranks screen with a Titan tier badge and a global leaderboard of runners ranked by territory in km².' },
-  { src: '/shots/06.jpg', n: '06', label: 'Social feed', alt: 'Terrarun community feed with a shared run, kudos, comments, a challenge button and a live event card.' },
-  { src: '/shots/07.jpg', n: '07', label: 'Run clubs', alt: 'Terrarun clubs list with run clubs, their combined territory in km² and member counts for club-vs-club battles.' },
-  { src: '/shots/08.jpg', n: '08', label: 'Turf wars & events', alt: 'Terrarun events tab showing live and upcoming area-blitz turf war races you can join.' },
-  { src: '/shots/09.jpg', n: '09', label: 'Deep analytics', alt: 'Terrarun analytics with a 30-day distance trend line, a consistency ring, weekly totals and best-effort insights.' },
-  { src: '/shots/10.jpg', n: '10', label: 'Level up', alt: 'Terrarun profile with a hex avatar, Titan rank, 128-day streak, XP bar, followers and weekly activity.' },
+  { src: '/shots/01.jpg', n: '01', label: 'Capture territory as you run', alt: 'Terrarun map screen over Toronto: a large claimed territory outlined on a dark 3D map, rival territories in blue, purple, orange and red around it, a TERRITORY 1.46 square kilometre card at the top and a hexagonal START button in the tab bar.' },
+  { src: '/shots/02.jpg', n: '02', label: 'Climb the leaderboard', alt: 'Terrarun leaderboard with a podium of the top three runners and ranked rows below, each showing the runner and the territory they hold.' },
+  { src: '/shots/03.jpg', n: '03', label: 'Share your run', alt: 'Terrarun share card for a finished run, showing the route drawn over the map with distance, pace and the territory captured.' },
+  { src: '/shots/04.jpg', n: '04', label: 'Run analytics', alt: 'Terrarun analytics screen with distance and pace trends over time, weekly totals and best efforts.' },
+  { src: '/shots/05.jpg', n: '05', label: 'Running clubs', alt: 'Terrarun clubs screen showing running clubs as factions, each with its colour, combined territory and members.' },
+  { src: '/shots/06.jpg', n: '06', label: 'Know your rivals', alt: 'Terrarun rivals screen showing the border between your territory and each rival, sorted by how much ground you are down.' },
+  { src: '/shots/07.jpg', n: '07', label: 'Plan the loop first', alt: 'Terrarun route planner with a loop drawn on the map and the distance and estimated territory it would capture.' },
+  { src: '/shots/08.jpg', n: '08', label: 'A world of territory', alt: 'Terrarun world view showing claimed territory across the globe from space.' },
+  { src: '/shots/09.jpg', n: '09', label: 'Live events and races', alt: 'Terrarun events screen listing live and upcoming races and turf-war events you can join.' },
+  { src: '/shots/10.jpg', n: '10', label: 'Level up', alt: 'Terrarun profile with rank crest, level progress, streak, followers and recent activity.' },
 ];
 ---
 <section id="screens" class="relative mx-auto max-w-6xl px-5 pt-28">

@@ -83,13 +83,23 @@ const faqJsonLd = {
         <p class="reveal mt-6 max-w-md text-lg leading-relaxed text-ink-soft" style="animation-delay:.12s">
           Terrarun turns your city into a turf war. The area you enclose on a run becomes your territory. Claim it, defend it, and steal your rivals’ on a living 3D map.
         </p>
-        <div class="reveal mt-8 flex flex-wrap items-center gap-3" style="animation-delay:.18s">
-          <a href="/pricing/" class="btn-primary">Start claiming ground</a>
-          <a href="#how" class="btn-ghost">See how it works</a>
-        </div>
-        <div class="reveal mt-6" id="download-top" style="animation-delay:.22s">
+        {/* ⚠️ THE HERO ASKS FOR ONE THING: THE DOWNLOAD. The primary button used
+            to be "Start claiming ground" pointing at /pricing — a request for
+            money from somebody who has not run a metre, sitting directly above
+            the words "Free to play". It also competed with the store badges
+            three centimetres below it, so the page had two primary actions
+            saying different things.
+
+            This is the same lesson the app itself learned the hard way: 1.7 put
+            the paywall before the first run and activation fell from 56% to 5%.
+            Nothing sells Pro before somebody has ground worth defending. The
+            price is one click away in the nav for anyone who came looking. */}
+        <div class="reveal mt-8" id="download-top" style="animation-delay:.18s">
           <p class="mb-3 font-mono text-[11px] uppercase tracking-widest text-ink-faint">Free to play — get the app</p>
           <AppStore />
+        </div>
+        <div class="reveal mt-6 flex flex-wrap items-center gap-3" style="animation-delay:.24s">
+          <a href="#how" class="btn-ghost">See how it works</a>
         </div>
 
         {/* ⚠️ REAL NUMBERS, PULLED FROM THE LIVE DATABASE — never a rating badge.

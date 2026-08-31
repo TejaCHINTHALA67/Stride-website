@@ -1,3 +1,21 @@
+# ⚠️ THE CSP IS PART OF THE PRODUCT, NOT BOILERPLATE. It was written before the
+# site had a map or a checkout, and it silently broke both: `script-src 'self'`
+# blocked Mapbox GL AND Paddle.js, so the globe fell back to a flat painted
+# circle and the pricing page showed no prices with dead buy buttons. A blocked
+# script fails with no visible error on the page, so nothing surfaces it except
+# the console.
+#
+# Anything added to this site that talks to a third party needs its domains
+# added here IN THE SAME CHANGE. What each entry is for:
+#   script-src   api.mapbox.com (GL JS), *.paddle.com (Paddle.js; sandbox
+#                serves from sandbox-cdn.paddle.com, hence the wildcard)
+#   worker-src   blob: - Mapbox GL runs its tile workers from blob URLs and
+#                renders NOTHING without this. Not covered by script-src.
+#   frame-src    *.paddle.com - the checkout overlay is an iframe. Without it
+#                the button appears to do nothing at all.
+#   connect-src  mapbox tiles + telemetry, paddle, supabase
+#   style-src    api.mapbox.com serves mapbox-gl.css
+
 # Cloudflare Pages headers — security + caching
 /*
   X-Content-Type-Options: nosniff
@@ -5,7 +23,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=(), interest-cohort=()
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https:; font-src 'self' https://cdn.fontshare.com https://api.fontshare.com; style-src 'self' 'unsafe-inline' https://api.fontshare.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co; object-src 'none'
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https:; font-src 'self' https://cdn.fontshare.com https://api.fontshare.com https://*.paddle.com; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://api.mapbox.com; script-src 'self' 'unsafe-inline' https://api.mapbox.com https://*.paddle.com; worker-src 'self' blob:; child-src 'self' blob: https://*.paddle.com; frame-src https://*.paddle.com; connect-src 'self' https://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://*.paddle.com; object-src 'none'
 
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable

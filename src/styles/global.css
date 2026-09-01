@@ -43,6 +43,8 @@
   ::selection { background: rgba(6, 214, 160, 0.30); color: #04231B; }
   h1, h2, h3, .display { @apply font-display tracking-tight; }
   a { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 3px solid #03503A; outline-offset: 3px; }
+  button:disabled { transform: none !important; box-shadow: none; }
 }
 
 @layer components {
@@ -75,9 +77,19 @@
     color: #FFFFFF;
     box-shadow: 0 6px 18px rgba(4, 40, 30, 0.28);
   }
+  /* ⚠️ ON THE BAND, TEXT IS PURE WHITE — MEASURED, NOT ASSUMED. The ramp starts
+     at #04815F in the top-LEFT corner, which is where an eyebrow and a card's
+     first lines actually sit, and against that stop:
+         pure white 4.87:1 ✓   white 92% 4.38 ✗   white 80% 3.71 ✗
+         #5FF3C0 (the band accent) 3.50 ✗
+     Only pure white clears AA there. #5FF3C0 passes on `mid` (4.69) and `deep`
+     (6.81) and is fine on a DARKENED patch such as the `rgba(0,0,0,.26)` saving
+     pill — but never as body text on the open band, and translucent white never
+     anywhere on it. Hierarchy on the band comes from size and weight, which is
+     the relief rule anyway: depth and geometry, never opacity. */
   .glass-mint .text-ink,
   .glass-mint p,
-  .glass-mint li { color: rgba(255, 255, 255, 0.86); }
+  .glass-mint li { color: #FFFFFF; }
   .glass-mint h1, .glass-mint h2, .glass-mint h3 { color: #FFFFFF; }
 
   /* A well carved INTO the ground — inputs, selected chips, code blocks. */
@@ -167,19 +179,228 @@
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
 
-  .sheen { position: relative; overflow: hidden; }
-  .sheen::after {
-    content: ''; position: absolute; inset: 0; transform: translateX(-120%);
-    background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
-    animation: sheen 4.5s ease-in-out infinite;
-  }
 }
 
 /* on-scroll reveal (no JS framework needed — IntersectionObserver toggles .in) */
 .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
 .reveal.in { opacity: 1; transform: none; }
 
+/* Purchase motion is a status channel: it explains what the system is doing,
+   and never shifts the plan grid after paint. */
+.plan-card {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: plan-enter 520ms cubic-bezier(.16,1,.3,1) var(--plan-delay, 0ms) forwards;
+}
+.plan-recommended { position: relative; }
+.plan-recommended::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(15,23,20,.28);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.price-slot { min-height: 2.25rem; font-variant-numeric: tabular-nums; }
+.price-slot.is-loaded { animation: price-land 420ms cubic-bezier(.16,1,.3,1) both; }
+.step-number {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border-radius: .6rem;
+  background: #DDE3E0;
+  color: #03503A;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: .75rem;
+  font-weight: 700;
+  box-shadow: inset 2px 3px 5px rgba(160,176,169,.5), inset -2px -3px 5px rgba(255,255,255,.9);
+}
+.trust-row { border-left: 2px solid #06D6A0; padding-left: .85rem; }
+.progress-node {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(15,23,20,.08);
+  color: #566861;
+  font-size: .68rem;
+  font-weight: 700;
+}
+.progress-node.is-current, .progress-node.is-done { background: #046B4D; color: #fff; }
+.progress-line { position: relative; width: 1.5rem; height: 2px; overflow: hidden; background: rgba(15,23,20,.14); }
+.progress-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #046B4D;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.progress-line.is-filled::after { animation: progress-fill 420ms cubic-bezier(.16,1,.3,1) 120ms forwards; }
+.welcome-state-in { animation: welcome-state 420ms cubic-bezier(.16,1,.3,1) both; }
+.checkout-handoff {
+  position: fixed;
+  z-index: 70;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  display: flex;
+  width: min(calc(100vw - 2rem), 31rem);
+  transform: translateX(-50%);
+  align-items: center;
+  gap: .8rem;
+  border-radius: 1rem;
+  padding: .85rem 1rem;
+  background: #EEF2F0;
+  color: #0F1714;
+  box-shadow: 0 10px 30px rgba(15,23,20,.22);
+  animation: handoff-enter 240ms cubic-bezier(.16,1,.3,1) both;
+}
+.checkout-handoff.hidden { display: none; }
+.checkout-handoff strong, .checkout-handoff small { display: block; }
+.checkout-handoff strong { font-size: .875rem; }
+.checkout-handoff small { margin-top: .15rem; color: #566861; font-size: .75rem; line-height: 1.35; }
+.checkout-spinner {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  border: 2px solid rgba(3,80,58,.22);
+  border-top-color: #03503A;
+  border-radius: 999px;
+  animation: checkout-spin 700ms linear infinite;
+}
+.checkout-handoff.is-done .checkout-spinner {
+  border: 0;
+  background: #046B4D;
+  box-shadow: inset 0 0 0 4px #EEF2F0, 0 0 0 2px #046B4D;
+  animation: none;
+}
+
+@keyframes plan-enter { to { opacity: 1; transform: none; } }
+@keyframes price-land {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes handoff-enter {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes checkout-spin { to { transform: rotate(360deg); } }
+@keyframes progress-fill { to { transform: scaleX(1); } }
+@keyframes welcome-state {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The store row hands a phone its own store first. Order only — both badges
+   stay, at the same weight, because the app really is on both. */
+.as-row > * { order: 1; }
+html[data-platform="android"] .as-badge-android { order: 0; }
+html[data-platform="ios"] .as-badge-ios { order: 0; }
+
+/* ── THE FUNNEL PANES ──────────────────────────────────────────────────────
+   /signup is one page carrying three steps, so the transition between them is
+   the only thing telling the runner they moved. It is a settle, not a slide-in
+   from off-screen: 14px and a fade, on the same curve every other surface uses.
+   ⚠️ A pane at rest has NO transform — a lingering `translateY` on an ancestor
+   creates a containing block and would break the fixed-position checkout
+   status line inside it. */
+.funnel-pane.pane-in { animation: pane-in 460ms cubic-bezier(.16,1,.3,1) both; }
+@keyframes pane-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── A PLAN IS A KEY, NOT A CARD WITH A BUTTON IN IT ───────────────────────
+   The whole surface is the target: on a phone — 90% of this funnel's traffic —
+   a 44pt button inside a card wastes the card. Depth carries the state, so the
+   press SINKS: scale, shadow distance and blur move together, which is what
+   separates a physical key from a rectangle that shrinks.
+
+   ⚠️ THE TWO FACES SINK DIFFERENTLY AND THAT IS NOT A DETAIL. The light key
+   insets with the neumorphic pair; the band key must NOT — its white highlight
+   is the lit edge of something raised out of a PALE floor, and on the deep
+   green ramp there is nothing for it to be an edge of, so it reads as a lamp
+   behind the button. On the band, depth is one soft ink shadow. */
+.plan-key {
+  display: block;
+  opacity: 0;
+  animation: key-in 520ms cubic-bezier(.16,1,.3,1) var(--plan-delay, 0ms) forwards;
+  width: 100%;
+  cursor: pointer;
+  transition: transform .16s cubic-bezier(.16,1,.3,1), box-shadow .16s cubic-bezier(.16,1,.3,1);
+}
+.plan-key:hover { transform: translateY(-2px); }
+.plan-key.glass:hover {
+  box-shadow: 8px 10px 22px rgba(160,176,169,.6), -8px -10px 22px rgba(255,255,255,.98);
+}
+.plan-key.glass:active {
+  transform: scale(.986);
+  box-shadow: inset 3px 4px 9px rgba(160,176,169,.55), inset -3px -4px 9px rgba(255,255,255,.9);
+}
+.plan-key.glass-mint:hover { box-shadow: 0 10px 26px rgba(4,40,30,.34); }
+.plan-key.glass-mint:active { transform: scale(.986); box-shadow: inset 0 3px 8px rgba(2,26,19,.34); }
+.plan-key:disabled { cursor: not-allowed; }
+
+/* The arrow travels on hover — the one piece of decoration on the key, and it
+   points at what pressing it does. */
+.plan-arrow { transition: transform .2s cubic-bezier(.16,1,.3,1); }
+.plan-key:hover .plan-arrow { transform: translateX(4px); }
+
+/* The seam above the action line: the key creased, not a border drawn on it.
+   Two hairlines tuned per face, because the same pair on both would glow on
+   the band. */
+.plan-go { border-top: 1px solid rgba(15,23,20,.10); padding-top: .85rem; }
+@keyframes key-in { from { opacity: 0; } to { opacity: 1; } }
+.plan-key.glass-mint .plan-go { border-top-color: rgba(255,255,255,.20); }
+
+/* ── THE PAYOFF FRAME ──────────────────────────────────────────────────────
+   The green disc and its tick are the last thing in the funnel, and a static
+   glyph is the difference between "the page finished loading" and "that
+   worked". The disc settles UP into place and the tick draws itself a beat
+   later, so the two read as one gesture rather than two arrivals.
+
+   ⚠️ THE TICK'S RESTING STATE IS *DRAWN*, AND THAT IS LOAD-BEARING. The obvious
+   way to write this is `stroke-dashoffset: 26` at rest, animating to 0 — but
+   the reduced-motion block below is `animation: none !important`, which would
+   then leave the tick permanently undrawn: an empty green disc over the words
+   "You're Pro". Same failure as `.reveal` being `opacity: 0`, which has blanked
+   this site before. The undrawn state lives ONLY in the keyframe, and
+   `backwards` fill holds it through the delay. With motion off, it is simply a
+   tick. */
+.stamp { animation: stamp-in 520ms cubic-bezier(.16,1,.3,1) both; }
+.stamp-check path {
+  stroke-dasharray: 26;
+  stroke-dashoffset: 0;
+  animation: stamp-draw 440ms cubic-bezier(.16,1,.3,1) 160ms backwards;
+}
+@keyframes stamp-in {
+  from { opacity: 0; transform: scale(.86); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes stamp-draw { from { stroke-dashoffset: 26; } }
+
+/* A step that has just completed gets stamped, not swapped. ⚠️ It sinks and
+   settles — it never scales past 1. Overshoot is banned on every premium
+   surface in this product, and a progress bar that boings is the cheapest
+   possible tell. */
+.progress-node { transition: background-color .28s ease, color .28s ease; }
+.progress-node.is-done { animation: node-done 420ms cubic-bezier(.16,1,.3,1); }
+@keyframes node-done {
+  0% { transform: scale(1); }
+  38% { transform: scale(.88); }
+  100% { transform: scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
+  .plan-card { opacity: 1; transform: none; }
+  .funnel-pane.pane-in { opacity: 1; transform: none; }
+  .plan-key { opacity: 1; }
+  .stamp { opacity: 1; transform: none; }
+  .stamp-check path { stroke-dashoffset: 0; }
+  .plan-key:hover, .plan-key:active { transform: none; }
 }

@@ -2,7 +2,7 @@
 <!--
   Terrarun link fallback page — served for /e/* /c/* /u/* /r/* via _redirects.
   iPhones WITH the app never see this (universal links open the app directly).
-  Everyone else: we try the stride:// scheme once, then show the App Store CTA.
+  Everyone else: we try the stride:// scheme once, then show both store routes.
 -->
 <html lang="en">
 <head>
@@ -10,24 +10,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Terrarun — Run &amp; Own Your City</title>
 <style>
-  :root { color-scheme: dark; }
+  :root { color-scheme: light; }
   body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-         background: #0A0E17; color: #F4F7FC; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; }
-  .card { text-align: center; padding: 32px; max-width: 420px; }
+         background: #E7ECEA; color: #0F1714; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; }
+  .card { text-align: center; margin: 20px; padding: 32px; max-width: 440px; border-radius: 24px;
+          background:#E7ECEA; box-shadow: 8px 9px 22px rgba(160,176,169,.58), -8px -9px 22px rgba(255,255,255,.95); }
   h1 { font-size: 28px; letter-spacing: 2px; margin: 0 0 6px; }
-  h1 span { color: #06D6A0; text-shadow: 0 0 18px rgba(6,214,160,.8); }
-  p { color: #9AA3B2; line-height: 1.5; }
-  a.btn { display: inline-block; margin-top: 18px; padding: 14px 28px; border-radius: 999px;
-          background: linear-gradient(180deg, #2BE3B0, #06D6A0); color: #04140E; font-weight: 700;
-          text-decoration: none; box-shadow: 0 0 24px rgba(6,214,160,.45); }
-  .small { font-size: 12px; margin-top: 22px; color: #5A6372; }
+  h1 span { color: #03503A; }
+  p { color: #586A63; line-height: 1.5; }
+  .stores { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:18px; }
+  a.btn { display: inline-block; padding: 13px 20px; border-radius: 14px;
+          background: linear-gradient(180deg,#14D694,#059669 34%,#02513A); color: white; font-weight: 700;
+          text-decoration: none; box-shadow:0 3px 6px rgba(15,23,20,.22); }
+  a.btn.secondary { background:linear-gradient(180deg,#F4F8F6,#EEF2F0 40%,#E4E9E7); color:#0F1714;
+                    box-shadow:3px 4px 8px rgba(160,176,169,.6),-3px -4px 8px rgba(255,255,255,.95); }
+  .small { font-size: 12px; margin-top: 22px; color: #566861; }
 </style>
 </head>
 <body>
 <div class="card">
-  <h1><span>STRIDE</span></h1>
+  <h1><span>TERRARUN</span></h1>
   <p id="msg">Opening in the Terrarun app…</p>
-  <a class="btn" id="cta" href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395">Download on the App Store</a>
+  <div class="stores">
+    <a class="btn" id="ios" href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395">App Store</a>
+    <a class="btn secondary" id="android" href="https://play.google.com/store/apps/details?id=com.teja.stride">Google Play</a>
+  </div>
   <p class="small">Run. Claim. Own your city.</p>
 </div>
 <script>
@@ -36,13 +43,17 @@
   var labels = { e: 'an event', c: 'a club invite', u: 'a runner profile', r: 'a run' };
   var kind = labels[path.split('/')[0]] || 'a page';
   document.getElementById('msg').textContent = 'This link opens ' + kind + ' in the Terrarun app.';
+  if (/Android/i.test(navigator.userAgent)) {
+    document.getElementById('android').classList.remove('secondary');
+    document.getElementById('ios').classList.add('secondary');
+  }
   var tried = false;
   function tryApp() {
     if (tried) return; tried = true;
     location.href = 'stride:///' + path;
   }
   if (/iPhone|iPad|Android/i.test(navigator.userAgent)) setTimeout(tryApp, 350);
-  // If the app doesn't handle the scheme, the CTA above sends users to the live App Store listing.
+  // If the app does not handle the scheme, the store buttons stay available.
 </script>
 </body>
 </html>

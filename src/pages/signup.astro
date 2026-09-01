@@ -1,16 +1,26 @@
 ---
 /**
- * /signup — web onboarding. Account, name, colour, then straight to checkout.
+ * /signup — the web funnel, end to end, on ONE page.
  *
- * ⚠️ THIS IS THE FRONT DOOR, AND IT IS THE ONLY ONE. Google Play forbids the
- * Android app from linking users to any payment method other than Play Billing,
- * so a Pro purchase can only begin here. People arrive from /pricing, from
- * email, from search — never from a button inside the app.
+ *      1. Account   →   2. Plan   →   3. Get the app
  *
- * ⚠️ IT COLLECTS EXACTLY WHAT THE APP WOULD HAVE ASKED FOR, AND NOTHING MORE:
- * name and colour. It deliberately does NOT set `onboarded_at`, so the app still
- * runs the tutorial — that is where somebody learns the game, and skipping it for
- * the people who paid would be exactly backwards.
+ * ⚠️ THIS IS THE ONLY DOOR TO A PRO PURCHASE. Google Play forbids the Android app
+ * from leading users to any payment method other than Play Billing, so Pro cannot
+ * be sold in the app at all. It is sold here, and the account carries the
+ * entitlement to whatever device signs in.
+ *
+ * ⚠️ WHY THE PLAN STEP LIVES HERE AND NOT AT /pricing. Signup used to redirect to
+ * the pricing page, and that was reverted for a good reason — a price sheet is a
+ * marketing page, it has a nav, it loses the funnel, and landing on it cold reads
+ * as a toll gate. But removing the money step entirely left the site's one
+ * revenue path unreachable from its own front door. So the step is here, inside
+ * the flow, with the progress bar still on screen and a real free door under it:
+ * a recommendation, never a wall. Nobody navigates; nothing can bounce.
+ *
+ * ⚠️ IT COLLECTS EXACTLY WHAT THE APP WOULD HAVE ASKED FOR: name and colour. It
+ * deliberately does NOT set `onboarded_at`, so the app still runs the tutorial —
+ * that is where somebody learns the game, and skipping it for the people who paid
+ * would be exactly backwards.
  *
  * ⚠️ Email confirmation is OFF on this project (`mailer_autoconfirm: true`), so
  * signup returns a session immediately and the flow can continue into checkout
@@ -18,11 +28,34 @@
  * ever changes rather than failing halfway.
  */
 import Layout from '../layouts/Layout.astro';
+import AppStore from '../components/AppStore.astro';
 import { PALETTE } from '../lib/account';
 
 const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN ?? '';
 const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV ?? 'sandbox';
-const paddleReady = Boolean(PADDLE_TOKEN);
+const PRICE_MONTHLY = import.meta.env.PUBLIC_PADDLE_PRICE_MONTHLY ?? '';
+const PRICE_YEARLY = import.meta.env.PUBLIC_PADDLE_PRICE_YEARLY ?? '';
+
+/** ⚠️ A LIVE TOKEN AGAINST SANDBOX PRICES TAKES NO MONEY AND REPORTS NO ERROR.
+ *  Every mismatch that can silently sell nothing is checked here, at build time,
+ *  and a failure disables checkout rather than rendering a button that cannot
+ *  charge. */
+const paddleReady = Boolean(
+  PADDLE_TOKEN
+  && (PADDLE_ENV === 'sandbox' || PADDLE_ENV === 'production')
+  && (PADDLE_ENV === 'production' ? PADDLE_TOKEN.startsWith('live_') : PADDLE_TOKEN.startsWith('test_'))
+  && PRICE_MONTHLY.startsWith('pri_')
+  && PRICE_YEARLY.startsWith('pri_')
+  && PRICE_MONTHLY !== PRICE_YEARLY,
+);
+
+const proIncludes = [
+  'Every metre you claim keeps counting',
+  'The full leaderboards, not the top five',
+  'Route planner, clubs, events and races',
+  'Deep analytics and Apple Watch',
+  'No ads on Android',
+];
 ---
 
 <Layout
@@ -37,87 +70,235 @@ const paddleReady = Boolean(PADDLE_TOKEN);
     {/* ⚠️ A FUNNEL HAS TO SAY WHERE YOU ARE AND WHERE IT ENDS. Without it this
         page reads as an unbounded form on a site that had, a moment ago, been
         free — and "how much more of this is there" is the question that loses
-        people on step one. Three steps, the last one named, so the shape of the
-        commitment is visible before it is made. */}
-    <ol class="mt-6 flex items-center gap-2.5" aria-label="Progress: step 1 of 3">
+        people on step one. Three steps, all named, so the shape of the
+        commitment is visible before it is made. The nodes are driven by
+        `data-step` rather than duplicated once per pane. */}
+    <ol id="su-progress" data-step="1" class="funnel-progress mt-6 flex items-center gap-2.5" aria-label="Progress: step 1 of 3">
       <li class="flex items-center gap-2.5">
-        <span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold" style="background:#046B4D;color:#fff">1</span>
-        <span class="text-sm font-semibold text-ink">Account</span>
+        <span class="progress-node is-current" data-node="1">1</span>
+        <span class="text-sm font-semibold text-ink" data-label="1">Account</span>
       </li>
-      <li aria-hidden="true" class="h-px w-6" style="background:rgba(10,40,30,0.16)"></li>
+      <li aria-hidden="true" class="progress-line" data-line="1"></li>
       <li class="flex items-center gap-2.5">
-        <span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold" style="background:rgba(10,40,30,0.10);color:#3F5B50">2</span>
-        <span class="text-sm text-ink-faint">Get the app</span>
+        <span class="progress-node" data-node="2">2</span>
+        <span class="text-sm text-ink-faint" data-label="2">Plan</span>
       </li>
-      <li aria-hidden="true" class="h-px w-6" style="background:rgba(10,40,30,0.16)"></li>
+      <li aria-hidden="true" class="progress-line" data-line="2"></li>
       <li class="flex items-center gap-2.5">
-        <span class="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold" style="background:rgba(10,40,30,0.10);color:#3F5B50">3</span>
-        <span class="text-sm text-ink-faint">Run</span>
+        <span class="progress-node" data-node="3">3</span>
+        <span class="text-sm text-ink-faint" data-label="3">Get the app</span>
       </li>
     </ol>
 
-    <h1 class="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight">
-      Claim your <span class="text-gradient">name</span>.
-    </h1>
-    <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
-      One account works everywhere — the website, iPhone and Android. Take about a minute,
-      then the whole map is yours to run at.
-    </p>
+    <!-- ══════════════ STEP 1 · ACCOUNT ══════════════ -->
+    <div id="pane-account" class="funnel-pane">
+      <h1 class="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight">
+        Claim your <span class="text-gradient">name</span>.
+      </h1>
+      <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        One account works everywhere — the website, iPhone and Android. Take about a minute,
+        then the whole map is yours to run at.
+      </p>
 
-    <form id="signup-form" class="glass mt-8 space-y-5 p-6" novalidate>
-      <div>
-        <label for="su-email" class="block text-sm font-semibold text-ink">Email</label>
-        <input id="su-email" name="email" type="email" autocomplete="email" required
-          class="well mt-2 w-full px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-faint"
-          placeholder="you@example.com" />
+      <div class="mt-6 rounded-2xl p-4 text-sm leading-relaxed text-ink-soft" style="background:#DDE3E0">
+        <strong class="text-ink">No payment is taken on this page.</strong> Your account is what lets a web purchase unlock Pro inside the app—and gives support a safe way to recover it if the handoff is delayed.
       </div>
 
-      <div>
-        <label for="su-pass" class="block text-sm font-semibold text-ink">Password</label>
-        <input id="su-pass" name="password" type="password" autocomplete="new-password" required minlength="8"
-          class="well mt-2 w-full px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-faint"
-          placeholder="At least 8 characters" />
+      <form id="signup-form" class="glass mt-6 space-y-5 p-6" novalidate
+        data-price-monthly={PRICE_MONTHLY} data-price-yearly={PRICE_YEARLY}>
+        <div>
+          <label for="su-email" class="block text-sm font-semibold text-ink">Email</label>
+          <input id="su-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254"
+            class="well mt-2 w-full px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-faint"
+            placeholder="you@example.com" />
+        </div>
+
+        <div>
+          <label for="su-pass" class="block text-sm font-semibold text-ink">Password</label>
+          <input id="su-pass" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128"
+            class="well mt-2 w-full px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-faint"
+            placeholder="At least 8 characters" />
+        </div>
+
+        <div id="su-name-field">
+          <label for="su-name" class="block text-sm font-semibold text-ink">Runner name</label>
+          <input id="su-name" name="username" type="text" autocomplete="username" required minlength="3" maxlength="20"
+            class="well mt-2 w-full px-4 py-3 font-mono text-[15px] text-ink outline-none placeholder:text-ink-faint"
+            placeholder="lowercase, numbers, _" />
+          <p id="su-name-hint" class="mt-2 text-xs text-ink-faint">3–20 characters. This is how the city will know you.</p>
+        </div>
+
+        <div id="su-colour-field">
+          <span class="block text-sm font-semibold text-ink">Your colour</span>
+          <p class="mt-1 text-xs text-ink-faint">Every metre you claim is drawn in it, for everyone.</p>
+          <div id="su-colors" class="mt-3 grid grid-cols-6 gap-2.5">
+            {PALETTE.map((c, i) => (
+              <button type="button" data-color={c} aria-label={`Colour ${i + 1}`}
+                class="su-swatch h-10 rounded-xl transition"
+                style={`background:${c}`}></button>
+            ))}
+          </div>
+        </div>
+
+        <p id="su-error" class="hidden rounded-xl px-4 py-3 text-sm" role="alert" aria-live="assertive" style="background:rgba(229,72,77,0.10);color:#A3282C"></p>
+
+        <button id="su-submit" type="submit" class="btn-primary w-full">Create account</button>
+
+        <p class="text-center text-xs leading-relaxed text-ink-faint">
+          By creating an account you agree to our <a class="font-medium text-band-mid hover:underline" href="/terms/">Terms</a>
+          and <a class="font-medium text-band-mid hover:underline" href="/privacy/">Privacy Policy</a>.
+        </p>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-ink-soft">
+        Already have an account?
+        <button id="su-signin" class="font-semibold text-band-mid hover:underline">Sign in instead</button>
+      </p>
+
+      <div class="mt-7 grid grid-cols-3 gap-2 text-center text-[11px] leading-tight text-ink-faint" aria-label="Account safeguards">
+        <span>Encrypted connection</span><span>One account across devices</span><span>Delete your account any time</span>
+      </div>
+    </div>
+
+    <!-- ══════════════ STEP 2 · PLAN ══════════════
+         Reached only with an account in hand, so every button here has exactly
+         one runner to attach a payment to. -->
+    <div id="pane-plan" class="funnel-pane hidden">
+      <h1 class="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight">
+        You're in, <span class="text-gradient" id="plan-name">runner</span>.
+      </h1>
+      <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        Your account is ready and your colour is saved. The game is free — Pro is for
+        the runners who want every metre they earn to keep counting.
+      </p>
+
+      {/* ⚠️ AN IPHONE VISITOR IS TOLD THE BETTER ROUTE, AND NOT SOLD TO HERE.
+          A web purchase is legal on iOS — guideline 3.1.3(b) permits an app to let
+          users access a subscription "acquired… on other platforms or your web
+          site, provided those items are also available as in-app purchases", which
+          Pro is — and it already works: the entitlement is on the account and the
+          app's `useIsPro()` reads it before it ever asks the store. But inside the
+          app they pay with one Face ID tap and Apple owns the receipt, the renewal
+          and the cancellation, which is genuinely better for them. So on iOS the
+          store comes first and the plans sit below, still visible: hiding them
+          would be a lie, and this pane is also what an iPad or a desktop Mac
+          sees. */}
+      <div id="plan-ios" class="hidden mt-6 rounded-2xl p-5" style="background:#DDE3E0">
+        <p class="text-sm font-semibold text-ink">You're on an iPhone — Pro is one tap inside the app.</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink-soft">
+          Install Terrarun, sign in with the email you just used, and subscribe with Face ID.
+          Apple handles the receipt, the renewal and the cancellation.
+        </p>
+        <div class="mt-4"><AppStore compact={true} only="ios" /></div>
+        <p class="mt-4 text-xs leading-relaxed text-ink-faint">
+          You can still subscribe here if you prefer — it unlocks the same account on every device.
+        </p>
       </div>
 
-      <div>
-        <label for="su-name" class="block text-sm font-semibold text-ink">Runner name</label>
-        <input id="su-name" name="username" type="text" autocomplete="username" required
-          class="well mt-2 w-full px-4 py-3 font-mono text-[15px] text-ink outline-none placeholder:text-ink-faint"
-          placeholder="lowercase, numbers, _" />
-        <p id="su-name-hint" class="mt-2 text-xs text-ink-faint">3–20 characters. This is how the city will know you.</p>
+      <div id="plan-cards" class="mt-6 grid gap-4">
+        <button type="button" id="plan-yearly" data-checkout={PRICE_YEARLY} disabled={!paddleReady}
+          class="plan-key glass-mint plan-recommended p-6 text-left disabled:cursor-not-allowed disabled:opacity-60" style="--plan-delay:60ms">
+          <span class="flex items-start justify-between gap-3">
+            <span class="block">
+              <span class="block font-mono text-xs uppercase tracking-widest text-white">Yearly</span>
+              <span class="price-slot mt-2 block font-display text-3xl font-bold" data-price="yearly">{paddleReady ? '—' : 'Unavailable'}</span>
+              <span class="mt-1 block text-sm text-white" data-permonth></span>
+            </span>
+            <span class="rounded-full px-2.5 py-1 text-[11px] font-bold" style="background:rgba(0,0,0,0.26);color:#5FF3C0" data-saving>Best value</span>
+          </span>
+          <span class="plan-go mt-5 flex items-center justify-between text-sm font-semibold text-white">
+            Get Pro yearly <span aria-hidden="true" class="plan-arrow">→</span>
+          </span>
+        </button>
+
+        <button type="button" id="plan-monthly" data-checkout={PRICE_MONTHLY} disabled={!paddleReady}
+          class="plan-key glass p-6 text-left disabled:cursor-not-allowed disabled:opacity-60" style="--plan-delay:130ms">
+          <span class="block">
+            <span class="block font-mono text-xs uppercase tracking-widest text-ink-faint">Monthly</span>
+            <span class="price-slot mt-2 block font-display text-3xl font-bold text-ink" data-price="monthly">{paddleReady ? '—' : 'Unavailable'}</span>
+            <span class="mt-1 block text-sm text-ink-faint">Cancel any time.</span>
+          </span>
+          <span class="plan-go mt-5 flex items-center justify-between text-sm font-semibold text-band-mid">
+            Get Pro monthly <span aria-hidden="true" class="plan-arrow">→</span>
+          </span>
+        </button>
       </div>
 
-      <div>
-        <span class="block text-sm font-semibold text-ink">Your colour</span>
-        <p class="mt-1 text-xs text-ink-faint">Every metre you claim is drawn in it, for everyone.</p>
-        <div id="su-colors" class="mt-3 grid grid-cols-6 gap-2.5">
-          {PALETTE.map((c, i) => (
-            <button type="button" data-color={c} aria-label={`Colour ${i + 1}`}
-              class="su-swatch h-10 rounded-xl transition"
-              style={`background:${c}`}></button>
-          ))}
+      <ul class="mt-5 grid gap-2 text-sm text-ink-soft">
+        {proIncludes.map((line) => (
+          <li class="flex items-start gap-2.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#046B4D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+
+      <p id="plan-error" class="hidden mt-5 rounded-xl px-4 py-3 text-sm" role="alert" aria-live="assertive" style="background:rgba(229,72,77,0.10);color:#A3282C"></p>
+
+      {/* ⚠️ THE FREE DOOR IS A REAL DOOR, AND IT IS NOT HIDDEN. The app learned
+          this the expensive way: 1.7 put the wall before the first run and
+          activation fell from 56% to 5%. Nothing sells Pro to somebody with no
+          ground to lose — the offer that works is the one the app makes after
+          their first loop. This step exists because the website is the ONLY place
+          an Android runner can buy at all, not because it should extract a card
+          from a stranger. */}
+      <button type="button" id="plan-skip" class="btn-ghost mt-6 w-full">Continue with the free game</button>
+      <p class="mt-3 text-center text-xs leading-relaxed text-ink-faint">
+        The whole game — running, claiming, stealing, clubs — is free. Pro never makes a run count for more territory.
+      </p>
+
+      <div class="trust-primer mt-8 grid gap-px overflow-hidden rounded-2xl bg-sunken sm:grid-cols-3" aria-label="Purchase safeguards">
+        <div class="bg-canvas p-4">
+          <p class="text-sm font-semibold text-ink">Paddle checkout</p>
+          <p class="mt-1 text-xs leading-relaxed text-ink-faint">A regulated payment company takes the payment—not this page.</p>
+        </div>
+        <div class="bg-canvas p-4">
+          <p class="text-sm font-semibold text-ink">No card data here</p>
+          <p class="mt-1 text-xs leading-relaxed text-ink-faint">Your card details go directly to Paddle and never touch Terrarun’s servers.</p>
+        </div>
+        <div class="bg-canvas p-4">
+          <p class="text-sm font-semibold text-ink">A way back</p>
+          <p class="mt-1 text-xs leading-relaxed text-ink-faint"><a href="/refunds/" class="font-semibold text-band-mid hover:underline">Refunds</a> and direct human support, visible before you pay.</p>
         </div>
       </div>
+    </div>
 
-      <p id="su-error" class="hidden rounded-xl px-4 py-3 text-sm" style="background:rgba(229,72,77,0.10);color:#A3282C"></p>
-
-      <button id="su-submit" type="submit" class="btn-primary w-full">Create account</button>
-
-      <p class="text-center text-xs leading-relaxed text-ink-faint">
-        By creating an account you agree to our <a class="font-medium text-band-mid hover:underline" href="/terms/">Terms</a>
-        and <a class="font-medium text-band-mid hover:underline" href="/privacy/">Privacy Policy</a>.
+    <!-- ══════════════ ALREADY PRO ══════════════
+         ⚠️ THE ONE GUARD THAT SAVES REAL MONEY. Somebody who subscribed on iPhone,
+         or here last month, signing in again would otherwise be shown two buy
+         buttons and could pay twice for the same account. A sentence in an FAQ is
+         not a guard; this is. -->
+    <div id="pane-pro" class="funnel-pane hidden">
+      <div class="stamp mt-8 mx-auto flex h-16 w-16 items-center justify-center rounded-full"
+        style="background:linear-gradient(180deg,#14D694,#059669 34%,#02513A);box-shadow:0 3px 6px rgba(15,23,20,0.22)">
+        <svg class="stamp-check" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h1 class="mt-7 text-center font-display text-4xl font-bold leading-[1.05] tracking-tight">
+        You already have <span class="text-gradient">Pro</span>.
+      </h1>
+      <p class="mt-4 text-center text-[15px] leading-relaxed text-ink-soft">
+        This account is already subscribed, so there is nothing to buy here. Open the app
+        and sign in with the same email — Pro is already on.
       </p>
-    </form>
-
-    <p class="mt-6 text-center text-sm text-ink-soft">
-      Already have an account?
-      <button id="su-signin" class="font-semibold text-band-mid hover:underline">Sign in instead</button>
-    </p>
+      <div class="mt-8 flex justify-center [&_.as-cta]:items-center"><AppStore compact={true} /></div>
+      <p class="mt-7 text-center text-sm text-ink-faint">
+        Managing or cancelling? Use the link in your Paddle receipt, or email
+        <a class="font-semibold text-band-mid hover:underline" href="mailto:support@striderunning.run">support@striderunning.run</a>.
+      </p>
+    </div>
   </section>
+
+  <div id="signup-checkout-handoff" class="checkout-handoff hidden" role="status" aria-live="polite" aria-atomic="true">
+    <span class="checkout-spinner" aria-hidden="true"></span>
+    <span><strong data-checkout-title>Opening Paddle’s secure checkout…</strong><small data-checkout-copy>Your card details go directly to Paddle, not Terrarun.</small></span>
+  </div>
 </Layout>
 
 <script>
-  import { signUp, signIn, setProfile, usernameAvailable, remember, HANDLE_RE, PALETTE, configured } from '../lib/account';
+  import {
+    signUp, signIn, setProfile, usernameAvailable, remember, isPro, openCheckout,
+    devicePlatform, HANDLE_RE, PALETTE, configured,
+  } from '../lib/account';
 
   const form = document.getElementById('signup-form') as HTMLFormElement | null;
   if (form && configured) {
@@ -125,8 +306,44 @@ const paddleReady = Boolean(PADDLE_TOKEN);
     const submit = document.getElementById('su-submit') as HTMLButtonElement;
     const nameEl = document.getElementById('su-name') as HTMLInputElement;
     const hint = document.getElementById('su-name-hint')!;
+    const paneAccount = document.getElementById('pane-account')!;
+    const panePlan = document.getElementById('pane-plan')!;
+    const panePro = document.getElementById('pane-pro')!;
+    const progress = document.getElementById('su-progress')!;
     let colour = PALETTE[0];
     let mode: 'signup' | 'signin' = 'signup';
+    let account: { userId: string; email: string } | null = null;
+    /** Set the moment `signUp` returns, BEFORE the profile write that can fail.
+     *  See the note at the retry below — this is what makes a second attempt
+     *  possible at all. */
+    let created: Awaited<ReturnType<typeof signUp>> | null = null;
+
+    // ── the progress bar is ONE element, driven by a step number ──────────
+    const setStep = (step: number) => {
+      progress.dataset.step = String(step);
+      progress.setAttribute('aria-label', `Progress: step ${step} of 3`);
+      for (let i = 1; i <= 3; i++) {
+        const node = progress.querySelector(`[data-node="${i}"]`)!;
+        const label = progress.querySelector(`[data-label="${i}"]`)!;
+        node.classList.toggle('is-done', i < step);
+        node.classList.toggle('is-current', i === step);
+        node.textContent = i < step ? '✓' : String(i);
+        label.className = i <= step ? 'text-sm font-semibold text-ink' : 'text-sm text-ink-faint';
+      }
+      progress.querySelector('[data-line="1"]')!.classList.toggle('is-filled', step > 1);
+      progress.querySelector('[data-line="2"]')!.classList.toggle('is-filled', step > 2);
+    };
+
+    const showPane = (pane: HTMLElement, step: number) => {
+      [paneAccount, panePlan, panePro].forEach((p) => p.classList.add('hidden'));
+      pane.classList.remove('hidden');
+      // Restart the entrance every time, so a second arrival still animates.
+      pane.classList.remove('pane-in');
+      void pane.offsetWidth;
+      pane.classList.add('pane-in');
+      setStep(step);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     // ── colour ────────────────────────────────────────────────────────────
     const swatches = Array.from(document.querySelectorAll<HTMLButtonElement>('.su-swatch'));
@@ -162,11 +379,14 @@ const paddleReady = Boolean(PADDLE_TOKEN);
     // ── sign in instead ───────────────────────────────────────────────────
     document.getElementById('su-signin')!.addEventListener('click', () => {
       mode = mode === 'signup' ? 'signin' : 'signup';
+      created = null; // a different mode is a different account
+
       const signingIn = mode === 'signin';
       submit.textContent = signingIn ? 'Sign in' : 'Create account';
+      (document.getElementById('su-pass') as HTMLInputElement).autocomplete = signingIn ? 'current-password' : 'new-password';
       // The name and colour belong to an account that already has them.
-      (document.getElementById('su-name')!.parentElement as HTMLElement).style.display = signingIn ? 'none' : '';
-      (document.getElementById('su-colors')!.parentElement as HTMLElement).style.display = signingIn ? 'none' : '';
+      (document.getElementById('su-name-field') as HTMLElement).style.display = signingIn ? 'none' : '';
+      (document.getElementById('su-colour-field') as HTMLElement).style.display = signingIn ? 'none' : '';
       (document.getElementById('su-signin') as HTMLElement).textContent = signingIn ? 'Create one instead' : 'Sign in instead';
     });
 
@@ -177,6 +397,37 @@ const paddleReady = Boolean(PADDLE_TOKEN);
       submit.textContent = mode === 'signin' ? 'Sign in' : 'Create account';
     };
 
+    // ── step 2 ────────────────────────────────────────────────────────────
+    // An iPhone is shown the store route first. The plan cards stay where they
+    // are — reordering the DOM would move a button under a thumb already
+    // travelling toward it, and this is the one page where a mis-tap costs money.
+    if (devicePlatform() === 'ios') {
+      document.getElementById('plan-ios')!.classList.remove('hidden');
+    }
+
+    const planError = document.getElementById('plan-error')!;
+    const handoff = document.getElementById('signup-checkout-handoff');
+    const checkoutFailed = () => {
+      handoff?.classList.add('hidden');
+      planError.textContent = 'Secure checkout could not open — nothing was charged. Check any content blocker and try again, or email support@striderunning.run.';
+      planError.classList.remove('hidden');
+    };
+
+    const buy = (priceId: string) => {
+      if (!account || !priceId) return;
+      planError.classList.add('hidden');
+      handoff?.classList.remove('hidden');
+      openCheckout({ priceId, userId: account.userId, email: account.email, onError: checkoutFailed });
+    };
+
+    document.querySelectorAll<HTMLButtonElement>('#plan-cards [data-checkout]').forEach((btn) => {
+      btn.addEventListener('click', () => buy(btn.getAttribute('data-checkout') || ''));
+    });
+    document.getElementById('plan-skip')!.addEventListener('click', () => {
+      location.href = '/welcome/?new=1';
+    });
+
+    // ── submit ────────────────────────────────────────────────────────────
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       err.classList.add('hidden');
@@ -190,35 +441,50 @@ const paddleReady = Boolean(PADDLE_TOKEN);
         if (!HANDLE_RE.test(username)) return fail('Runner name: 3–20 characters, lowercase letters, numbers and underscores.');
       }
 
+      // ⚠️ A `?plan=` IS ONLY HONOURED IF IT IS ONE OF THIS BUILD'S OWN PRICES.
+      // The value reaches Paddle, so an arbitrary id from a crafted link would
+      // otherwise open a checkout for something we never meant to sell.
+      const requestedPlan = new URLSearchParams(location.search).get('plan');
+      const allowedPlans = [form.dataset.priceMonthly, form.dataset.priceYearly].filter(Boolean);
+      const plan = requestedPlan && allowedPlans.includes(requestedPlan) ? requestedPlan : null;
+      if (requestedPlan && !plan) return fail('That plan link is invalid or has expired. Return to Pricing and choose a current plan.');
+
       submit.disabled = true;
       submit.textContent = mode === 'signin' ? 'Signing in…' : 'Creating…';
 
       try {
-        const acc = mode === 'signin' ? await signIn(email, password) : await signUp(email, password);
-        if (mode === 'signup') await setProfile(acc, username, colour);
+        // ⚠️ THE ACCOUNT SURVIVES A FAILED SECOND HALF, SO THE RETRY MUST NOT
+        // TRY TO CREATE IT AGAIN. `setProfile` can fail after `signUp` has
+        // already succeeded — the runner name losing a race to the unique index
+        // is exactly the case it catches, and it tells them to pick another one.
+        // Without this, that retry calls signUp with an email that now exists,
+        // GoTrue answers "User already registered", and somebody with a perfectly
+        // good account is stranded on step one of their own funnel with no way
+        // forward and no way to know why.
+        // ⚠️ …but only for the SAME email. Editing the address between attempts
+        // means a different account was intended, and reusing the created one
+        // would quietly write this name and colour onto the first one.
+        if (created && created.email.toLowerCase() !== email.toLowerCase()) created = null;
+        const acc = created ?? (mode === 'signin' ? await signIn(email, password) : await signUp(email, password));
+        if (mode === 'signup') { created = acc; await setProfile(acc, username, colour); }
         remember(acc);
+        account = { userId: acc.userId, email: acc.email };
 
-        // ⚠️ Straight into checkout when they arrived with a plan chosen. Sending
-        // somebody who has just decided to pay back to a pricing page to decide
-        // again is where funnels die.
-        const plan = new URLSearchParams(location.search).get('plan');
-        if (plan && (window as any).Paddle) {
-          (window as any).Paddle.Checkout.open({
-            items: [{ priceId: plan, quantity: 1 }],
-            customData: { app_user_id: acc.userId },
-            settings: { displayMode: 'overlay', theme: 'light', successUrl: location.origin + '/welcome/' },
-          });
-          submit.disabled = false;
-          submit.textContent = 'Opening checkout…';
+        // Somebody signing back in may already be subscribed — on iPhone, here,
+        // or from a previous card. Never show them a buy button.
+        if (mode === 'signin' && await isPro(acc.userId, acc.accessToken)) {
+          showPane(panePro, 3);
           return;
         }
-        // ⚠️ NEVER SEND A PLAIN SIGN-UP TO /pricing. Somebody who just made a
-        // free account has not asked to buy anything, and landing them on a
-        // price sheet is the "pay before you have run" mistake one screen later.
-        // They go to step 2 — get the app — and the offer waits until there is
-        // territory worth defending. A signup that CAME from a plan still
-        // carries it, because that person did ask.
-        location.href = plan ? `/pricing/?plan=${encodeURIComponent(plan)}` : '/welcome/?new=1';
+
+        const nameSlot = document.getElementById('plan-name');
+        if (nameSlot) nameSlot.textContent = mode === 'signup' ? username : (acc.email.split('@')[0] || 'runner');
+
+        showPane(panePlan, 2);
+        // ⚠️ THEY ALREADY CHOSE. Arriving with a plan means the decision was made
+        // on the pricing page; asking a second time is a step that only loses
+        // people. The pane is shown first so closing the overlay lands on it.
+        if (plan) buy(plan);
       } catch (e: any) {
         fail(e?.message || 'Something went wrong. Please try again.');
       }
@@ -227,13 +493,92 @@ const paddleReady = Boolean(PADDLE_TOKEN);
 </script>
 
 {paddleReady && (
-  <script is:inline define:vars={{ PADDLE_TOKEN, PADDLE_ENV }}>
+  <script is:inline define:vars={{ PADDLE_TOKEN, PADDLE_ENV, PRICE_MONTHLY, PRICE_YEARLY }}>
     (function () {
+      var handoff = document.getElementById('signup-checkout-handoff');
+      var title = handoff && handoff.querySelector('[data-checkout-title]');
+      var copy = handoff && handoff.querySelector('[data-checkout-copy]');
+
+      function say(t, c, spinning) {
+        if (!handoff) return;
+        if (title) title.textContent = t;
+        if (copy) copy.textContent = c;
+        handoff.classList.toggle('is-done', !spinning);
+        handoff.classList.remove('hidden');
+      }
+      function hide() { if (handoff) handoff.classList.add('hidden'); }
+
+      function disablePlans(note) {
+        document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = 'Unavailable'; });
+        document.querySelectorAll('#plan-cards [data-checkout]').forEach(function (b) { b.disabled = true; });
+        var e = document.getElementById('plan-error');
+        if (e) { e.textContent = note; e.classList.remove('hidden'); }
+      }
+
       var s = document.createElement('script');
       s.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
       s.onload = function () {
         if (PADDLE_ENV !== 'production') window.Paddle.Environment.set(PADDLE_ENV);
-        window.Paddle.Initialize({ token: PADDLE_TOKEN });
+        window.Paddle.Initialize({
+          token: PADDLE_TOKEN,
+          eventCallback: function (event) {
+            if (!event || !event.name) return;
+            switch (event.name) {
+              case 'checkout.loaded':
+                // Paddle now owns the screen; our own status line would only be
+                // a second thing talking over it.
+                hide();
+                break;
+              case 'checkout.completed':
+                say('Payment approved.', 'Unlocking Pro on your account…', true);
+                break;
+              case 'checkout.closed':
+                hide();
+                break;
+              case 'checkout.payment.failed':
+                say('That payment did not go through.', 'Nothing was charged. Try another card or payment method.', false);
+                break;
+              case 'checkout.error':
+              case 'checkout.payment.error':
+                say('Checkout hit a problem.', 'Nothing was charged. Please try again or email support@striderunning.run.', false);
+                break;
+            }
+          },
+        });
+
+        // Prices come from Paddle, localised to the visitor. Never from markup.
+        window.Paddle.PricePreview({
+          items: [{ priceId: PRICE_MONTHLY, quantity: 1 }, { priceId: PRICE_YEARLY, quantity: 1 }],
+        }).then(function (res) {
+          var raw = {};
+          var currency = res.data.currencyCode;
+          (res.data.details.lineItems || []).forEach(function (li) {
+            var key = li.price.id === PRICE_YEARLY ? 'yearly' : 'monthly';
+            var el = document.querySelector('[data-price="' + key + '"]');
+            if (el) { el.textContent = li.formattedTotals.total; el.classList.add('is-loaded'); }
+            raw[key] = Number(li.totals.total);
+          });
+          if (raw.monthly > 0 && raw.yearly > 0) {
+            // ⚠️ Both are MINOR UNITS in the SAME currency, so the ratio needs no
+            // decimal handling and is correct in every market.
+            var pct = Math.round((1 - raw.yearly / (raw.monthly * 12)) * 100);
+            var badge = document.querySelector('[data-saving]');
+            if (badge && pct > 0) badge.textContent = 'Save ' + pct + '%';
+            // ⚠️ The per-month figure DOES need it: minor units are hundredths in
+            // most currencies but WHOLE UNITS in JPY, KRW, HUF and TWD.
+            try {
+              var f = new Intl.NumberFormat(navigator.language || 'en', { style: 'currency', currency: currency });
+              var dp = f.resolvedOptions().maximumFractionDigits;
+              var per = document.querySelector('[data-permonth]');
+              if (per) per.textContent = f.format(raw.yearly / 12 / Math.pow(10, dp)) + ' a month';
+            } catch (e) { /* an unknown currency code just leaves the line empty */ }
+          }
+        }).catch(function () {
+          disablePlans('Paddle could not load this build’s prices, so checkout is disabled and nothing can be charged. The free game is unaffected.');
+        });
+      };
+      s.onerror = function () {
+        disablePlans('Secure checkout could not load — check your connection or content blocker. The free game is unaffected.');
       };
       document.head.appendChild(s);
     })();

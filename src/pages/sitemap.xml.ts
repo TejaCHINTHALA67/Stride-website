@@ -4,7 +4,7 @@ import { cities } from '../data/cities';
 // Dynamic sitemap — auto-includes every city page + blog post so we never
 // hand-maintain XML again. (Replaces the old static public/sitemap.xml.)
 const SITE = 'https://striderunning.run';
-const TODAY = '2026-06-22';
+const TODAY = '2026-08-31';
 
 type Entry = { path: string; lastmod?: string; changefreq?: string; priority?: string };
 
@@ -28,6 +28,7 @@ const entries: Entry[] = [
   { path: '/pricing/', changefreq: 'weekly', priority: '0.9' },
   { path: '/privacy/', changefreq: 'monthly', priority: '0.4' },
   { path: '/refunds/', changefreq: 'monthly', priority: '0.4' },
+  { path: '/security/', changefreq: 'monthly', priority: '0.5' },
   { path: '/terms/', changefreq: 'monthly', priority: '0.4' },
   { path: '/delete-account/', changefreq: 'monthly', priority: '0.3' },
   { path: '/disclaimer/', changefreq: 'monthly', priority: '0.4' },

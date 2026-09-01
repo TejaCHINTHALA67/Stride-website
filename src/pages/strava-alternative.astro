@@ -58,8 +58,8 @@ const cell = (v) =>
 
   <!-- Hero -->
   <section class="relative mx-auto max-w-4xl px-5 pt-32 pb-10 text-center sm:pt-36">
-    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Terrarun home</a>
-    <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-mint">The Strava alternative</p>
+    <a href="/" class="text-sm text-ink-faint transition hover:text-band-mid">← Terrarun home</a>
+    <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-band-mid">The Strava alternative</p>
     <h1 class="mt-4 font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
       Run tracking is solved.<br /><span class="text-gradient">Running for fun isn’t.</span>
     </h1>
@@ -85,7 +85,7 @@ const cell = (v) =>
         ['You want to compete', 'KOMs are great for the fast few. Most of us want a game we can actually win in our own neighbourhood.'],
       ].map(([h, p]) => (
         <div class="glass rounded-2xl p-5">
-          <h3 class="font-display text-lg font-semibold text-mint">{h}</h3>
+          <h3 class="font-display text-lg font-semibold text-band-mid">{h}</h3>
           <p class="mt-2 text-sm leading-relaxed text-ink-soft" set:html={p} />
         </div>
       ))}
@@ -104,7 +104,7 @@ const cell = (v) =>
         <thead>
           <tr class="border-b border-ink/10 text-left">
             <th class="px-4 py-4 font-display font-semibold text-ink">Feature</th>
-            <th class="px-4 py-4 text-center font-display font-semibold text-mint">Terrarun</th>
+            <th class="px-4 py-4 text-center font-display font-semibold text-band-mid">Terrarun</th>
             <th class="px-4 py-4 text-center font-display font-semibold text-ink-soft">Strava</th>
           </tr>
         </thead>
@@ -112,7 +112,7 @@ const cell = (v) =>
           {rows.map(([label, s, st], i) => (
             <tr class={i % 2 ? 'bg-sunken/50' : ''}>
               <td class="px-4 py-3.5 text-ink-soft">{label}</td>
-              <td class="px-4 py-3.5 text-center font-semibold text-mint">{cell(s)}</td>
+              <td class="px-4 py-3.5 text-center font-semibold text-band-mid">{cell(s)}</td>
               <td class="px-4 py-3.5 text-center text-ink-soft">{cell(st)}</td>
             </tr>
           ))}
@@ -168,7 +168,7 @@ const cell = (v) =>
       </p>
       <div class="mt-8 flex justify-center [&_.as-cta]:items-center [&_.as-social]:justify-center"><AppStore compact={false} /></div>
       <p class="mt-6 text-sm text-ink-faint">
-        Curious how it plays? <a href="/blog/how-to-make-running-fun/" class="text-mint hover:underline">Read: how to make running fun →</a>
+        Curious how it plays? <a href="/blog/how-to-make-running-fun/" class="text-band-mid hover:underline">Read: how to make running fun →</a>
       </p>
     </div>
   </section>

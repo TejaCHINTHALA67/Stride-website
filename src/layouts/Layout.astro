@@ -12,7 +12,7 @@ export interface Props {
 }
 const {
   title = 'Terrarun — Run & Own Your City | Territory Running Game',
-  description = 'Terrarun turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Free territory running game — download now on the App Store for iPhone.',
+  description = 'Terrarun turns running into a turf war. Run a loop, claim the real area you enclose, and steal rivals’ territory on a live 3D map. Free on iPhone and Android.',
   path = '/',
   noindex = false,
 } = Astro.props;
@@ -24,9 +24,7 @@ const site = 'https://striderunning.run';
 // canonical tag" instead of indexing them directly.
 const normalizedPath = path.endsWith('/') ? path : `${path}/`;
 const canonical = new URL(normalizedPath, site).href;
-// SVG renders in most link-preview unfurlers (Slack/Discord/LinkedIn/iMessage).
-// For Twitter/Facebook (raster only) export og.svg → og.png and switch this.
-const ogImage = `${site}/og.svg`;
+const ogImage = `${site}/images/og.png`;
 const keywords = 'Terrarun, Terrarun running, Terrarun run, Terrarun game, Terrarun play, best running app, running app, GPS running app, run tracker app, fitness app, Strava alternative, competitive running app, territory running game, running game, GPS running game, run and own your city, claim territory running, turf running, run tracker game, iOS running game, gamified running app, running game iPhone';
 
 const jsonLd = {
@@ -59,8 +57,14 @@ const jsonLd = {
       genre: 'Fitness Game',
       keywords,
       url: site,
-      installUrl: 'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395',
-      downloadUrl: 'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395',
+      installUrl: [
+        'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395',
+        'https://play.google.com/store/apps/details?id=com.teja.stride',
+      ],
+      downloadUrl: [
+        'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395',
+        'https://play.google.com/store/apps/details?id=com.teja.stride',
+      ],
       description,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     },
@@ -80,7 +84,7 @@ const jsonLd = {
     {noindex
       ? <meta name="robots" content="noindex, nofollow" />
       : <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />}
-    <meta name="theme-color" content="#0A0E17" />
+    <meta name="theme-color" content="#E7ECEA" />
 
     <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website" />
@@ -89,10 +93,14 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Terrarun — Run a loop. Own the block." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="Terrarun — Run a loop. Own the block." />
 
     <!-- Fonts: Clash Display (app display font) + Satoshi (body) -->
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
@@ -106,6 +114,22 @@ const jsonLd = {
     <!-- LLM-readable site summary for AI assistants / answer engines -->
     <link rel="alternate" type="text/markdown" href="/llms.txt" title="llms.txt" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- ⚠️ THE PLATFORM STAMP HAS TO LAND BEFORE THE FIRST PAINT. It decides
+         which store badge sits first in every CTA row on the page; set from a
+         deferred script it would reorder the buttons under a thumb already on
+         its way to one. Blocking, in the head, four lines, no dependency.
+         iPadOS reports itself as a Macintosh, so the touch-point test is not
+         optional. -->
+    <script is:inline>
+      (function () {
+        var ua = navigator.userAgent || '';
+        var p = /Android/i.test(ua) ? 'android'
+          : (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1)) ? 'ios'
+          : 'other';
+        document.documentElement.setAttribute('data-platform', p);
+      })();
+    </script>
   </head>
   <body>
     <HexField />

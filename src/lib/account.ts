@@ -87,6 +87,9 @@ async function gotrue(path: string, body: unknown): Promise<{ access_token: stri
   const r = await fetch(`${URL_}/auth/v1/${path}`, { method: 'POST', headers: headers(), body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) {
+    if (r.status === 429) {
+      throw new Error('Too many account attempts from this connection. Wait a minute, then try again.');
+    }
     // GoTrue's own message is usually the clearest thing we can say.
     throw new Error(j?.msg || j?.error_description || j?.message || 'Something went wrong. Please try again.');
   }
@@ -156,6 +159,93 @@ export async function isPro(userId: string, token: string): Promise<boolean> {
     const exp = row.premium_expires_at ? Date.parse(row.premium_expires_at) : NaN;
     return Number.isNaN(exp) || exp > Date.now();
   } catch {
+    return false;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * WHICH DEVICE IS ASKING, AND WHY IT CHANGES WHAT WE SAY
+ *
+ * ⚠️ A WEB PURCHASE IS LEGAL ON IPHONE, AND IT ALREADY WORKS. App Review
+ * guideline 3.1.3(b) (Multiplatform Services) permits an app to "allow users to
+ * access content, subscriptions, or features they have acquired… on other
+ * platforms or your web site, provided those items are also available as
+ * in-app purchases within the app" — and Pro IS an in-app purchase on iOS. The
+ * entitlement lives on `users.is_premium`, which `useIsPro()` short-circuits on
+ * before it ever asks the store, so an iPhone signed in to a web-paid account is
+ * Pro with no client change. Nothing here needs to block that.
+ *
+ * ⚠️ WHAT IS NOT PERMITTED IS THE APP STEERING THEM HERE. That is 3.1.1, and the
+ * app does not do it — there is no link to this site from inside iOS. The site's
+ * own obligation is smaller but real: an iPhone visitor should be told that Pro
+ * is one Face ID tap away inside the app they can install for free, because that
+ * is genuinely the better route for them, and because a site that funnels iOS
+ * users into a card form is the thing that draws attention to a boundary we are
+ * currently on the right side of. The web plans stay visible — hiding them would
+ * be a lie, and iPads and desktops share this code path — they are just not the
+ * recommendation.
+ *
+ * iPadOS reports itself as a Macintosh, so the touch-point test is not optional.
+ */
+export type DevicePlatform = 'ios' | 'android' | 'other';
+
+export function devicePlatform(): DevicePlatform {
+  if (typeof navigator === 'undefined') return 'other';
+  const ua = navigator.userAgent || '';
+  if (/Android/i.test(ua)) return 'android';
+  if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+  // iPadOS 13+ ships a desktop UA; only the touch points give it away.
+  if (/Macintosh/.test(ua) && (navigator.maxTouchPoints ?? 0) > 1) return 'ios';
+  return 'other';
+}
+
+/** Canonical origin. Paddle requires `successUrl` to be an absolute URL, and a
+ *  preview deployment sending someone to the production /welcome would strand
+ *  them in a browser with no session — so this is derived, never typed twice. */
+export const SITE = 'https://striderunning.run';
+export function successUrl(): string {
+  const origin = typeof location !== 'undefined' ? location.origin : SITE;
+  return `${origin}/welcome/`;
+}
+
+/**
+ * The ONE checkout call. Both the funnel and /pricing open Paddle through this
+ * so the two can never drift apart on the things that matter.
+ *
+ * ⚠️ `customData.app_user_id` IS THE ENTIRE INTEGRATION — the only thread tying
+ * a payment to a Terrarun account. Without it somebody pays and the webhook has
+ * nobody to grant.
+ *
+ * ⚠️ PREFILLING `customer.email` SKIPS PADDLE'S FIRST CHECKOUT PAGE and lands
+ * them straight on payment, which is a step removed from a funnel where 90% of
+ * traffic is a phone. It also makes the receipt arrive at the address the
+ * account uses — and `allowLogout: false` keeps it that way, so nobody pays
+ * under an email they will later try to sign in with and find nothing on.
+ */
+export function openCheckout(opts: {
+  priceId: string;
+  userId: string;
+  email?: string;
+  onError?: () => void;
+}): boolean {
+  const P = (window as unknown as { Paddle?: any }).Paddle;
+  if (!P?.Checkout?.open) { opts.onError?.(); return false; }
+  try {
+    P.Checkout.open({
+      items: [{ priceId: opts.priceId, quantity: 1 }],
+      ...(opts.email ? { customer: { email: opts.email } } : {}),
+      customData: { app_user_id: opts.userId },
+      settings: {
+        displayMode: 'overlay',
+        theme: 'light',
+        variant: 'one-page',
+        allowLogout: false,
+        successUrl: successUrl(),
+      },
+    });
+    return true;
+  } catch {
+    opts.onError?.();
     return false;
   }
 }

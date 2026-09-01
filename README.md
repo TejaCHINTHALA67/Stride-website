@@ -58,8 +58,8 @@ Get `hello@striderunning.run`, `privacy@…`, `legal@…` forwarded to your pers
 4. Cloudflare adds the required MX/TXT records automatically.
 > To *send* from that address too, add it as a "Send mail as" alias in Gmail using Cloudflare's worker/SMTP guidance — but receiving (forwarding) is free and instant.
 
-## 6. Add the social image
-Add `public/og.png` (1200×630) — a dark card with the Stride wordmark + "Run & Own Your City". It's already referenced in the `<head>` for link previews.
+## 6. Social image
+`public/images/og.png` is the 1200×630 Terrarun social card referenced by the shared layout.
 
 ## 7. AI / chatbot discoverability (built in)
 So assistants like ChatGPT, Claude, and Perplexity can read & recommend Stride:

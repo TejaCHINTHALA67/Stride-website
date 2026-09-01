@@ -1,0 +1,5 @@
+Contact: mailto:support@striderunning.run?subject=Security%20report
+Canonical: https://striderunning.run/.well-known/security.txt
+Policy: https://striderunning.run/security/
+Preferred-Languages: en
+Expires: 2027-08-31T23:59:59Z

@@ -64,7 +64,7 @@ const plan = [
     <table class="w-full border-collapse text-sm">
       <thead>
         <tr class="border-b border-ink/10 text-left">
-          <th class="px-4 py-3 font-display font-semibold text-mint">Week</th>
+          <th class="px-4 py-3 font-display font-semibold text-band-mid">Week</th>
           <th class="px-4 py-3 font-display font-semibold text-ink">Each session (after a 5-min warm-up walk)</th>
           <th class="px-4 py-3 font-display font-semibold text-ink-soft">Per week</th>
         </tr>
@@ -72,7 +72,7 @@ const plan = [
       <tbody>
         {plan.map(([w, s, n], i) => (
           <tr class={i % 2 ? 'bg-sunken/50' : ''}>
-            <td class="px-4 py-3 font-semibold text-mint align-top">{w}</td>
+            <td class="px-4 py-3 font-semibold text-band-mid align-top">{w}</td>
             <td class="px-4 py-3 text-ink-soft">{s}</td>
             <td class="px-4 py-3 text-ink-soft align-top">{n}</td>
           </tr>

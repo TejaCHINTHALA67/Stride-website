@@ -1,6 +1,6 @@
 # Stride — Run & Own Your City
 
-> Stride is a competitive territory-running game for iOS. You run a loop outdoors; the real-world area your route encloses becomes your territory on a shared, live 3D map. You can steal rivals' territory by enclosing it, defend your own, climb monthly leagues, join clubs, and compete on city and global leaderboards. Free to play. Website: https://striderunning.run
+> Terrarun is a competitive territory-running game for iPhone and Android. You run a loop outdoors; the real-world area your route encloses becomes your territory on a shared, live 3D map. You can steal rivals' territory by enclosing it, defend your own, climb weekly leagues, join clubs, and compete on city and global leaderboards. Free to play. Website: https://striderunning.run
 
 ## What Stride is
 - A running app **and** a real-time strategy game in one. Think "running app meets territory control / turf war."
@@ -27,14 +27,20 @@
 - Clubs, events (with nearby-event notifications), challenges, achievements, and city/country/global leaderboards.
 - Free to play. No pay-to-win territory.
 
-## Availability
-- iOS first: Stride is live now on the Apple App Store for iPhone. Android planned later.
-- Download on the App Store: https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395
+## Availability and pricing
+- Terrarun is live on the Apple App Store for iPhone and on Google Play for Android.
+- The game is free to download and play. The Android free tier is supported by ads.
+- Optional Terrarun Pro removes Android ads and unlocks the full map, route planning and deeper analytics. Website payments are handled by Paddle as merchant of record; Terrarun never receives card details.
+- App Store: https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395
+- Google Play: https://play.google.com/store/apps/details?id=com.teja.stride
+- Pricing: https://striderunning.run/pricing/
 
 ## Pages
 - Home: https://striderunning.run
 - Download on the App Store: https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395
 - Privacy Policy: https://striderunning.run/privacy
+- Security: https://striderunning.run/security
+- Refund Policy: https://striderunning.run/refunds
 - Terms of Service: https://striderunning.run/terms
 - Safety Disclaimer: https://striderunning.run/disclaimer
 

@@ -1,19 +1,32 @@
 ---
-// Store CTAs — Terrarun is LIVE on BOTH stores (Android approved 2026-07-30).
-// Faithful black badges, Apple first (it is the older, larger platform), Google
-// Play beside it. Drop-in replacement for the old <Waitlist /> (same props).
+/**
+ * Store CTAs — Terrarun is LIVE on BOTH stores (Android approved 2026-07-30).
+ *
+ * ⚠️ THE VISITOR'S OWN STORE COMES FIRST. Both badges always render — the app is
+ * genuinely on both and hiding one would be a lie — but a phone is handed its own
+ * store at the front of the row, because "Download on the App Store" sitting first
+ * on an Android phone is a dead end presented as the primary action. The ordering
+ * is pure CSS off `html[data-platform]` (set once in Layout), so it costs no
+ * layout pass and no script per instance.
+ *
+ * `only` is for the places that have already NAMED a platform in the copy beside
+ * them — the iPhone notice on the plan step, for one. There, a second badge for
+ * the other store is a contradiction, not a courtesy.
+ */
 const APP_STORE_URL = 'https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.teja.stride';
-const { compact = false } = Astro.props;
+interface Props { compact?: boolean; only?: 'ios' | 'android'; }
+const { compact = false, only } = Astro.props as Props;
 ---
 <div class="as-cta inline-flex flex-col items-start gap-4">
-  <div class="flex flex-wrap items-center gap-3">
+  <div class="as-row flex flex-wrap items-center gap-3">
+  {only !== 'android' && (
   <a
     href={APP_STORE_URL}
     target="_blank"
     rel="noopener"
     aria-label="Download Terrarun on the App Store"
-    class="as-badge group inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-black px-5 py-3.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-0.5 hover:border-black/25 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-mint/70"
+    class="as-badge as-badge-ios group inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-black px-5 py-3.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-0.5 hover:border-black/25 hover:shadow-contact focus:outline-none focus-visible:ring-2 focus-visible:ring-band-accent"
   >
     <!-- Apple mark -->
     <svg viewBox="0 0 24 24" class="h-8 w-8 shrink-0" fill="#fff" aria-hidden="true">
@@ -24,13 +37,15 @@ const { compact = false } = Astro.props;
       <span class="mt-0.5 font-display text-xl font-semibold tracking-tight">App Store</span>
     </span>
   </a>
+  )}
 
+  {only !== 'ios' && (
   <a
     href={PLAY_STORE_URL}
     target="_blank"
     rel="noopener"
     aria-label="Get Terrarun on Google Play"
-    class="as-badge group inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-black px-5 py-3.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-0.5 hover:border-black/25 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-mint/70"
+    class="as-badge as-badge-android group inline-flex items-center gap-3 rounded-2xl border border-black/10 bg-black px-5 py-3.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] transition duration-300 hover:-translate-y-0.5 hover:border-black/25 hover:shadow-contact focus:outline-none focus-visible:ring-2 focus-visible:ring-band-accent"
   >
     <!-- Google Play mark — the four-colour triangle -->
     <svg viewBox="0 0 24 24" class="h-8 w-8 shrink-0" aria-hidden="true">
@@ -44,6 +59,7 @@ const { compact = false } = Astro.props;
       <span class="mt-0.5 font-display text-xl font-semibold tracking-tight">Google Play</span>
     </span>
   </a>
+  )}
   </div>
 
   {!compact && (
@@ -63,7 +79,7 @@ const { compact = false } = Astro.props;
         ))}
       </div>
       <p class="text-sm text-ink-soft">
-        <span class="font-display font-semibold text-mint">Live now</span>
+        <span class="font-display font-semibold text-band-mid">Live now</span>
         <span> · Free on iPhone &amp; Android</span>
         <span class="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-mint align-middle animate-pulse-glow" aria-hidden="true"></span>
       </p>

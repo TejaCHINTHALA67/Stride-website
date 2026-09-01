@@ -1,9 +1,9 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
-const updated = 'June 22, 2026';
+const updated = 'August 31, 2026';
 ---
 <LegalLayout title="Privacy Policy" updated={updated} path="/privacy" description="How Terrarun collects, uses, and protects your data — including location and health data used to track your runs.">
-  <p>This Privacy Policy explains how <strong>Terrarun</strong> ("Terrarun", "we", "us", "our") collects, uses, shares, and protects information when you use the Terrarun mobile app and <a href="/">striderunning.run</a> (together, the "Service"). Terrarun is a location-based running game — location is core to how it works, and this Policy is written to be honest about exactly what that means. <strong>We do not sell your personal information, and we do not show ads.</strong></p>
+  <p>This Privacy Policy explains how <strong>Terrarun</strong> ("Terrarun", "we", "us", "our") collects, uses, shares, and protects information when you use the Terrarun mobile app and <a href="/">striderunning.run</a> (together, the "Service"). Terrarun is a location-based running game — location is core to how it works, and this Policy is written to be honest about exactly what that means. <strong>We do not sell your personal information.</strong> The free Android app may show ads; iPhone and Terrarun Pro do not.</p>
   <p>By using the Service you agree to this Policy. If you do not agree, please do not use the Service.</p>
 
   <h2>1. Information we collect</h2>
@@ -28,13 +28,14 @@ const updated = 'June 22, 2026';
   </ul>
   <h3>Collected automatically</h3>
   <ul>
-    <li><strong>Device &amp; diagnostics:</strong> app version, device model, OS version, crash reports and performance traces (via Sentry) so we can fix problems. We do not use third-party advertising or cross-app tracking SDKs, and we do not request the iOS App Tracking Transparency permission because we do not track you across other companies’ apps or websites.</li>
+    <li><strong>Device &amp; diagnostics:</strong> app version, device model, OS version, crash reports and performance traces (via Sentry) so we can fix problems. The Android build includes Google Mobile Ads; the iPhone build excludes that SDK and does not request the App Tracking Transparency permission.</li>
+    <li><strong>Ads on Android:</strong> the free Android tier may show ads from Google AdMob. Where required, Google’s consent flow runs before ads are requested. Depending on your consent choices and region, Google may process device identifiers, approximate location derived from IP, ad interactions and diagnostics to deliver, measure and protect ads. Health data and precise run routes are not provided to AdMob. Pro removes ads.</li>
     <li><strong>Push token:</strong> if you enable notifications, a device push token so we can deliver them. Every notification category can be turned off in Settings.</li>
     <li><strong>Motion (on-device only):</strong> the app may use the accelerometer to animate on-screen effects (for example, liquid that tilts with your phone). This sensor data is processed on your device in real time and is never recorded or transmitted.</li>
   </ul>
   <h3>If you subscribe to Terrarun Pro</h3>
   <ul>
-    <li><strong>Purchases:</strong> Terrarun Pro is an optional auto-renewing subscription. <strong>Apple processes the payment</strong> through your App Store account — we never see or store your card number or full payment details. We receive only confirmation of your subscription and entitlement status (in trial, active, expired) so we can unlock Pro features for your account.</li>
+    <li><strong>Purchases:</strong> Terrarun Pro is an optional auto-renewing subscription. Apple processes purchases made inside the iPhone app. Paddle.com Market Ltd is the merchant of record for purchases made on this website: Paddle collects the payment, tax and billing details and sends the receipt. We never receive or store your full card number or security code. We receive the purchase and entitlement status needed to unlock Pro for your account.</li>
     <li><strong>Paywall provider (Superwall):</strong> we use Superwall to present offers and manage subscriptions. It receives a pseudonymous app-user identifier, your subscription/entitlement status, and basic device and locale information to show the right offer and record the purchase. It does not receive your name, email, runs, location, or health data, and it is not an advertising or cross-app tracking service.</li>
   </ul>
 
@@ -57,7 +58,8 @@ const updated = 'June 22, 2026';
 
   <h2>4. How we share information</h2>
   <ul>
-    <li><strong>Service providers (processors)</strong> that process data on our behalf and only on our instructions: Supabase (database, authentication, file storage, realtime infrastructure, and email-delivery functions), Apple and Google (sign-in, when you choose them), Mapbox (map tiles and rendering — receives map viewport requests), Apple and Expo (push notification delivery), Superwall (subscription paywall and entitlement management), Apple (payment processing for subscriptions), Resend (transactional and product email delivery), Sentry (crash diagnostics), and Cloudflare (website hosting). Each is bound by contractual data-protection terms.</li>
+    <li><strong>Service providers</strong> that help operate the Service: Supabase (database, authentication, file storage, realtime infrastructure, and email-delivery functions), Apple and Google (sign-in, when you choose them), Mapbox (map tiles and rendering — receives map viewport requests), Apple and Expo (push notification delivery), Superwall (iPhone subscription presentation and entitlement management), Apple (App Store payment processing), Google AdMob (Android advertising and consent), Resend (transactional and product email delivery), Sentry (crash diagnostics), and Cloudflare (website hosting). Their handling of data is governed by their role and contractual/data-protection terms.</li>
+    <li><strong>Paddle:</strong> for website purchases, Paddle.com Market Ltd acts as merchant of record and processes checkout, billing, tax, receipts, subscription status and refunds. Paddle receives the account linkage and billing information needed to complete and support the purchase; it does not receive your run routes or health data from Terrarun.</li>
     <li><strong>Apple Health, if you connect it:</strong> data flows only in the directions described above, on your device, under Apple's HealthKit rules.</li>
     <li><strong>Legal:</strong> if required by law, subpoena, or to protect the rights, property, or safety of Terrarun, our users, or the public.</li>
     <li><strong>Business transfer:</strong> if Terrarun is acquired or merged, your data may transfer to the successor, who must honour this Policy or notify you of changes.</li>

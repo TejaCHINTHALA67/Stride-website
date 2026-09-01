@@ -16,7 +16,7 @@ const countries = Object.keys(byCountry).sort();
 
 <Layout title={title} description={description} path="/run">
   <section class="mx-auto max-w-4xl px-5 pt-32 pb-10 text-center sm:pt-36">
-    <a href="/" class="text-sm text-ink-faint transition hover:text-mint">← Terrarun home</a>
+    <a href="/" class="text-sm text-ink-faint transition hover:text-band-mid">← Terrarun home</a>
     <h1 class="mt-6 font-display text-4xl font-bold tracking-tight sm:text-5xl">
       Run &amp; own <span class="text-gradient">your city</span>.
     </h1>
@@ -32,15 +32,15 @@ const countries = Object.keys(byCountry).sort();
         <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {byCountry[country].map((c) => (
             <a href={`/run/${c.slug}/`} class="glass group flex items-center justify-between rounded-2xl px-5 py-4 transition hover:border-mint/40">
-              <span class="font-display text-lg font-semibold transition group-hover:text-mint">{c.name}</span>
-              <span class="text-ink-faint transition group-hover:text-mint">→</span>
+              <span class="font-display text-lg font-semibold transition group-hover:text-band-mid">{c.name}</span>
+              <span class="text-ink-faint transition group-hover:text-band-mid">→</span>
             </a>
           ))}
         </div>
       </div>
     ))}
     <p class="mt-12 text-center text-sm text-ink-faint">
-      Don’t see your city? It’s still unclaimed — <a href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395" target="_blank" rel="noopener" class="text-mint hover:underline">download Terrarun</a> and play anywhere.
+      Don’t see your city? It’s still unclaimed — <a href="/#download" class="text-band-mid hover:underline">download Terrarun</a> and play anywhere.
     </p>
   </section>
 </Layout>

@@ -16,12 +16,30 @@
 #   connect-src  mapbox tiles + telemetry, paddle, supabase
 #   style-src    api.mapbox.com serves mapbox-gl.css
 
+#
+# ⚠️ `payment=` IS NOT DECORATION — WITHOUT IT APPLE PAY AND GOOGLE PAY DO NOT
+# APPEAR IN OUR OWN CHECKOUT. The Payment Request API's default allowlist is
+# `self`, so a CROSS-ORIGIN iframe cannot use it unless the top-level document
+# delegates the permission to that exact origin. Paddle renders the checkout in an
+# iframe on buy.paddle.com (sandbox-buy.paddle.com in sandbox), so both are named
+# here. ⚠️ Permissions-Policy takes NO WILDCARDS — the `https://*.paddle.com` that
+# works in the CSP above is silently invalid in this header, and a new checkout
+# origin has to be added by hand. The failure mode is the CSP incident's twin:
+# nothing errors, the wallet buttons simply are not offered, and a card form is
+# the worst-converting thing you can show a phone.
+#
+# ⚠️ COOP is `same-origin-allow-popups`, NOT `same-origin`. Several of Paddle's
+# local payment methods finish in a POPUP window, and the stricter value severs
+# the opener relationship those flows need — it would break a payment silently and
+# only in the markets that use them.
+
 # Cloudflare Pages headers — security + caching
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), camera=(), microphone=(), interest-cohort=()
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), interest-cohort=(), payment=(self "https://buy.paddle.com" "https://sandbox-buy.paddle.com")
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https:; font-src 'self' https://cdn.fontshare.com https://api.fontshare.com https://*.paddle.com; style-src 'self' 'unsafe-inline' https://api.fontshare.com https://api.mapbox.com; script-src 'self' 'unsafe-inline' https://api.mapbox.com https://*.paddle.com; worker-src 'self' blob:; child-src 'self' blob: https://*.paddle.com; frame-src https://*.paddle.com; connect-src 'self' https://*.supabase.co https://api.mapbox.com https://events.mapbox.com https://*.paddle.com; object-src 'none'
 
@@ -35,4 +53,8 @@
 # Universal links: Apple requires JSON content-type, no redirect, on this exact path
 /.well-known/apple-app-site-association
   Content-Type: application/json
+  Cache-Control: public, max-age=3600
+
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8
   Cache-Control: public, max-age=3600

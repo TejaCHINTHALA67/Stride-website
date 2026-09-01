@@ -5,9 +5,9 @@ import Showcase from '../components/Showcase.astro';
 import WorldGlobe from '../components/WorldGlobe.astro';
 
 const steps = [
-  { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself — your block, a park, your neighbourhood.', c: '#06D6A0' },
-  { n: '02', t: 'Claim the area', d: 'The real area your loop encloses becomes your territory on a live 3D map. Bigger loop, bigger turf.', c: '#FBBF24' },
-  { n: '03', t: 'Defend & conquer', d: 'Run over a rival’s turf to steal it. Get robbed? Run it back within 24h for a revenge bonus.', c: '#FF6B35' },
+  { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself — your block, a park, your neighbourhood.', c: '#046B4D', image: '/images/how-loop.webp', alt: 'A carved city map with a runner completing a bright mint loop around a park.' },
+  { n: '02', t: 'Claim the area', d: 'The real area your loop encloses becomes your territory on a live 3D map. Bigger loop, bigger turf.', c: '#9A6B00', image: '/images/how-claim.webp', alt: 'A raised mint territory claimed inside an irregular route loop, marked by a gold flag.' },
+  { n: '03', t: 'Defend & conquer', d: 'Run over a rival’s turf to steal it. Get robbed? Run it back within 24h for a revenge bonus.', c: '#C6471B', image: '/images/how-defend.webp', alt: 'Mint and orange runners contesting the border between two carved city territories.' },
 ];
 
 const features = [
@@ -45,7 +45,7 @@ const faqs = [
   { q: 'What is Terrarun?', a: 'Terrarun is a competitive territory-running game for iOS. You run a loop outdoors and the real-world area your route encloses becomes your territory on a shared, live 3D map — you can steal rivals’ territory, defend your own, and climb weekly leagues.' },
   { q: 'Is Terrarun available now?', a: 'Yes — Terrarun is live on the App Store for iPhone and on Google Play for Android. Download it free, pick your colour, and claim your first block today.' },
   { q: 'How do you actually “own” territory?', a: 'When your GPS route closes into a loop, the area it encloses is captured as a polygon and becomes yours on the shared map. Other runners can take it by enclosing it themselves, and you can take theirs.' },
-  { q: 'Is it free?', a: 'Yes. Terrarun is free to play. A future optional membership may add cosmetic and convenience perks — never pay-to-win territory.' },
+  { q: 'Is it free?', a: 'Yes. Terrarun is free to play. Android is supported by ads; optional Terrarun Pro removes them and unlocks the full map, route planning and deeper analytics. Pro never makes a run count for more territory.' },
   { q: 'What stops cheaters in cars?', a: 'Every run goes through anti-cheat: physics checks on speed, GPS quality and movement patterns, plus a second-pass automatic review. Vehicle-speed runs are saved as workouts only — no territory, no XP.' },
   { q: 'Do I need to share my location?', a: 'Terrarun needs GPS while you run to track your route, like any running app. You control privacy settings, and you can run in explore mode without claiming. See our Privacy Policy.' },
   { q: 'Is there an Android version?', a: 'Yes. Terrarun is live on Google Play for Android, and on the App Store for iPhone. Both are free to download.' },
@@ -69,7 +69,6 @@ const faqJsonLd = {
 
   <!-- HERO -->
   <section class="relative overflow-hidden pt-28 sm:pt-36">
-    <div class="aurora pointer-events-none absolute inset-0" aria-hidden="true"></div>
     <div class="dot-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"></div>
     <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-[1.05fr_0.95fr]">
       <div>
@@ -140,8 +139,19 @@ const faqJsonLd = {
       {/* THE WORLD, TURNING. Real territory from the live database landing one
           claim at a time — the one thing on this site nobody else can copy,
           because it is not an illustration. */}
-      <div class="reveal mx-auto w-full max-w-[440px]" style="animation-delay:.3s">
+      <div class="reveal mx-auto w-full max-w-[460px]" style="animation-delay:.3s">
         <WorldGlobe />
+        <figure class="hero-photo glass mt-5 overflow-hidden p-2">
+          <div class="relative overflow-hidden rounded-[14px]">
+            <img src="/images/runner-dawn.webp" width="1536" height="1024"
+              alt="A runner rounding a quiet city block at dawn."
+              fetchpriority="high" decoding="async" class="aspect-[3/2] w-full object-cover" />
+            <figcaption class="absolute inset-x-3 bottom-3 rounded-xl px-3 py-2 text-xs font-medium text-white"
+              style="background:rgba(3,80,58,.90)">
+              The city is the board. Your run is the move.
+            </figcaption>
+          </div>
+        </figure>
       </div>
     </div>
   </section>
@@ -149,17 +159,21 @@ const faqJsonLd = {
   <!-- HOW IT WORKS -->
   <section id="how" class="relative mx-auto max-w-6xl px-5 pt-28">
     <div class="reveal max-w-xl">
-      <p class="font-mono text-xs uppercase tracking-[0.2em] text-mint">How it works</p>
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-band-mid">How it works</p>
       <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">Three moves. The whole city.</h2>
     </div>
     <div class="mt-12 grid gap-5 md:grid-cols-3">
       {steps.map((s, i) => (
-        <div class="reveal group relative overflow-hidden rounded-2xl glass p-7 transition-transform duration-300 hover:-translate-y-1" style={`animation-delay:${i * 0.08}s`}>
-          <div class="font-mono text-sm" style={`color:${s.c}`}>{s.n}</div>
-          <h3 class="mt-4 font-display text-2xl font-semibold">{s.t}</h3>
+        <div class="reveal group relative overflow-hidden rounded-2xl glass p-3 transition-transform duration-300 hover:-translate-y-1" style={`animation-delay:${i * 0.08}s`}>
+          <img src={s.image} alt={s.alt} width="1200" height="1200" loading="lazy" decoding="async"
+            class="aspect-square w-full rounded-[14px] object-cover" />
+          <div class="p-4">
+          <div class="font-mono text-sm font-semibold" style={`color:${s.c}`}>{s.n}</div>
+          <h3 class="mt-3 font-display text-2xl font-semibold">{s.t}</h3>
           <p class="mt-3 text-sm leading-relaxed text-ink-soft">{s.d}</p>
           <div class="mt-6 h-1 w-full rounded-full bg-sunken">
-            <div class="h-1 rounded-full transition-all duration-700 group-hover:w-full" style={`width:34%;background:${s.c};box-shadow:0 0 16px ${s.c}`}></div>
+            <div class="h-1 rounded-full transition-all duration-700 group-hover:w-full" style={`width:34%;background:${s.c}`}></div>
+          </div>
           </div>
         </div>
       ))}
@@ -172,7 +186,7 @@ const faqJsonLd = {
   <!-- THE GAME (bento) -->
   <section id="game" class="relative mx-auto max-w-6xl px-5 pt-28">
     <div class="reveal max-w-xl">
-      <p class="font-mono text-xs uppercase tracking-[0.2em] text-flame">The game</p>
+      <p class="font-mono text-xs uppercase tracking-[0.2em]" style="color:#A83D18">The game</p>
       <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">A running app with a <span class="text-gradient">scoreboard</span>.</h2>
       <p class="mt-4 text-ink-soft">Not another step counter. A hard, skill-based territory game where every run changes the map.</p>
     </div>
@@ -192,7 +206,7 @@ const faqJsonLd = {
   <!-- THE PLAYBOOK — actually useful tactics -->
   <section id="playbook" class="relative mx-auto max-w-6xl px-5 pt-28">
     <div class="reveal max-w-xl">
-      <p class="font-mono text-xs uppercase tracking-[0.2em] text-gold">The playbook</p>
+      <p class="font-mono text-xs uppercase tracking-[0.2em]" style="color:#765500">The playbook</p>
       <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">Win your first week.</h2>
       <p class="mt-4 text-ink-soft">Territory is a skill game. These three habits separate block-owners from joggers — learn them before your first run.</p>
     </div>
@@ -226,7 +240,7 @@ const faqJsonLd = {
         { v: 'One shared map', s: 'one city, one war' },
       ].map((x) => (
         <div class="bg-canvas/40 p-8 text-center">
-          <div class="font-display text-3xl font-bold text-mint sm:text-4xl">{x.v}</div>
+          <div class="font-display text-3xl font-bold text-band-mid sm:text-4xl">{x.v}</div>
           <div class="mt-1 text-sm text-ink-soft">{x.s}</div>
         </div>
       ))}
@@ -236,7 +250,7 @@ const faqJsonLd = {
   <!-- FAQ -->
   <section id="faq" class="relative mx-auto max-w-3xl px-5 pt-28">
     <div class="reveal text-center">
-      <p class="font-mono text-xs uppercase tracking-[0.2em] text-mint">FAQ</p>
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-band-mid">FAQ</p>
       <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">Good questions.</h2>
     </div>
     <div class="mt-10 divide-y divide-white/8 overflow-hidden rounded-2xl glass">
@@ -244,7 +258,7 @@ const faqJsonLd = {
         <details class="group px-6 py-5">
           <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-lg font-medium marker:hidden">
             {f.q}
-            <span class="text-ink-faint transition group-open:rotate-45 group-open:text-mint">+</span>
+            <span class="text-ink-faint transition group-open:rotate-45 group-open:text-band-mid">+</span>
           </summary>
           <p class="mt-3 text-sm leading-relaxed text-ink-soft">{f.a}</p>
         </details>
@@ -256,7 +270,6 @@ const faqJsonLd = {
   <section id="download" class="relative mx-auto max-w-4xl px-5 pt-28">
     <div class="reveal relative overflow-hidden rounded-[2rem] glass glass-mint px-6 py-16 text-center sm:px-12">
       <div class="dot-grid pointer-events-none absolute inset-0 opacity-30"></div>
-      <div class="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 animate-pulse-glow rounded-full bg-mint/15 blur-3xl"></div>
       <div class="relative">
         <h2 class="font-display text-4xl font-bold tracking-tight sm:text-5xl">Claim your city.</h2>
         <p class="mx-auto mt-4 max-w-md text-ink-soft">Terrarun is live. Download it free, run your first loop, and take your block before your rivals do.</p>
@@ -264,24 +277,5 @@ const faqJsonLd = {
       </div>
     </div>
   </section>
-
-  <style>
-    /* slow aurora wash behind the hero */
-    .aurora {
-      background:
-        radial-gradient(40% 36% at 75% 6%, rgba(6,214,160,0.16), transparent 70%),
-        radial-gradient(34% 30% at 12% 28%, rgba(255,107,53,0.10), transparent 70%),
-        radial-gradient(30% 26% at 55% 60%, rgba(251,191,36,0.06), transparent 70%);
-      animation: aurora 16s ease-in-out infinite alternate;
-      filter: blur(2px);
-    }
-    @keyframes aurora {
-      0% { transform: translate3d(0,0,0) scale(1); }
-      100% { transform: translate3d(0,-3%,0) scale(1.08); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .aurora { animation: none; }
-    }
-  </style>
 
 </Layout>

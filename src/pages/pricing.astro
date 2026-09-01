@@ -19,12 +19,22 @@
  * checking that you describe what you sell.
  */
 import Layout from '../layouts/Layout.astro';
+import AppStore from '../components/AppStore.astro';
 
 const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN ?? '';
 const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV ?? 'sandbox';
 const PRICE_MONTHLY = import.meta.env.PUBLIC_PADDLE_PRICE_MONTHLY ?? '';
 const PRICE_YEARLY = import.meta.env.PUBLIC_PADDLE_PRICE_YEARLY ?? '';
-const configured = Boolean(PADDLE_TOKEN && PRICE_MONTHLY && PRICE_YEARLY);
+const environmentValid = PADDLE_ENV === 'sandbox' || PADDLE_ENV === 'production';
+const tokenMatchesEnvironment = PADDLE_ENV === 'production'
+  ? PADDLE_TOKEN.startsWith('live_')
+  : PADDLE_TOKEN.startsWith('test_');
+const pricesLookValid = PRICE_MONTHLY.startsWith('pri_')
+  && PRICE_YEARLY.startsWith('pri_')
+  && PRICE_MONTHLY !== PRICE_YEARLY;
+const configured = Boolean(
+  PADDLE_TOKEN && environmentValid && tokenMatchesEnvironment && pricesLookValid,
+);
 
 const included = [
   ['Every metre you claim', 'No cap on territory, no banked ground waiting to be unlocked.'],
@@ -56,48 +66,148 @@ const included = [
     </header>
 
     <!-- ── the two plans ────────────────────────────────────────────────── -->
-    <div class="mt-12 grid gap-6 sm:grid-cols-2">
-      <div class="glass p-7">
+    <div class="trust-primer mt-9 grid gap-px overflow-hidden rounded-2xl bg-sunken sm:grid-cols-3" aria-label="Purchase safeguards">
+      <div class="bg-canvas p-4">
+        <p class="text-sm font-semibold text-ink">Paddle checkout</p>
+        <p class="mt-1 text-xs leading-relaxed text-ink-faint">A regulated payment company takes the payment—not this page.</p>
+      </div>
+      <div class="bg-canvas p-4">
+        <p class="text-sm font-semibold text-ink">No card data here</p>
+        <p class="mt-1 text-xs leading-relaxed text-ink-faint">Your card details go directly to Paddle and never touch Terrarun’s servers.</p>
+      </div>
+      <div class="bg-canvas p-4">
+        <p class="text-sm font-semibold text-ink">A way back</p>
+        <p class="mt-1 text-xs leading-relaxed text-ink-faint">Refund terms and direct human support are visible before you pay.</p>
+      </div>
+    </div>
+
+    {/* ⚠️ AN IPHONE VISITOR IS TOLD THE BETTER ROUTE, AND NOT SOLD TO HERE.
+        A web purchase is legal on iOS — guideline 3.1.3(b) permits an app to let
+        users access a subscription "acquired… on other platforms or your web
+        site, provided those items are also available as in-app purchases", which
+        Pro is — and it already works, because the entitlement lives on the
+        account and the app reads it before it ever asks the store. But inside the
+        app they pay with one Face ID tap and Apple owns the receipt, the renewal
+        and the cancellation. So iOS gets told that first. The plans stay exactly
+        where they are: hiding them would be a lie, and this page is also what an
+        iPad or a desktop Mac sees. */}
+    <div id="ios-notice" class="hidden mt-7 rounded-2xl p-5" style="background:#DDE3E0">
+      <p class="text-sm font-semibold text-ink">On iPhone, Pro is one tap inside the app.</p>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
+        Install Terrarun, sign in, and subscribe with Face ID — Apple handles the receipt,
+        the renewal and the cancellation. Buying here works too and unlocks the same
+        account everywhere; it is just the longer way round.
+      </p>
+      <div class="mt-4"><AppStore compact={true} only="ios" /></div>
+    </div>
+
+    {/* ⚠️ THE ONE GUARD THAT SAVES REAL MONEY. Somebody who subscribed on iPhone,
+        or here last month, would otherwise see two live buy buttons and could pay
+        twice for one account. The FAQ below says "do not buy it twice"; a
+        sentence is not a guard. This disables the buttons. */}
+    <div id="already-pro" class="hidden mt-7 rounded-2xl p-5" style="background:#DDE3E0">
+      <p class="text-sm font-semibold text-ink">You already have Pro on this account.</p>
+      <p class="mt-2 text-sm leading-relaxed text-ink-soft">
+        There is nothing to buy here. Open the app and sign in with the same email — Pro is
+        already on. To manage or cancel, use the link in your receipt or email
+        <a class="font-semibold text-band-mid hover:underline" href="mailto:support@striderunning.run">support@striderunning.run</a>.
+      </p>
+    </div>
+
+    <div class="mt-7 grid gap-6 sm:grid-cols-2">
+      <div class="glass plan-card p-7" style="--plan-delay:80ms">
         <p class="font-mono text-xs uppercase tracking-widest text-ink-faint">Monthly</p>
-        <p class="mt-3 font-display text-3xl font-bold" data-price="monthly">
+        <p class="price-slot mt-3 font-display text-3xl font-bold" data-price="monthly" aria-live="polite">
           {configured ? '—' : 'Loads in your currency'}
         </p>
         <p class="mt-2 text-sm text-ink-faint">Cancel any time.</p>
         <button
-          class="btn-primary mt-6 w-full"
+          type="button" class="btn-primary mt-6 w-full disabled:cursor-not-allowed disabled:opacity-55"
           data-checkout={PRICE_MONTHLY}
           disabled={!configured}
         >Get Pro monthly</button>
+        <p class="mt-3 text-center text-xs text-ink-faint">Opens Paddle’s secure checkout.</p>
       </div>
 
       <!-- The band is the app's ONE green surface. Used here for the plan we
            recommend — a single emphasised object, not decoration. -->
-      <div class="glass-mint rounded-[18px] p-7">
+      <div class="glass-mint plan-card plan-recommended rounded-[18px] p-7" style="--plan-delay:160ms">
         <div class="flex items-center justify-between">
-          <p class="font-mono text-xs uppercase tracking-widest" style="color:#5FF3C0">Yearly</p>
+          <p class="font-mono text-xs uppercase tracking-widest text-white">Yearly</p>
           <span class="rounded-full px-2.5 py-1 text-[11px] font-bold" style="background:rgba(0,0,0,0.26);color:#5FF3C0" data-saving>Best value</span>
         </div>
-        <p class="mt-3 font-display text-3xl font-bold" data-price="yearly">
+        <p class="price-slot mt-3 font-display text-3xl font-bold" data-price="yearly" aria-live="polite">
           {configured ? '—' : 'Loads in your currency'}
         </p>
         <!-- The per-month equivalent, filled in from the same PricePreview
              response. It is the number that makes the yearly plan legible —
              nobody compares 44.99 to 9.99 in their head — and like every other
              price on this page it is never written into the markup. -->
-        <p class="mt-1 text-sm" style="color:rgba(255,255,255,0.80)" data-permonth></p>
-        <p class="mt-2 text-sm" style="color:rgba(255,255,255,0.80)">Billed once a year. Cancel any time.</p>
+        <p class="mt-1 text-sm text-white" data-permonth></p>
+        <p class="mt-2 text-sm text-white">Billed once a year. Cancel any time.</p>
         <button
-          class="btn-on-band mt-6 w-full"
+          type="button" class="btn-on-band mt-6 w-full disabled:cursor-not-allowed disabled:opacity-55"
           data-checkout={PRICE_YEARLY}
           disabled={!configured}
         >Get Pro yearly</button>
+        <p class="mt-3 text-center text-xs text-white">Opens Paddle’s secure checkout.</p>
       </div>
     </div>
 
-    <p class="mt-5 text-sm text-ink-faint">
+    <p class="mt-5 text-sm text-ink-faint" data-pricing-note>
       Prices are shown in your local currency and include any tax due where you live.
-      Payments are handled by Paddle, our authorised reseller.
+      Paddle is the seller of record and handles the payment, tax and receipt.
     </p>
+
+    {!configured && (
+      <div class="mt-5 rounded-2xl p-4 text-sm" role="status" style="background:#FFF2D8;color:#6C4700">
+        Checkout is not available in this build. No payment can be taken until the live billing configuration passes its safety check.
+      </div>
+    )}
+
+    <section class="payment-trust glass mt-10 overflow-hidden p-3" aria-labelledby="payment-trust-title">
+      <div class="grid items-center gap-7 lg:grid-cols-[.94fr_1.06fr]">
+        <img src="/images/trust-paddle.webp" width="1600" height="900" loading="lazy" decoding="async"
+          class="aspect-video w-full rounded-[14px] object-cover"
+          alt="A carved city map showing a runner’s route passing through a protected gateway into claimed territory." />
+        <div class="px-3 pb-4 lg:px-2 lg:pr-8">
+          <p class="font-mono text-xs uppercase tracking-[.2em] text-band-mid">The payment handoff</p>
+          <h2 id="payment-trust-title" class="mt-3 font-display text-3xl font-bold tracking-tight">You pay Paddle. Pro lands on your Terrarun account.</h2>
+          <p class="mt-4 text-sm leading-relaxed text-ink-soft">
+            Paddle.com Market Ltd is our authorised reseller and merchant of record. Its checkout collects the payment, calculates tax and sends the receipt. Terrarun receives the completed purchase—not your card number.
+          </p>
+          <dl class="mt-5 space-y-4 text-sm">
+            <div class="trust-row">
+              <dt class="font-semibold text-ink">What appears on your statement</dt>
+              <dd class="mt-1 text-ink-faint">Paddle, because Paddle is the seller that charged you.</dd>
+            </div>
+            <div class="trust-row">
+              <dt class="font-semibold text-ink">If you change your mind</dt>
+              <dd class="mt-1 text-ink-faint">Cancel any time to stop the next renewal. Eligible lightly-used purchases within 14 days are refunded in full.</dd>
+            </div>
+            <div class="trust-row">
+              <dt class="font-semibold text-ink">If Pro takes a moment</dt>
+              <dd class="mt-1 text-ink-faint">The confirmation page checks the server until the unlock is real. If it is slow, your receipt and a direct support route stay visible.</dd>
+            </div>
+          </dl>
+          <div class="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-band-mid">
+            <a href="/refunds/" class="hover:underline">Read the refund policy</a>
+            <a href="/security/" class="hover:underline">How we protect checkout</a>
+            <a href="mailto:support@striderunning.run" class="hover:underline">Ask Teja directly</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="seam my-14" />
+
+    <!-- ── how it reaches the app ───────────────────────────────────────── -->
+    <h2 class="font-display text-2xl font-bold tracking-tight">From this page to Pro in the app</h2>
+    <ol class="funnel-steps mt-6 grid gap-4 sm:grid-cols-3">
+      <li class="glass p-5"><span class="step-number">1</span><strong class="mt-4 block text-ink">Use your Terrarun account</strong><span class="mt-1 block text-sm leading-relaxed text-ink-faint">Create one or sign in, so the purchase has one exact runner to unlock.</span></li>
+      <li class="glass p-5"><span class="step-number">2</span><strong class="mt-4 block text-ink">Pay in Paddle checkout</strong><span class="mt-1 block text-sm leading-relaxed text-ink-faint">The secure overlay opens here. Your card details never pass through Terrarun.</span></li>
+      <li class="glass p-5"><span class="step-number">3</span><strong class="mt-4 block text-ink">Return to the app</strong><span class="mt-1 block text-sm leading-relaxed text-ink-faint">Sign in with the same email. The server-confirmed Pro status is already attached.</span></li>
+    </ol>
 
     <hr class="seam my-14" />
 
@@ -112,16 +222,6 @@ const included = [
       ))}
     </ul>
 
-    <hr class="seam my-14" />
-
-    <!-- ── how it reaches the app ───────────────────────────────────────── -->
-    <h2 class="font-display text-2xl font-bold tracking-tight">How it works</h2>
-    <ol class="mt-6 space-y-4 text-[15px] leading-relaxed text-ink-soft">
-      <li><strong class="text-ink">1.</strong> Create your Terrarun account here and choose a plan.</li>
-      <li><strong class="text-ink">2.</strong> Download Terrarun and sign in with the same account.</li>
-      <li><strong class="text-ink">3.</strong> Pro is already on. Nothing to restore, nothing to enter.</li>
-    </ol>
-
     <div class="glass mt-10 p-6">
       <h3 class="font-display text-lg font-semibold text-ink">Questions people actually ask</h3>
       <dl class="mt-4 space-y-4 text-sm leading-relaxed text-ink-soft">
@@ -134,8 +234,16 @@ const included = [
           <dd class="mt-1">You keep Pro until the end of the period you have paid for, then the account returns to free. You never lose your runs, and your territory stays on the map.</dd>
         </div>
         <div>
+          <dt class="font-semibold text-ink">Will a web purchase work in the Android app?</dt>
+          <dd class="mt-1">Yes. Pro is attached to your Terrarun account, not this browser. Sign in to Android with the same email and the app reads that account’s server-confirmed access.</dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-ink">What if the unlock is not instant?</dt>
+          <dd class="mt-1">Stay on the confirmation page while it checks. Most unlocks land in seconds. If it takes longer, keep your Paddle receipt and email <a class="font-semibold text-band-mid" href="mailto:support@striderunning.run">support@striderunning.run</a>; Teja will trace it.</dd>
+        </div>
+        <div>
           <dt class="font-semibold text-ink">Can I get a refund?</dt>
-          <dd class="mt-1">Yes — see our <a class="font-semibold" style="color:#046B4D" href="/refunds/">refund policy</a>.</dd>
+          <dd class="mt-1">Eligible lightly-used purchases made within 14 days are refunded in full. Duplicate charges and failed access are covered too. Read the plain-English <a class="font-semibold" style="color:#046B4D" href="/refunds/">refund policy</a>.</dd>
         </div>
         <div>
           <dt class="font-semibold text-ink">I already subscribed on iPhone.</dt>
@@ -143,25 +251,156 @@ const included = [
         </div>
       </dl>
     </div>
+
+    <div class="mt-8 flex items-start gap-4 rounded-2xl p-5" style="background:#DDE3E0">
+      <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-canvas font-display font-bold text-band-mid">TC</div>
+      <div>
+        <h3 class="font-display text-lg font-semibold text-ink">Built and supported by Teja Chinthala</h3>
+        <p class="mt-1 text-sm leading-relaxed text-ink-soft">Terrarun is an independent app, not an anonymous checkout funnel. When you write to support, you reach the person who builds the product and can inspect the account-to-payment handoff directly.</p>
+      </div>
+    </div>
   </section>
+
+  <div id="checkout-handoff" class="checkout-handoff hidden" role="status" aria-live="polite" aria-atomic="true">
+    <span class="checkout-spinner" aria-hidden="true"></span>
+    <span><strong data-checkout-title>Opening Paddle’s secure checkout…</strong><small data-checkout-copy>Your card details go directly to Paddle, not Terrarun.</small></span>
+  </div>
 </Layout>
 
 <!--
-  ⚠️ REHYDRATE THE ACCOUNT ID BEFORE ANYTHING READS IT. `remember()` sets
-  `window.__terrarunUserId`, but a window global does not survive a navigation —
-  and this page is reached BY navigation, from /signup. Without this, somebody
-  who already has an account clicks "Get Pro", is found to have no id, and is
-  sent to /signup; /signup's non-Paddle fallback sends them back here; and the
-  two pages bounce the same person between them forever.
+  ⚠️ THE BUY BUTTONS ARE WIRED FROM A MODULE, NOT FROM THE INLINE BOOTSTRAPPER.
+  There is exactly ONE `openCheckout()` (src/lib/account.ts) and both this page
+  and the /signup funnel call it, so the two can never drift on the four things
+  that decide whether a payment lands: `customData.app_user_id`, the prefilled
+  email, `allowLogout: false` and the success URL. An inline script cannot
+  import, so duplicating the call here is exactly how those silently diverge.
 
-  This is a plain module script, not `is:inline`, so it can import from the same
-  module that wrote the value — the alternative is hardcoding the sessionStorage
-  key in two files and waiting for one of them to drift.
+  ⚠️ REHYDRATE THE ACCOUNT ID BEFORE ANYTHING READS IT. `remember()` sets
+  `window.__terrarunUserId`, but a window global does not survive a navigation,
+  and this page is reached BY navigation. Without this, somebody who already has
+  an account clicks "Get Pro", is found to have no id, and is sent to /signup.
 -->
 <script>
-  import { recall } from '../lib/account';
+  import { recall, isPro, openCheckout, devicePlatform } from '../lib/account';
+
   const acc = recall();
   if (acc) (window as any).__terrarunUserId = acc.userId;
+
+  if (devicePlatform() === 'ios') {
+    document.getElementById('ios-notice')?.classList.remove('hidden');
+  }
+
+  const handoff = document.getElementById('checkout-handoff');
+  const hTitle = handoff?.querySelector('[data-checkout-title]');
+  const hCopy = handoff?.querySelector('[data-checkout-copy]');
+
+  const say = (title: string, copy: string, spinning: boolean) => {
+    if (!handoff) return;
+    if (hTitle) hTitle.textContent = title;
+    if (hCopy) hCopy.textContent = copy;
+    handoff.classList.toggle('is-done', !spinning);
+    handoff.classList.remove('hidden');
+  };
+  const hide = () => handoff?.classList.add('hidden');
+
+  // ⚠️ THE BUSY BUTTON IS MARKED IN THE DOM, NOT HELD IN A CLOSURE. Paddle's
+  // eventCallback lives in the inline bootstrapper — a different scope — and it
+  // is what learns that the checkout opened, closed or failed. A variable here
+  // would be invisible to it, so the state lives where both can read it.
+  const busy = () => document.querySelector<HTMLButtonElement>('[data-checkout][data-busy]');
+  const resetBusy = () => {
+    const b = busy();
+    if (!b) return;
+    b.disabled = false;
+    b.removeAttribute('aria-busy');
+    b.removeAttribute('data-busy');
+    if (b.dataset.label) b.textContent = b.dataset.label;
+  };
+  (window as any).__trCheckout = { say, hide, resetBusy };
+
+  const open = (priceId: string, uid: string, btn: HTMLButtonElement | null) => {
+    if (btn) {
+      btn.dataset.label = btn.textContent || '';
+      btn.dataset.busy = '1';
+      btn.disabled = true;
+      btn.setAttribute('aria-busy', 'true');
+      btn.textContent = 'Opening secure checkout…';
+    }
+    say('Opening Paddle’s secure checkout…', 'Your card details go directly to Paddle, not Terrarun.', true);
+    openCheckout({
+      priceId,
+      userId: uid,
+      email: acc?.email,
+      onError: () => {
+        resetBusy();
+        say('Checkout could not open.', 'Nothing was charged. Please try again or email support@striderunning.run.', false);
+      },
+    });
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('[data-checkout]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const priceId = btn.getAttribute('data-checkout');
+      if (!priceId) return;
+      // ⚠️ `customData.app_user_id` IS THE WHOLE INTEGRATION — the only thread
+      // tying a payment to a Terrarun account. A checkout with no account
+      // attached is sent to signup first rather than opened.
+      const uid = (window as any).__terrarunUserId || null;
+      if (!uid) {
+        btn.disabled = true;
+        btn.textContent = 'Taking you to sign in…';
+        say('First, connect this purchase to your account.', 'You will return to the plan you chose. Nothing has been charged.', false);
+        location.href = '/signup/?plan=' + encodeURIComponent(priceId);
+        return;
+      }
+      open(priceId, uid, btn);
+    });
+  });
+
+  // ⚠️ ALREADY SUBSCRIBED → NO LIVE BUY BUTTONS. Somebody who subscribed on
+  // iPhone, or here last month, would otherwise be shown two working buy buttons
+  // and could pay twice for one account. The FAQ below says "do not buy it
+  // twice"; a sentence is not a guard, and this is.
+  //
+  // ⚠️ IT IS A PROMISE BECAUSE THE `?plan=` AUTO-OPEN HAS TO WAIT FOR IT. Both
+  // are asynchronous and they race: a subscriber arriving on a plan link would
+  // otherwise have a checkout opened in front of them a beat before the guard
+  // that exists to stop exactly that finished asking the server.
+  const proChecked: Promise<boolean> = acc
+    ? isPro(acc.userId, acc.token).then((pro) => {
+        if (pro) {
+          document.getElementById('already-pro')?.classList.remove('hidden');
+          document.querySelectorAll<HTMLButtonElement>('[data-checkout]').forEach((b) => {
+            b.disabled = true;
+            b.textContent = 'You already have Pro';
+          });
+        }
+        return pro;
+      })
+    : Promise.resolve(false);
+
+  // ── arriving with a plan already chosen ────────────────────────────────
+  // ⚠️ THEY ALREADY CHOSE. /signup sends people back here with `?plan=` when it
+  // could not open the checkout itself. Making somebody who signed up *in order
+  // to pay* pick the same plan again is a step that only loses people.
+  //
+  // ⚠️ It resolves the plan to a BUTTON THIS PAGE RENDERED rather than trusting
+  // the parameter — the value reaches Paddle, and an arbitrary price id from a
+  // crafted link would otherwise open a checkout for something we never sold.
+  // A disabled button (prices failed to load, or already Pro) is also a no.
+  const autoOpen = async () => {
+    const wanted = new URLSearchParams(location.search).get('plan');
+    const uid = (window as any).__terrarunUserId || null;
+    if (!wanted || !uid) return;
+    if (await proChecked) return; // already subscribed — never open a checkout
+    const btn = document.querySelector<HTMLButtonElement>(`[data-checkout="${CSS.escape(wanted)}"]`);
+    if (!btn || btn.disabled) return;
+    open(wanted, uid, btn);
+  };
+  // Paddle.js is a network away; opening a checkout before Initialize does
+  // nothing at all, silently.
+  if ((window as any).__trPaddleReady) autoOpen();
+  else window.addEventListener('tr:paddle-ready', autoOpen, { once: true });
 </script>
 
 <!--
@@ -172,11 +411,51 @@ const included = [
 {configured && (
   <script is:inline define:vars={{ PADDLE_TOKEN, PADDLE_ENV, PRICE_MONTHLY, PRICE_YEARLY }}>
     (function () {
+      function ui() {
+        return window.__trCheckout || { say: function () {}, hide: function () {}, resetBusy: function () {} };
+      }
+
+      function killPrices(note) {
+        document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = 'Pricing unavailable'; });
+        document.querySelectorAll('[data-checkout]').forEach(function (btn) { btn.disabled = true; });
+        var n = document.querySelector('[data-pricing-note]');
+        if (n) n.textContent = note;
+      }
+
       var s = document.createElement('script');
       s.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
       s.onload = function () {
         if (PADDLE_ENV !== 'production') window.Paddle.Environment.set(PADDLE_ENV);
-        window.Paddle.Initialize({ token: PADDLE_TOKEN });
+        window.Paddle.Initialize({
+          token: PADDLE_TOKEN,
+          eventCallback: function (event) {
+            if (!event || !event.name) return;
+            switch (event.name) {
+              case 'checkout.loaded':
+                // Paddle owns the screen now; our own status line would only be
+                // a second thing talking over it.
+                ui().resetBusy();
+                ui().hide();
+                break;
+              case 'checkout.completed':
+                ui().say('Payment approved.', 'Now confirming Pro on your Terrarun account…', true);
+                break;
+              case 'checkout.closed':
+                ui().resetBusy();
+                ui().hide();
+                break;
+              case 'checkout.payment.failed':
+                ui().resetBusy();
+                ui().say('That payment did not go through.', 'Nothing was charged. Try another card or payment method.', false);
+                break;
+              case 'checkout.error':
+              case 'checkout.payment.error':
+                ui().resetBusy();
+                ui().say('Checkout hit a problem.', 'Nothing was charged. Please try again or email support@striderunning.run.', false);
+                break;
+            }
+          },
+        });
 
         // Prices come from Paddle, localised to the visitor. Never from markup.
         window.Paddle.PricePreview({
@@ -187,7 +466,12 @@ const included = [
           (res.data.details.lineItems || []).forEach(function (li) {
             var key = li.price.id === PRICE_YEARLY ? 'yearly' : 'monthly';
             var el = document.querySelector('[data-price="' + key + '"]');
-            if (el) el.textContent = li.formattedTotals.total;
+            if (el) {
+              el.textContent = li.formattedTotals.total;
+              el.classList.remove('is-loaded');
+              void el.offsetWidth;
+              el.classList.add('is-loaded');
+            }
             raw[key] = Number(li.totals.total);
           });
 
@@ -212,41 +496,16 @@ const included = [
               if (per) per.textContent = f.format(raw.yearly / 12 / Math.pow(10, dp)) + ' a month';
             } catch (e) { /* an unknown currency code just leaves the line empty */ }
           }
-        }).catch(function () { /* leave the honest fallback text in place */ });
-
-        document.querySelectorAll('[data-checkout]').forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            var priceId = btn.getAttribute('data-checkout');
-            if (!priceId) return;
-            // ⚠️ `customData.app_user_id` IS THE WHOLE INTEGRATION. It is the only
-            // thread tying a payment to a Terrarun account — without it somebody
-            // pays and the webhook has no idea whose entitlement to grant. It is
-            // written by the signup step; a checkout with no account attached is
-            // sent to signup first rather than opened.
-            var uid = window.__terrarunUserId || null;
-            if (!uid) { window.location.href = '/signup/?plan=' + encodeURIComponent(priceId); return; }
-            window.Paddle.Checkout.open({
-              items: [{ priceId: priceId, quantity: 1 }],
-              customData: { app_user_id: uid },
-              settings: { displayMode: 'overlay', theme: 'light', successUrl: 'https://striderunning.run/welcome/' },
-            });
-          });
+        }).catch(function () {
+          killPrices('Paddle could not load this build’s prices. Checkout is disabled, so nothing can be charged. Please try again later.');
         });
 
-        // ⚠️ THEY ALREADY CHOSE. /signup sends people back here with ?plan= when
-        // it could not open the checkout itself (Paddle blocked, slow, or an ad
-        // blocker). Making somebody who has signed up *in order to pay* pick the
-        // same plan a second time is a step that only loses people, so if the
-        // account is known the checkout opens on arrival.
-        var wanted = new URLSearchParams(location.search).get('plan');
-        var known = window.__terrarunUserId || null;
-        if (wanted && known && (wanted === PRICE_MONTHLY || wanted === PRICE_YEARLY)) {
-          window.Paddle.Checkout.open({
-            items: [{ priceId: wanted, quantity: 1 }],
-            customData: { app_user_id: known },
-            settings: { displayMode: 'overlay', theme: 'light', successUrl: 'https://striderunning.run/welcome/' },
-          });
-        }
+        // Tell the module wiring it may now honour a `?plan=` arrival.
+        window.__trPaddleReady = true;
+        window.dispatchEvent(new Event('tr:paddle-ready'));
+      };
+      s.onerror = function () {
+        killPrices('Secure checkout could not load. Nothing can be charged. Check your connection or content blocker, then reload.');
       };
       document.head.appendChild(s);
     })();

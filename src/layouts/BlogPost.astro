@@ -52,8 +52,8 @@ const dateLabel = new Date(updated).toLocaleDateString('en-US', { year: 'numeric
   <script type="application/ld+json" set:html={JSON.stringify(ld)} />
 
   <article class="article mx-auto max-w-3xl px-5 pt-32 pb-20">
-    <a href="/blog/" class="text-sm text-ink-faint transition hover:text-mint">← Terrarun blog</a>
-    <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-mint">{tag}</p>
+    <a href="/blog/" class="text-sm text-ink-faint transition hover:text-band-mid">← Terrarun blog</a>
+    <p class="mt-6 font-mono text-xs uppercase tracking-[0.25em] text-band-mid">{tag}</p>
     <h1 class="mt-3 font-display text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">{title}</h1>
     <p class="mt-4 font-mono text-xs uppercase tracking-widest text-ink-faint">Updated · {dateLabel} · {readTime} read</p>
 
@@ -86,7 +86,7 @@ const dateLabel = new Date(updated).toLocaleDateString('en-US', { year: 'numeric
 
     {related && (
       <p class="mt-10 text-sm text-ink-faint">
-        Related: <a href={related.href} class="text-mint hover:underline">{related.label} →</a>
+        Related: <a href={related.href} class="text-band-mid hover:underline">{related.label} →</a>
       </p>
     )}
   </article>
@@ -98,7 +98,7 @@ const dateLabel = new Date(updated).toLocaleDateString('en-US', { year: 'numeric
   .article .prose p { @apply text-ink-soft; }
   .article .prose ul { @apply list-disc space-y-1.5 pl-5 text-ink-soft; }
   .article .prose ol { @apply list-decimal space-y-1.5 pl-5 text-ink-soft; }
-  .article .prose a { @apply text-mint hover:underline; }
+  .article .prose a { @apply text-band-mid hover:underline; }
   .article .prose strong { @apply text-ink; }
   .article details summary::-webkit-details-marker { display: none; }
 </style>

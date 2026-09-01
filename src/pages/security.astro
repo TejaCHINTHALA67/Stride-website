@@ -1,0 +1,59 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Security — Terrarun"
+  description="How Terrarun protects account and payment data, what our systems do not store, and how to report a vulnerability."
+  path="/security"
+>
+  <section class="mx-auto max-w-3xl px-5 pt-28 pb-24">
+    <p class="font-mono text-xs uppercase tracking-[.2em] text-band-mid">Security, in plain English</p>
+    <h1 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">What we protect. What we never receive.</h1>
+    <p class="mt-5 max-w-2xl text-[17px] leading-relaxed text-ink-soft">
+      Terrarun is built and operated by Teja Chinthala, an independent developer. That makes clarity more important, not less: this page names the systems involved and the boundaries we enforce.
+    </p>
+
+    <div class="mt-10 grid gap-5 sm:grid-cols-2">
+      <article class="glass p-6">
+        <h2 class="font-display text-xl font-semibold text-ink">Payments stay with Paddle</h2>
+        <p class="mt-3 text-sm leading-relaxed text-ink-soft">Paddle.com Market Ltd is the seller of record for web purchases. Payment fields are rendered by Paddle. Terrarun does not receive or store your full card number, security code or bank credentials.</p>
+      </article>
+      <article class="glass p-6">
+        <h2 class="font-display text-xl font-semibold text-ink">The browser cannot grant Pro</h2>
+        <p class="mt-3 text-sm leading-relaxed text-ink-soft">A successful page redirect is not treated as proof of purchase. Pro is granted only after our server verifies Paddle’s signed webhook and confirms that the purchased price is an approved Terrarun Pro plan.</p>
+      </article>
+      <article class="glass p-6">
+        <h2 class="font-display text-xl font-semibold text-ink">Account access is scoped</h2>
+        <p class="mt-3 text-sm leading-relaxed text-ink-soft">Supabase Auth handles account sessions. Database row-level rules restrict account data to the signed-in user, while payment entitlements are write-locked to the trusted server role.</p>
+      </article>
+      <article class="glass p-6">
+        <h2 class="font-display text-xl font-semibold text-ink">The site limits what may load</h2>
+        <p class="mt-3 text-sm leading-relaxed text-ink-soft">HTTPS is enforced with HSTS. A restrictive Content Security Policy limits scripts, network connections and frames to Terrarun plus the specific Mapbox, Paddle, Supabase and font services the site needs.</p>
+      </article>
+    </div>
+
+    <hr class="seam my-12" />
+
+    <div class="grid gap-10 md:grid-cols-2">
+      <div>
+        <h2 class="font-display text-2xl font-semibold text-ink">Data the website uses</h2>
+        <ul class="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
+          <li><strong class="text-ink">Account:</strong> email, runner name and territory colour.</li>
+          <li><strong class="text-ink">Purchase link:</strong> your internal Terrarun user ID is sent to Paddle as checkout metadata so the signed webhook can unlock the right account.</li>
+          <li><strong class="text-ink">Session:</strong> the current web session is kept only in this browser tab’s session storage so the purchase handoff can complete.</li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="font-display text-2xl font-semibold text-ink">Report a vulnerability</h2>
+        <p class="mt-4 text-sm leading-relaxed text-ink-soft">Email <a href="mailto:support@striderunning.run?subject=Security%20report" class="font-semibold text-band-mid hover:underline">support@striderunning.run</a> with “Security report” in the subject. Include the affected URL, what you observed and safe reproduction steps.</p>
+        <p class="mt-3 text-sm leading-relaxed text-ink-soft">Please do not access another person’s data, disrupt the service, run denial-of-service tests or publish an unpatched issue. We will acknowledge a good-faith report and work with you on a safe disclosure timeline.</p>
+      </div>
+    </div>
+
+    <div class="mt-12 rounded-2xl p-6" style="background:#DDE3E0">
+      <h2 class="font-display text-xl font-semibold text-ink">No theatre</h2>
+      <p class="mt-2 text-sm leading-relaxed text-ink-soft">We do not display invented security seals, claim certifications we do not hold, or imply that HTTPS makes a site risk-free. The useful protections are the payment boundary, server-side entitlement checks, least-privilege database rules and a reachable human when something goes wrong.</p>
+    </div>
+  </section>
+</Layout>

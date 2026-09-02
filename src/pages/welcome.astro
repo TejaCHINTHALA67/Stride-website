@@ -184,6 +184,7 @@ import AppStore from '../components/AppStore.astro';
 
 <script>
   import { recall, isPro, configured } from '../lib/account';
+  import { track } from '../lib/analytics';
 
   const waiting = document.getElementById('w-waiting')!;
   const ready = document.getElementById('w-ready')!;
@@ -215,6 +216,7 @@ import AppStore from '../components/AppStore.astro';
     const em = document.getElementById('w-acc-email');
     if (em && acc.email) em.textContent = acc.email;
     show(account);
+    track('web_welcome_free');
   } else if (!configured || !acc) {
     // Landed here without a session — a shared link, a new browser, private mode.
     // We cannot verify anything, so we claim nothing.
@@ -228,8 +230,10 @@ import AppStore from '../components/AppStore.astro';
     const DELAYS = [800, 1200, 1800, 2500, 3500, 5000, 6000, 8000, 10000];
     let i = 0;
     (async function poll() {
-      if (await isPro(acc.userId, acc.token)) { show(ready); return; }
-      if (i >= DELAYS.length) { show(slow); return; }
+      if (await isPro(acc.userId, acc.token)) { show(ready); track('web_pro_confirmed', { polls: i }); return; }
+      // ⚠️ THE ONE THAT MATTERS FOR SUPPORT: paid, and the webhook never
+      // landed inside ~39s. Every one of these is a person about to email us.
+      if (i >= DELAYS.length) { show(slow); track('web_pro_slow'); return; }
       setTimeout(poll, DELAYS[i++]);
     })();
   }

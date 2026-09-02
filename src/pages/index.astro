@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import AppStore from '../components/AppStore.astro';
 import Showcase from '../components/Showcase.astro';
 import WorldGlobe from '../components/WorldGlobe.astro';
+import GameDemo from '../components/GameDemo.astro';
 
 const steps = [
   { n: '01', t: 'Run a loop', d: 'Lace up and run any route that closes back on itself — your block, a park, your neighbourhood.', c: '#046B4D', image: '/images/how-loop.webp', alt: 'A carved city map with a runner completing a bright mint loop around a park.' },
@@ -173,7 +174,16 @@ const faqJsonLd = {
     <div class="reveal max-w-xl">
       <p class="font-mono text-xs uppercase tracking-[0.2em] text-band-mid">How it works</p>
       <h2 class="mt-3 font-display text-4xl font-bold tracking-tight sm:text-5xl">Three moves. The whole city.</h2>
+      <p class="mt-4 text-ink-soft">Watch it happen, then draw one yourself.</p>
     </div>
+
+    {/* ⚠️ THE DEMO GOES BEFORE THE DESCRIPTION, NOT INSTEAD OF IT. The whole
+        product is a gesture; three still images and a paragraph cannot carry it,
+        and a visitor deciding whether this is worth an account should see the
+        mechanic work before they read about it. The cards below still earn their
+        place — they carry the detail the animation cannot (the revenge window,
+        the bigger-loop-bigger-turf rule). Show, then tell. */}
+    <div class="reveal mt-10"><GameDemo /></div>
     <div class="mt-12 grid gap-5 md:grid-cols-3">
       {steps.map((s, i) => (
         <div class="reveal group relative overflow-hidden rounded-2xl glass p-3 transition-transform duration-300 hover:-translate-y-1" style={`animation-delay:${i * 0.08}s`}>
@@ -291,3 +301,13 @@ const faqJsonLd = {
   </section>
 
 </Layout>
+
+<script>
+  // ⚠️ THE TOP OF THE FUNNEL. Without this, "how many people who saw the landing
+  // page started the funnel" is unanswerable, and every drop below looks like it
+  // belongs to whatever screen it was measured on.
+  import { track } from '../lib/analytics';
+  document.querySelectorAll('a[href="/signup/"]').forEach((a) => {
+    a.addEventListener('click', () => track('web_get_started'));
+  });
+</script>

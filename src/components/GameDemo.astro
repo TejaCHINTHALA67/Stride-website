@@ -1,0 +1,298 @@
+---
+/**
+ * GameDemo — the one move, shown rather than described.
+ *
+ * ⚠️ THE SITE EXPLAINED THE GAME IN PROSE AND THREE STILL IMAGES. The whole
+ * product is a gesture — you close a loop and the ground inside becomes yours —
+ * and a paragraph cannot carry that. This draws it, then lets you draw it.
+ *
+ * ⚠️ IT PLAYS ITSELF FIRST, AND INTERACTION IS OPT-IN. That is not timidity, it
+ * is the scroll problem: a drawing surface needs `touch-action: none` to stop the
+ * page fighting the drag, and a full-width surface with that set is a dead zone a
+ * thumb cannot scroll past. So the lesson runs on its own — everyone sees it for
+ * free — and "Try it yourself" is what arms the pointer handlers and the CSS.
+ *
+ * ⚠️ NO MAPBOX HERE. The hero globe already carries one live map; a second on the
+ * same page costs another GL context and a second tile bill to teach a mechanic
+ * that is pure geometry. This is ~4 KB of SVG.
+ *
+ * Area is honest: the shoelace formula over the traced points, scaled by
+ * M_PER_UNIT. A loop around the drawn blocks lands in the tens of thousands of
+ * m², which is what a few real city blocks actually measure.
+ */
+const M_PER_UNIT = 1.6; // the 400×300 viewBox is therefore 640 m × 480 m
+---
+
+<figure class="demo-card glass p-3" data-m-per-unit={M_PER_UNIT}>
+  <div class="demo-stage">
+    <svg id="demo-svg" viewBox="0 0 400 300" class="demo-svg" role="img"
+      aria-label="A city block map. A running route closes into a loop and the ground inside it is claimed, then a rival's loop takes part of it back.">
+      <defs>
+        <clipPath id="demo-clip"><rect x="0" y="0" width="400" height="300" rx="12" /></clipPath>
+      </defs>
+      <g clip-path="url(#demo-clip)">
+        <rect x="0" y="0" width="400" height="300" fill="#DDE3E0" />
+        <!-- streets: the board, carved rather than drawn on -->
+        <g stroke="#C8D2CD" stroke-width="9" stroke-linecap="square">
+          <path d="M0 60H400M0 130H400M0 200H400M0 265H400" />
+          <path d="M55 0V300M140 0V300M225 0V300M310 0V300" />
+        </g>
+        <g stroke="#EEF2F0" stroke-width="2.5" stroke-linecap="square" opacity=".9">
+          <path d="M0 60H400M0 130H400M0 200H400M0 265H400" />
+          <path d="M55 0V300M140 0V300M225 0V300M310 0V300" />
+        </g>
+
+        <!-- claimed ground, drawn under the route so the route always reads -->
+        <path id="demo-fill" d="" fill="#06D6A0" fill-opacity="0" />
+        <path id="demo-rival" d="" fill="#FF5C5C" fill-opacity="0" />
+
+        <!-- the route itself -->
+        <path id="demo-route" d="" fill="none" stroke="#03503A" stroke-width="4.5"
+          stroke-linecap="round" stroke-linejoin="round" />
+        <circle id="demo-head" r="6.5" fill="#03503A" opacity="0" />
+      </g>
+    </svg>
+
+    <!-- the readout sits ON the ground it is measuring -->
+    <div id="demo-readout" class="demo-readout" aria-live="polite">
+      <span id="demo-area" class="demo-area">0 m²</span>
+      <span id="demo-label" class="demo-label">claimed</span>
+    </div>
+  </div>
+
+  <figcaption class="demo-foot">
+    <p id="demo-caption" class="demo-caption">Run a loop. The ground inside it becomes yours.</p>
+    <button type="button" id="demo-try" class="btn-ghost demo-key">Try it yourself</button>
+  </figcaption>
+</figure>
+
+<script>
+  /**
+   * ⚠️ AREA IS COMPUTED, NEVER WRITTEN DOWN. The number that appears is the
+   * shoelace area of whatever was actually traced, scaled by M_PER_UNIT — so a
+   * bigger loop really is a bigger number, which is the entire lesson. A
+   * hardcoded "875 m²" would teach nothing and would be the first thing a
+   * sceptical visitor tested.
+   *
+   * ⚠️ THE STEAL IS GRID-SAMPLED, NOT CLIPPED. Sutherland–Hodgman only clips
+   * against a CONVEX polygon and a hand-drawn loop never is, so a real clip would
+   * return an empty overlap on exactly the shapes people draw. The app hit this
+   * and solved it the same way: sample a grid, count the cells inside both.
+   */
+  const card = document.querySelector<HTMLElement>('.demo-card');
+  const svg = document.getElementById('demo-svg');
+  if (card && svg) {
+    const M = Number(card.dataset.mPerUnit || 1.6);
+    const routeEl = document.getElementById('demo-route') as unknown as SVGPathElement;
+    const fillEl = document.getElementById('demo-fill') as unknown as SVGPathElement;
+    const rivalEl = document.getElementById('demo-rival') as unknown as SVGPathElement;
+    const headEl = document.getElementById('demo-head') as unknown as SVGCircleElement;
+    const areaEl = document.getElementById('demo-area')!;
+    const labelEl = document.getElementById('demo-label')!;
+    const capEl = document.getElementById('demo-caption')!;
+    const tryBtn = document.getElementById('demo-try') as HTMLButtonElement;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    type P = { x: number; y: number };
+    const d = (pts: P[], close = true) =>
+      pts.length ? 'M' + pts.map((p) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join('L') + (close ? 'Z' : '') : '';
+
+    const areaOf = (pts: P[]) => {
+      let a = 0;
+      for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        a += (pts[j].x + pts[i].x) * (pts[j].y - pts[i].y);
+      }
+      return Math.abs(a / 2) * M * M;
+    };
+
+    const inside = (p: P, poly: P[]) => {
+      let hit = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const a = poly[i], b = poly[j];
+        if ((a.y > p.y) !== (b.y > p.y) && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) hit = !hit;
+      }
+      return hit;
+    };
+
+    /** Fraction of `mine` that also falls inside `theirs`. */
+    const overlapFraction = (mine: P[], theirs: P[]) => {
+      let inMine = 0, inBoth = 0;
+      for (let x = 2; x < 400; x += 4) {
+        for (let y = 2; y < 300; y += 4) {
+          const p = { x, y };
+          if (!inside(p, mine)) continue;
+          inMine++;
+          if (inside(p, theirs)) inBoth++;
+        }
+      }
+      return inMine ? inBoth / inMine : 0;
+    };
+
+    const fmt = (n: number) => Math.round(n).toLocaleString() + ' m²';
+
+    let countRaf = 0;
+    const countTo = (to: number, from = 0) => {
+      cancelAnimationFrame(countRaf);
+      if (reduce) { areaEl.textContent = fmt(to); return; }
+      const t0 = performance.now(), dur = 900;
+      const step = (t: number) => {
+        const k = Math.min(1, (t - t0) / dur);
+        const e = 1 - Math.pow(1 - k, 3);
+        areaEl.textContent = fmt(from + (to - from) * e);
+        if (k < 1) countRaf = requestAnimationFrame(step);
+      };
+      countRaf = requestAnimationFrame(step);
+    };
+
+    const claim = (pts: P[]) => {
+      const a = areaOf(pts);
+      fillEl.setAttribute('d', d(pts));
+      fillEl.style.transition = reduce ? 'none' : 'fill-opacity .5s cubic-bezier(.16,1,.3,1)';
+      fillEl.setAttribute('fill-opacity', '0.42');
+      labelEl.textContent = 'claimed';
+      countTo(a);
+      capEl.textContent = 'That ground is yours now — until somebody runs it back.';
+      return a;
+    };
+
+    /** Beat three: a rival encloses part of it, and the number falls. */
+    const raid = (mine: P[], a: number) => {
+      const theirs: P[] = [
+        { x: 196, y: 150 }, { x: 372, y: 150 }, { x: 372, y: 268 }, { x: 196, y: 268 },
+      ];
+      const lost = overlapFraction(mine, theirs) * a;
+      rivalEl.setAttribute('d', d(theirs));
+      rivalEl.style.transition = reduce ? 'none' : 'fill-opacity .45s cubic-bezier(.16,1,.3,1)';
+      rivalEl.setAttribute('fill-opacity', '0.5');
+      labelEl.textContent = 'after the raid';
+      countTo(a - lost, a);
+      capEl.textContent = 'A rival enclosed part of it. Run it back to take it again.';
+    };
+
+    // ── the lesson, played on its own ──────────────────────────────────────
+    const demoLoop: P[] = [
+      { x: 58, y: 64 }, { x: 130, y: 58 }, { x: 224, y: 62 }, { x: 300, y: 66 },
+      { x: 308, y: 130 }, { x: 312, y: 198 }, { x: 226, y: 204 }, { x: 138, y: 200 },
+      { x: 60, y: 196 }, { x: 56, y: 130 },
+    ];
+
+    const drawRoute = (pts: P[], done: () => void) => {
+      routeEl.setAttribute('d', d(pts, true));
+      if (reduce) { headEl.setAttribute('opacity', '0'); done(); return; }
+      const len = routeEl.getTotalLength();
+      routeEl.style.transition = 'none';
+      routeEl.style.strokeDasharray = String(len);
+      routeEl.style.strokeDashoffset = String(len);
+      headEl.setAttribute('opacity', '1');
+      // ⚠️ ONE rAF loop driving both the trim and the runner's head — read off
+      // the same clock, so the dot can never be somewhere the line is not.
+      const t0 = performance.now(), dur = 2200;
+      const step = (t: number) => {
+        const k = Math.min(1, (t - t0) / dur);
+        routeEl.style.strokeDashoffset = String(len * (1 - k));
+        const at = routeEl.getPointAtLength(len * k);
+        headEl.setAttribute('cx', String(at.x));
+        headEl.setAttribute('cy', String(at.y));
+        if (k < 1) requestAnimationFrame(step);
+        else { headEl.setAttribute('opacity', '0'); done(); }
+      };
+      requestAnimationFrame(step);
+    };
+
+    let played = false;
+    const playOnce = () => {
+      if (played) return;
+      played = true;
+      capEl.textContent = 'Run a loop — any route that closes back on itself.';
+      drawRoute(demoLoop, () => {
+        const a = claim(demoLoop);
+        setTimeout(() => raid(demoLoop, a), reduce ? 0 : 1400);
+      });
+    };
+
+    // ⚠️ Plays when it is actually on screen, not on load. A lesson that ran
+    // while the visitor was still reading the hero is a lesson nobody saw.
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => {
+        es.forEach((e) => { if (e.isIntersecting) { playOnce(); io.disconnect(); } });
+      }, { threshold: 0.4 });
+      io.observe(card);
+    } else {
+      playOnce();
+    }
+
+    // ── and then they can draw it themselves ───────────────────────────────
+    let armed = false, drawing = false, pts: P[] = [];
+
+    const toLocal = (e: PointerEvent): P => {
+      const r = (svg as unknown as SVGSVGElement).getBoundingClientRect();
+      return { x: ((e.clientX - r.left) / r.width) * 400, y: ((e.clientY - r.top) / r.height) * 300 };
+    };
+
+    const reset = () => {
+      pts = [];
+      routeEl.style.strokeDasharray = '';
+      routeEl.style.strokeDashoffset = '';
+      routeEl.setAttribute('d', '');
+      fillEl.setAttribute('fill-opacity', '0');
+      rivalEl.setAttribute('fill-opacity', '0');
+      areaEl.textContent = '0 m²';
+      labelEl.textContent = 'draw a loop';
+    };
+
+    tryBtn.addEventListener('click', () => {
+      armed = true;
+      card.classList.add('is-armed');
+      reset();
+      capEl.textContent = 'Drag across the map and close the loop back where you started.';
+      tryBtn.textContent = 'Reset';
+      tryBtn.onclick = () => { reset(); capEl.textContent = 'Drag across the map and close the loop back where you started.'; };
+    }, { once: true });
+
+    svg.addEventListener('pointerdown', (e) => {
+      if (!armed) return;
+      const ev = e as PointerEvent;
+      drawing = true;
+      pts = [toLocal(ev)];
+      fillEl.setAttribute('fill-opacity', '0');
+      rivalEl.setAttribute('fill-opacity', '0');
+      routeEl.style.strokeDasharray = '';
+      routeEl.style.strokeDashoffset = '';
+      (svg as unknown as SVGSVGElement).setPointerCapture?.(ev.pointerId);
+    });
+
+    svg.addEventListener('pointermove', (e) => {
+      if (!armed || !drawing) return;
+      const p = toLocal(e as PointerEvent);
+      const last = pts[pts.length - 1];
+      // A point every ~6 units: enough to feel like a line, few enough that the
+      // shoelace and the point-in-polygon stay cheap.
+      if (Math.hypot(p.x - last.x, p.y - last.y) < 6) return;
+      pts.push(p);
+      routeEl.setAttribute('d', d(pts, false));
+    });
+
+    const finish = () => {
+      if (!armed || !drawing) return;
+      drawing = false;
+      if (pts.length < 8) {
+        capEl.textContent = 'Too short to enclose anything — draw a bigger loop.';
+        routeEl.setAttribute('d', '');
+        return;
+      }
+      const a = areaOf(pts);
+      // ⚠️ A loop that encloses nothing gains nothing — the actual game rule, so
+      // the demo must not reward a scribble either.
+      if (a < 800) {
+        capEl.textContent = 'That did not close into a shape. Bring the end back to the start.';
+        routeEl.setAttribute('d', '');
+        return;
+      }
+      routeEl.setAttribute('d', d(pts, true));
+      claim(pts);
+    };
+    svg.addEventListener('pointerup', finish);
+    svg.addEventListener('pointercancel', finish);
+    svg.addEventListener('pointerleave', finish);
+  }
+</script>

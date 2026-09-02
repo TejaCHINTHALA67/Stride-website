@@ -1,0 +1,74 @@
+---
+/**
+ * CookieConsent — the first-layer choice.
+ *
+ * ⚠️ REJECT HAS THE SAME WEIGHT AS ACCEPT, AND IT IS ON THIS LAYER. That is the
+ * single most-enforced detail in cookie law: a Reject that is smaller, greyer, or
+ * hidden one click deeper is not a choice, and it is what the multi-million-euro
+ * fines are actually for. Both keys below are the same component, the same size
+ * and the same face. There is deliberately no "primary" here — a nudge is the
+ * whole thing we are not allowed to do.
+ *
+ * ⚠️ THERE ARE NO TOGGLES BECAUSE THERE IS ONE NON-ESSENTIAL CATEGORY. Analytics
+ * is all we would ever set beyond what the checkout and the sign-in need, so a
+ * category panel would be theatre — three switches where one honest question
+ * belongs. If a second category is ever added, this becomes a real panel with
+ * every non-essential toggle defaulting OFF.
+ *
+ * ⚠️ IT IS NOT A MODAL AND IT TRAPS NOTHING. The page underneath stays readable
+ * and usable, because a wall in front of a payment site reads as a dark pattern
+ * and because refusing to answer must remain a valid state.
+ */
+---
+
+<div id="cookie-consent" class="cookie-bar hidden" role="dialog" aria-modal="false"
+  aria-labelledby="cc-title" aria-describedby="cc-body">
+  <div class="cookie-inner glass">
+    <div class="min-w-0">
+      <p id="cc-title" class="font-display text-base font-semibold text-ink">Can we measure how this page is doing?</p>
+      <p id="cc-body" class="mt-1.5 text-sm leading-relaxed text-ink-faint">
+        We would like to count anonymous visits so we can see where people get stuck.
+        Signing in and paying work either way — those need no permission and no tracking.
+        <a href="/privacy/#cookies" class="font-semibold text-band-mid hover:underline">What we store</a>.
+      </p>
+    </div>
+    <div class="cookie-keys">
+      <button type="button" id="cc-reject" class="btn-ghost cookie-key">Reject</button>
+      <button type="button" id="cc-accept" class="btn-ghost cookie-key">Accept</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { readConsent, setConsent, onConsentChange } from '../lib/consent';
+  import { pageview } from '../lib/analytics';
+
+  const bar = document.getElementById('cookie-consent');
+  if (bar) {
+    const show = () => { bar.classList.remove('hidden'); bar.classList.add('is-in'); };
+    const hide = () => { bar.classList.add('hidden'); bar.classList.remove('is-in'); };
+
+    // Asked only when unanswered. A stored choice is respected in silence.
+    if (readConsent() === null) show();
+
+    document.getElementById('cc-accept')!.addEventListener('click', () => {
+      setConsent('granted');
+      hide();
+      // The visit that granted it still counts — otherwise the first pageview of
+      // every consenting session is lost, which biases the funnel's own top.
+      pageview();
+    });
+    document.getElementById('cc-reject')!.addEventListener('click', () => {
+      setConsent('denied');
+      hide();
+    });
+
+    // ⚠️ CONSENT MUST BE WITHDRAWABLE, so the footer link reopens this. Reopening
+    // is the same first-layer choice, never a pre-ticked panel.
+    document.querySelectorAll('[data-cookie-settings]').forEach((el) => {
+      el.addEventListener('click', (e) => { e.preventDefault(); show(); });
+    });
+
+    onConsentChange(() => hide());
+  }
+</script>

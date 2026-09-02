@@ -347,6 +347,7 @@ const proIncludes = [
     signUp, signIn, setProfile, usernameAvailable, remember, isPro, openCheckout,
     devicePlatform, HANDLE_RE, PALETTE, configured,
   } from '../lib/account';
+  import { track, identify } from '../lib/analytics';
 
   const form = document.getElementById('signup-form') as HTMLFormElement | null;
   if (form && configured) {
@@ -381,6 +382,12 @@ const proIncludes = [
       progress.querySelector('[data-line="1"]')!.classList.toggle('is-filled', step > 1);
       progress.querySelector('[data-line="2"]')!.classList.toggle('is-filled', step > 2);
     };
+
+    // ⚠️ THE INLINE PADDLE CALLBACK CANNOT IMPORT, and it is the only thing that
+    // learns whether a checkout completed, was abandoned or failed — the three
+    // outcomes the funnel is actually about. Bridged on `window` rather than
+    // duplicating a second capture path that would drift.
+    (window as any).__trTrack = track;
 
     const showPane = (pane: HTMLElement, step: number) => {
       [paneAccount, panePlan, panePro].forEach((p) => p.classList.add('hidden'));
@@ -456,6 +463,7 @@ const proIncludes = [
     const planError = document.getElementById('plan-error')!;
     const handoff = document.getElementById('signup-checkout-handoff');
     const checkoutFailed = () => {
+      track('web_checkout_open_failed');
       handoff?.classList.add('hidden');
       planError.textContent = 'Secure checkout could not open — nothing was charged. Check any content blocker and try again, or email support@striderunning.run.';
       planError.classList.remove('hidden');
@@ -463,6 +471,10 @@ const proIncludes = [
 
     const buy = (priceId: string) => {
       if (!account || !priceId) return;
+      track('web_checkout_opened', {
+        plan: priceId === form.dataset.priceYearly ? 'yearly' : 'monthly',
+        country: (window as any).__trCountry || null,
+      });
       planError.classList.add('hidden');
       handoff?.classList.remove('hidden');
       openCheckout({
@@ -482,6 +494,10 @@ const proIncludes = [
       btn.addEventListener('click', () => buy(btn.getAttribute('data-checkout') || ''));
     });
     document.getElementById('plan-skip')!.addEventListener('click', () => {
+      // The single most important number on this page: how many reach the offer
+      // and choose the free game. Without it, "the plan step converts badly" and
+      // "the plan step works exactly as designed" look identical.
+      track('web_free_chosen');
       location.href = '/welcome/?new=1';
     });
 
@@ -527,11 +543,17 @@ const proIncludes = [
         if (mode === 'signup') { created = acc; await setProfile(acc, username, colour); }
         remember(acc);
         account = { userId: acc.userId, email: acc.email };
+        // ⚠️ `users.id` is the SAME distinct_id the app calls `track.identify()`
+        // with, which is what makes "signed up on the web, ran in the app" one
+        // person in one funnel instead of two strangers.
+        identify(acc.userId);
+        track('web_account_created', { mode });
 
         // Somebody signing back in may already be subscribed — on iPhone, here,
         // or from a previous card. Never show them a buy button.
         if (mode === 'signin' && await isPro(acc.userId, acc.accessToken)) {
           showPane(panePro, 3);
+          track('web_already_pro');
           return;
         }
 
@@ -539,6 +561,7 @@ const proIncludes = [
         if (nameSlot) nameSlot.textContent = mode === 'signup' ? username : (acc.email.split('@')[0] || 'runner');
 
         showPane(panePlan, 2);
+        track('web_plan_view', { arrived_with_plan: !!plan });
         // ⚠️ THEY ALREADY CHOSE. Arriving with a plan means the decision was made
         // on the pricing page; asking a second time is a step that only loses
         // people. The pane is shown first so closing the overlay lands on it.
@@ -705,12 +728,18 @@ const proIncludes = [
                 hide();
                 break;
               case 'checkout.completed':
+                if (window.__trTrack) window.__trTrack('web_paid');
                 say('Payment approved.', 'Unlocking Pro on your account…', true);
                 break;
               case 'checkout.closed':
+                // Abandoned INSIDE Paddle's own overlay — invisible to every
+                // other measurement we have, and the biggest single drop in any
+                // checkout funnel.
+                if (window.__trTrack) window.__trTrack('web_checkout_abandoned');
                 hide();
                 break;
               case 'checkout.payment.failed':
+                if (window.__trTrack) window.__trTrack('web_payment_failed');
                 say('That payment did not go through.', 'Nothing was charged. Try another card or payment method.', false);
                 break;
               case 'checkout.error':
@@ -742,6 +771,7 @@ const proIncludes = [
             // ⚠️ THE PRICE MUST FOLLOW THE COUNTRY. Currency and tax both change
             // with it, so re-price rather than only relabelling — a card charged
             // an amount the page never showed is a chargeback.
+            if (window.__trTrack) window.__trTrack('web_country_changed', { country: code });
             document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = '…'; });
             loadPrices(code).catch(function () {
               disablePlans('Prices could not be loaded for that country. Nothing can be charged — pick another, or reload.');

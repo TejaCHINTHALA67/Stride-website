@@ -289,6 +289,7 @@ const included = [
 -->
 <script>
   import { recall, isPro, openCheckout, devicePlatform } from '../lib/account';
+  import { track } from '../lib/analytics';
 
   const acc = recall();
   if (acc) (window as any).__terrarunUserId = acc.userId;
@@ -325,7 +326,10 @@ const included = [
   };
   (window as any).__trCheckout = { say, hide, resetBusy };
 
+  (window as any).__trTrack = track;
+
   const open = (priceId: string, uid: string, btn: HTMLButtonElement | null) => {
+    track('web_checkout_opened', { plan: priceId, from: 'pricing', country: (window as any).__trCountry || null });
     if (btn) {
       btn.dataset.label = btn.textContent || '';
       btn.dataset.busy = '1';
@@ -361,6 +365,7 @@ const included = [
         btn.disabled = true;
         btn.textContent = 'Taking you to sign in…';
         say('First, connect this purchase to your account.', 'You will return to the plan you chose. Nothing has been charged.', false);
+        track('web_pricing_needs_account', { plan: priceId });
         location.href = '/signup/?plan=' + encodeURIComponent(priceId);
         return;
       }

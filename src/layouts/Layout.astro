@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import HexField from '../components/HexField.astro';
+import CookieConsent from '../components/CookieConsent.astro';
 
 export interface Props {
   title?: string;
@@ -138,6 +139,15 @@ const jsonLd = {
       <slot />
     </main>
     <Footer />
+    <CookieConsent />
+
+    <!-- ⚠️ THE PAGEVIEW IS GATED, NOT DEFERRED. `track()` returns without
+         sending when consent is absent, so this runs on every page and does
+         nothing at all until someone has said yes. -->
+    <script>
+      import { pageview } from '../lib/analytics';
+      pageview();
+    </script>
 
     <!-- on-scroll reveals (vanilla, respects reduced motion)
 

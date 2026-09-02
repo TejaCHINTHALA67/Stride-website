@@ -92,7 +92,12 @@
   .glass-mint li { color: #FFFFFF; }
   .glass-mint h1, .glass-mint h2, .glass-mint h3 { color: #FFFFFF; }
 
-  /* A well carved INTO the ground — inputs, selected chips, code blocks. */
+  /* A well carved INTO the ground — inputs, selected chips, code blocks.
+     ⚠️ TEXT ON A WELL IS `ink-faint`, NOT `ink-soft`. Measured on #DDE3E0:
+     ink-soft (#586A63) is 4.41:1 — UNDER AA — while ink-faint (#566861, which
+     IS relief.wellInk and exists for this) is 4.55:1. The token is not wrong;
+     it is chosen for the canvas (#E7ECEA, where it measures 4.81) and the well
+     is darker. Anything sitting on a #DDE3E0 surface takes ink-faint. */
   .well {
     background: #DDE3E0;
     border-radius: 14px;

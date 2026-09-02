@@ -93,7 +93,7 @@ const included = [
         iPad or a desktop Mac sees. */}
     <div id="ios-notice" class="hidden mt-7 rounded-2xl p-5" style="background:#DDE3E0">
       <p class="text-sm font-semibold text-ink">On iPhone, Pro is one tap inside the app.</p>
-      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-ink-soft">
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-ink-faint">
         Install Terrarun, sign in, and subscribe with Face ID — Apple handles the receipt,
         the renewal and the cancellation. Buying here works too and unlocks the same
         account everywhere; it is just the longer way round.
@@ -107,7 +107,7 @@ const included = [
         sentence is not a guard. This disables the buttons. */}
     <div id="already-pro" class="hidden mt-7 rounded-2xl p-5" style="background:#DDE3E0">
       <p class="text-sm font-semibold text-ink">You already have Pro on this account.</p>
-      <p class="mt-2 text-sm leading-relaxed text-ink-soft">
+      <p class="mt-2 text-sm leading-relaxed text-ink-faint">
         There is nothing to buy here. Open the app and sign in with the same email — Pro is
         already on. To manage or cancel, use the link in your receipt or email
         <a class="font-semibold text-band-mid hover:underline" href="mailto:support@striderunning.run">support@striderunning.run</a>.
@@ -153,6 +153,13 @@ const included = [
         <p class="mt-3 text-center text-xs text-white">Opens Paddle’s secure checkout.</p>
       </div>
     </div>
+
+    {/* ⚠️ REAL METHODS, FROM PADDLE, FOR THIS LOCATION. `availablePaymentMethods`
+        comes back with the price preview — it is Paddle's own answer for where
+        the visitor actually is, not a row of logos we picked. On a payment page
+        run by a solo developer an invented trust signal is worse than none, and
+        this one costs nothing because the request was already being made. */}
+    <p id="pricing-methods" class="mt-5 hidden text-sm text-ink-soft"></p>
 
     <p class="mt-5 text-sm text-ink-faint" data-pricing-note>
       Prices are shown in your local currency and include any tax due where you live.
@@ -331,6 +338,10 @@ const included = [
       priceId,
       userId: uid,
       email: acc?.email,
+      // The country the price on screen was calculated for — published by the
+      // inline bootstrapper from Paddle's own geolocation. A checkout opened with
+      // a different country would show a different currency than the page did.
+      countryCode: (window as any).__trCountry || undefined,
       onError: () => {
         resetBusy();
         say('Checkout could not open.', 'Nothing was charged. Please try again or email support@striderunning.run.', false);
@@ -474,6 +485,32 @@ const included = [
             }
             raw[key] = Number(li.totals.total);
           });
+
+          // ⚠️ PADDLE ECHOES THE COUNTRY IT GEOLOCATED, and the checkout needs it
+          // back: `customer.address.countryCode` is half of what lets Paddle skip
+          // its first page (the other half is the email). It costs no question —
+          // it is the same answer that decided the currency shown above.
+          var addr = res.data.address || {};
+          if (addr.countryCode) window.__trCountry = addr.countryCode;
+
+          var HIDE = { offline: 1, unknown: 1, none: 1 };
+          var NAMES = {
+            card: 'Cards', paypal: 'PayPal', apple_pay: 'Apple Pay', google_pay: 'Google Pay',
+            samsung_pay: 'Samsung Pay', ideal: 'iDEAL', bancontact: 'Bancontact', alipay: 'Alipay',
+            wechat_pay: 'WeChat Pay', blik: 'BLIK', mb_way: 'MB WAY', pix: 'Pix', upi: 'UPI',
+            kakaopay: 'KakaoPay', naver_pay: 'Naver Pay', payco: 'PAYCO', wero: 'Wero'
+          };
+          var methods = (res.data.availablePaymentMethods || [])
+            .filter(function (m) { return !HIDE[m]; })
+            .map(function (m) {
+              return NAMES[m] || String(m).replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+            });
+          var mEl = document.getElementById('pricing-methods');
+          // Nothing invented: if Paddle did not tell us, the line stays hidden.
+          if (mEl && methods.length) {
+            mEl.textContent = 'Ways to pay where you are: ' + methods.join(' · ');
+            mEl.classList.remove('hidden');
+          }
 
           // ── the comparison, computed from what Paddle just returned ──────
           // ⚠️ Both figures are MINOR UNITS in the SAME currency, so the ratio

@@ -104,16 +104,28 @@ const faqJsonLd = {
             iPhone and Android, and means the app has something to sign into
             rather than a cold start. The price is one click away in the nav for
             anyone who came looking for it. */}
-        <div class="reveal mt-8 flex flex-wrap items-center gap-3" style="animation-delay:.18s">
+        {/* ⚠️ ONE KEY. The hero used to carry FOUR competing actions — a primary,
+            a ghost "See how it works", and two store badges under an "or just get
+            the app" line. Testing across landing pages puts the cost of a second
+            competing CTA offer at up to a 266% drop in conversion, and this hero
+            had three, each sending the visitor somewhere different: into the
+            funnel, down the page, and out to a store. A page that asks for three
+            things asks for nothing.
+
+            The store badges are NOT gone — they are the whole final CTA section
+            at #download, and the nav's "Get the app" points straight at it, which
+            is one tap from anywhere on the page. What changed is that they no
+            longer compete with the funnel in the first screenful. The funnel is
+            the one that has to win here: it captures the account, and an account
+            is the only thing a purchase can ever attach to. */}
+        <div class="reveal mt-8" style="animation-delay:.18s">
           <a href="/signup/" class="btn-primary">Get started — it's free</a>
-          <a href="#how" class="btn-ghost">See how it works</a>
         </div>
-        {/* Straight to the store for anyone who does not want an account first.
-            The funnel is the recommendation, never a toll gate. */}
-        <div class="reveal mt-7" id="download-top" style="animation-delay:.24s">
-          <p class="mb-3 font-mono text-[11px] uppercase tracking-widest text-ink-faint">Or just get the app — free to play</p>
-          <AppStore />
-        </div>
+        <p class="reveal mt-4 text-sm text-ink-soft" style="animation-delay:.24s">
+          <a href="#how" class="font-semibold text-band-mid hover:underline">See how it works</a>
+          <span class="mx-2 text-ink-faint" aria-hidden="true">·</span>
+          <a href="#download" class="font-semibold text-band-mid hover:underline">Just get the app</a>
+        </p>
 
         {/* ⚠️ REAL NUMBERS, PULLED FROM THE LIVE DATABASE — never a rating badge.
             The App Store average is 4.7 from THREE ratings; printing a star score

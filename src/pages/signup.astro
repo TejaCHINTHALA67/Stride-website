@@ -100,7 +100,7 @@ const proIncludes = [
         then the whole map is yours to run at.
       </p>
 
-      <div class="mt-6 rounded-2xl p-4 text-sm leading-relaxed text-ink-soft" style="background:#DDE3E0">
+      <div class="mt-6 rounded-2xl p-4 text-sm leading-relaxed text-ink-faint" style="background:#DDE3E0">
         <strong class="text-ink">No payment is taken on this page.</strong> Your account is what lets a web purchase unlock Pro inside the app—and gives support a safe way to recover it if the handoff is delayed.
       </div>
 
@@ -185,7 +185,7 @@ const proIncludes = [
           sees. */}
       <div id="plan-ios" class="hidden mt-6 rounded-2xl p-5" style="background:#DDE3E0">
         <p class="text-sm font-semibold text-ink">You're on an iPhone — Pro is one tap inside the app.</p>
-        <p class="mt-2 text-sm leading-relaxed text-ink-soft">
+        <p class="mt-2 text-sm leading-relaxed text-ink-faint">
           Install Terrarun, sign in with the email you just used, and subscribe with Face ID.
           Apple handles the receipt, the renewal and the cancellation.
         </p>
@@ -193,6 +193,54 @@ const proIncludes = [
         <p class="mt-4 text-xs leading-relaxed text-ink-faint">
           You can still subscribe here if you prefer — it unlocks the same account on every device.
         </p>
+      </div>
+
+      {/* ⚠️ WHAT THEY JUST JOINED, BEFORE WHAT IT COSTS. A runner who came
+          straight to /signup from an ad has never read the landing page, and the
+          next thing this pane does is show them two prices. Three lines, the
+          same three the landing page leads with, so the offer lands on somebody
+          who knows what the game is. */}
+      <ol class="mt-7 grid gap-3 text-sm" aria-label="How Terrarun works">
+        <li class="flex items-start gap-3">
+          <span class="step-number shrink-0">1</span>
+          <span class="pt-1 text-ink-soft"><strong class="text-ink">Run a loop.</strong> Any route that closes back on itself — your block, a park, the long way home.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="step-number shrink-0">2</span>
+          <span class="pt-1 text-ink-soft"><strong class="text-ink">The ground inside is yours.</strong> Measured in real m² and painted in your colour on everyone's map.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="step-number shrink-0">3</span>
+          <span class="pt-1 text-ink-soft"><strong class="text-ink">Rivals come for it.</strong> Anyone who encloses your turf takes it. Run it back to take it again.</span>
+        </li>
+      </ol>
+
+      {/* ⚠️ THE COUNTRY IS DETECTED, NOT ASKED. Paddle geolocates the visitor for
+          the price preview and hands the answer back in `address.countryCode` —
+          so the country costs no question, no step and no third-party lookup, and
+          it is the SAME answer that decided the currency shown above it.
+
+          Passing it into the checkout is what lets Paddle skip its first page.
+          ⚠️ Not everywhere: the markets that need a ZIP/postal code for tax or
+          banking compliance still ask for one, so the copy never promises a page
+          count it cannot keep.
+
+          ⚠️ AND THE METHODS ARE REAL. `availablePaymentMethods` comes from the
+          same response — it is Paddle's own answer for THIS location, not a row
+          of logos we chose. On a payment page run by a solo developer, an
+          invented trust signal is worse than none, and this one is free. */}
+      <div id="plan-billing" class="hidden mt-6 rounded-2xl p-4" style="background:#DDE3E0">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <p class="text-sm text-ink-faint">
+            Billed from <strong id="plan-country" class="text-ink">—</strong>
+          </p>
+          <button type="button" id="plan-country-change"
+            class="text-sm font-semibold text-band-mid hover:underline">Change</button>
+        </div>
+        <label for="plan-country-select" class="sr-only">Your country</label>
+        <select id="plan-country-select"
+          class="well mt-3 hidden w-full px-3 py-2.5 text-[15px] text-ink outline-none"></select>
+        <p id="plan-methods" class="mt-2 text-xs leading-relaxed text-ink-faint"></p>
       </div>
 
       <div id="plan-cards" class="mt-6 grid gap-4">
@@ -417,7 +465,17 @@ const proIncludes = [
       if (!account || !priceId) return;
       planError.classList.add('hidden');
       handoff?.classList.remove('hidden');
-      openCheckout({ priceId, userId: account.userId, email: account.email, onError: checkoutFailed });
+      openCheckout({
+        priceId,
+        userId: account.userId,
+        email: account.email,
+        // ⚠️ THE SAME COUNTRY THE PRICE ON SCREEN WAS CALCULATED FOR. The inline
+        // bootstrapper publishes it after every PricePreview, including after the
+        // runner changes it — passing anything else would open a checkout whose
+        // currency disagrees with the card they just read.
+        countryCode: (window as any).__trCountry || undefined,
+        onError: checkoutFailed,
+      });
     };
 
     document.querySelectorAll<HTMLButtonElement>('#plan-cards [data-checkout]').forEach((btn) => {
@@ -515,6 +573,123 @@ const proIncludes = [
         if (e) { e.textContent = note; e.classList.remove('hidden'); }
       }
 
+      // Paddle answers in machine names. Anything we do not have a name for is
+      // title-cased rather than dropped — a new method should appear, not vanish.
+      var METHOD_NAMES = {
+        card: 'Cards', paypal: 'PayPal', apple_pay: 'Apple Pay', google_pay: 'Google Pay',
+        samsung_pay: 'Samsung Pay', ideal: 'iDEAL', bancontact: 'Bancontact', alipay: 'Alipay',
+        wechat_pay: 'WeChat Pay', blik: 'BLIK', mb_way: 'MB WAY', pix: 'Pix', upi: 'UPI',
+        kakaopay: 'KakaoPay', naver_pay: 'Naver Pay', payco: 'PAYCO', wero: 'Wero'
+      };
+      // ⚠️ `offline` is a real value and means wire transfer / manual settlement.
+      // Printing "Offline" in a list of ways to pay reads as an error, so the
+      // ones that are not a button on the checkout are filtered out.
+      var METHOD_HIDE = { offline: 1, unknown: 1, none: 1 };
+      function methodName(m) {
+        if (METHOD_NAMES[m]) return METHOD_NAMES[m];
+        return String(m).replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      }
+
+      var regionNames = null;
+      try { regionNames = new Intl.DisplayNames([navigator.language || 'en'], { type: 'region' }); } catch (e) { /* older browser */ }
+      function countryName(code) {
+        if (!code) return '';
+        try { var n = regionNames && regionNames.of(code); if (n && n !== code) return n; } catch (e) { /* not a region */ }
+        return code;
+      }
+
+      // The country actually in force. Read by the module wiring when it opens a
+      // checkout, so the checkout is prefilled with the same country the price
+      // on screen was calculated for — those two must never disagree.
+      window.__trCountry = null;
+
+      function renderBilling(countryCode, methods) {
+        var box = document.getElementById('plan-billing');
+        if (!box || !countryCode) return;
+        window.__trCountry = countryCode;
+        var nameEl = document.getElementById('plan-country');
+        if (nameEl) nameEl.textContent = countryName(countryCode);
+        var sel = document.getElementById('plan-country-select');
+        if (sel && sel.options.length) sel.value = countryCode;
+        var line = document.getElementById('plan-methods');
+        if (line) {
+          var list = (methods || [])
+            .filter(function (m) { return !METHOD_HIDE[m]; })
+            .map(methodName);
+          // Nothing invented: if Paddle did not tell us, we say nothing.
+          line.textContent = list.length ? 'Accepted here: ' + list.join(' · ') : '';
+        }
+        box.classList.remove('hidden');
+      }
+
+      // ⚠️ BUILT ONLY WHEN ASKED. 250-odd options is a real cost on the page that
+      // decides whether somebody pays, and the detected country is right for
+      // almost everyone — it is wrong for a VPN or somebody travelling, and that
+      // is who this is for. Codes come from ICU rather than a table that goes
+      // stale, and the names arrive already localised.
+      function buildCountrySelect() {
+        var sel = document.getElementById('plan-country-select');
+        if (!sel || sel.options.length) return;
+        var out = [];
+        for (var a = 65; a <= 90; a++) {
+          for (var b = 65; b <= 90; b++) {
+            var code = String.fromCharCode(a) + String.fromCharCode(b);
+            var name = countryName(code);
+            if (name && name !== code) out.push([code, name]);
+          }
+        }
+        out.sort(function (x, y) { return x[1].localeCompare(y[1]); });
+        var frag = document.createDocumentFragment();
+        out.forEach(function (pair) {
+          var o = document.createElement('option');
+          o.value = pair[0]; o.textContent = pair[1];
+          frag.appendChild(o);
+        });
+        sel.appendChild(frag);
+        if (window.__trCountry) sel.value = window.__trCountry;
+      }
+
+      function applyPreview(res) {
+        var raw = {};
+        var currency = res.data.currencyCode;
+        (res.data.details.lineItems || []).forEach(function (li) {
+          var key = li.price.id === PRICE_YEARLY ? 'yearly' : 'monthly';
+          var el = document.querySelector('[data-price="' + key + '"]');
+          if (el) {
+            el.textContent = li.formattedTotals.total;
+            el.classList.remove('is-loaded');
+            void el.offsetWidth;
+            el.classList.add('is-loaded');
+          }
+          raw[key] = Number(li.totals.total);
+        });
+        if (raw.monthly > 0 && raw.yearly > 0) {
+          // ⚠️ Both are MINOR UNITS in the SAME currency, so the ratio needs no
+          // decimal handling and is correct in every market.
+          var pct = Math.round((1 - raw.yearly / (raw.monthly * 12)) * 100);
+          var badge = document.querySelector('[data-saving]');
+          if (badge) badge.textContent = pct > 0 ? 'Save ' + pct + '%' : 'Best value';
+          // ⚠️ The per-month figure DOES need it: minor units are hundredths in
+          // most currencies but WHOLE UNITS in JPY, KRW, HUF and TWD.
+          try {
+            var f = new Intl.NumberFormat(navigator.language || 'en', { style: 'currency', currency: currency });
+            var dp = f.resolvedOptions().maximumFractionDigits;
+            var per = document.querySelector('[data-permonth]');
+            if (per) per.textContent = f.format(raw.yearly / 12 / Math.pow(10, dp)) + ' a month';
+          } catch (e) { /* an unknown currency code just leaves the line empty */ }
+        }
+        // Paddle echoes the address it geolocated, and lists what can pay there.
+        var addr = res.data.address || {};
+        renderBilling(addr.countryCode || window.__trCountry, res.data.availablePaymentMethods);
+      }
+
+      // `countryCode` omitted → Paddle geolocates by IP, which is the first load.
+      function loadPrices(countryCode) {
+        var req = { items: [{ priceId: PRICE_MONTHLY, quantity: 1 }, { priceId: PRICE_YEARLY, quantity: 1 }] };
+        if (countryCode) req.address = { countryCode: countryCode };
+        return window.Paddle.PricePreview(req).then(applyPreview);
+      }
+
       var s = document.createElement('script');
       s.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
       s.onload = function () {
@@ -547,35 +722,32 @@ const proIncludes = [
         });
 
         // Prices come from Paddle, localised to the visitor. Never from markup.
-        window.Paddle.PricePreview({
-          items: [{ priceId: PRICE_MONTHLY, quantity: 1 }, { priceId: PRICE_YEARLY, quantity: 1 }],
-        }).then(function (res) {
-          var raw = {};
-          var currency = res.data.currencyCode;
-          (res.data.details.lineItems || []).forEach(function (li) {
-            var key = li.price.id === PRICE_YEARLY ? 'yearly' : 'monthly';
-            var el = document.querySelector('[data-price="' + key + '"]');
-            if (el) { el.textContent = li.formattedTotals.total; el.classList.add('is-loaded'); }
-            raw[key] = Number(li.totals.total);
-          });
-          if (raw.monthly > 0 && raw.yearly > 0) {
-            // ⚠️ Both are MINOR UNITS in the SAME currency, so the ratio needs no
-            // decimal handling and is correct in every market.
-            var pct = Math.round((1 - raw.yearly / (raw.monthly * 12)) * 100);
-            var badge = document.querySelector('[data-saving]');
-            if (badge && pct > 0) badge.textContent = 'Save ' + pct + '%';
-            // ⚠️ The per-month figure DOES need it: minor units are hundredths in
-            // most currencies but WHOLE UNITS in JPY, KRW, HUF and TWD.
-            try {
-              var f = new Intl.NumberFormat(navigator.language || 'en', { style: 'currency', currency: currency });
-              var dp = f.resolvedOptions().maximumFractionDigits;
-              var per = document.querySelector('[data-permonth]');
-              if (per) per.textContent = f.format(raw.yearly / 12 / Math.pow(10, dp)) + ' a month';
-            } catch (e) { /* an unknown currency code just leaves the line empty */ }
-          }
-        }).catch(function () {
+        loadPrices(null).catch(function () {
           disablePlans('Paddle could not load this build’s prices, so checkout is disabled and nothing can be charged. The free game is unaffected.');
         });
+
+        var changeBtn = document.getElementById('plan-country-change');
+        var sel = document.getElementById('plan-country-select');
+        if (changeBtn && sel) {
+          changeBtn.addEventListener('click', function () {
+            buildCountrySelect();
+            var opening = sel.classList.contains('hidden');
+            sel.classList.toggle('hidden', !opening);
+            changeBtn.textContent = opening ? 'Done' : 'Change';
+            if (opening) sel.focus();
+          });
+          sel.addEventListener('change', function () {
+            var code = sel.value;
+            if (!code) return;
+            // ⚠️ THE PRICE MUST FOLLOW THE COUNTRY. Currency and tax both change
+            // with it, so re-price rather than only relabelling — a card charged
+            // an amount the page never showed is a chargeback.
+            document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = '…'; });
+            loadPrices(code).catch(function () {
+              disablePlans('Prices could not be loaded for that country. Nothing can be charged — pick another, or reload.');
+            });
+          });
+        }
       };
       s.onerror = function () {
         disablePlans('Secure checkout could not load — check your connection or content blocker. The free game is unaffected.');

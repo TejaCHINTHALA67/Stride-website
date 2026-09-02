@@ -216,24 +216,40 @@ export function successUrl(): string {
  * a payment to a Terrarun account. Without it somebody pays and the webhook has
  * nobody to grant.
  *
- * ⚠️ PREFILLING `customer.email` SKIPS PADDLE'S FIRST CHECKOUT PAGE and lands
- * them straight on payment, which is a step removed from a funnel where 90% of
- * traffic is a phone. It also makes the receipt arrive at the address the
- * account uses — and `allowLogout: false` keeps it that way, so nobody pays
- * under an email they will later try to sign in with and find nothing on.
+ * ⚠️ PREFILLING `customer.email` AND `customer.address.countryCode` SKIPS
+ * PADDLE'S FIRST CHECKOUT PAGE and lands them straight on payment — a step
+ * removed from a funnel where 90% of traffic is a phone. The country comes from
+ * Paddle's own geolocation in the price preview, so it costs no extra question.
+ *
+ * ⚠️ IT DOES NOT SKIP EVERYWHERE, AND THAT IS NOT A BUG. Paddle also needs a
+ * ZIP/postal code in the markets that require one for tax or banking compliance
+ * (Australia and the United States among them); there the first page still
+ * appears, asking only for that. Never promise "one page" in copy.
+ *
+ * The email prefill also makes the receipt arrive at the address the account
+ * uses — and `allowLogout: false` keeps it that way, so nobody pays under an
+ * email they will later try to sign in with and find nothing on.
  */
 export function openCheckout(opts: {
   priceId: string;
   userId: string;
   email?: string;
+  /** ISO-3166 alpha-2. Paddle geolocated it for the price preview; passing it
+   *  back is what lets the checkout skip its first page. */
+  countryCode?: string;
   onError?: () => void;
 }): boolean {
   const P = (window as unknown as { Paddle?: any }).Paddle;
   if (!P?.Checkout?.open) { opts.onError?.(); return false; }
+  // ⚠️ `customer` MUST BE OMITTED ENTIRELY when we know nothing — Paddle rejects
+  // an empty customer object, and an empty `address` is worse than no address.
+  const customer: Record<string, unknown> = {};
+  if (opts.email) customer.email = opts.email;
+  if (opts.countryCode) customer.address = { countryCode: opts.countryCode };
   try {
     P.Checkout.open({
       items: [{ priceId: opts.priceId, quantity: 1 }],
-      ...(opts.email ? { customer: { email: opts.email } } : {}),
+      ...(Object.keys(customer).length ? { customer } : {}),
       customData: { app_user_id: opts.userId },
       settings: {
         displayMode: 'overlay',

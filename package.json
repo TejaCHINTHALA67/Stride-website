@@ -6,9 +6,10 @@
   "description": "Marketing + waitlist site for Stride — Run & Own Your City (striderunning.run)",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/preflight-env.mjs && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "preflight": "node scripts/preflight-env.mjs"
   },
   "dependencies": {
     "astro": "^4.16.19",

@@ -453,19 +453,30 @@ const included = [
                 ui().resetBusy();
                 ui().hide();
                 break;
+              // ⚠️ THESE FOUR EVENTS WERE MISSING HERE AND PRESENT IN signup.astro,
+              // which meant every checkout STARTED FROM /pricing/ went dark the
+              // moment Paddle took the screen: `web_checkout_opened` fired and
+              // then nothing, whatever happened next. The `__trTrack` bridge was
+              // already set up above for exactly this and was simply never
+              // called. Paid, abandoned and failed are the only three outcomes a
+              // checkout has, and they are the whole reason to measure one.
               case 'checkout.completed':
+                if (window.__trTrack) window.__trTrack('web_paid', { from: 'pricing' });
                 ui().say('Payment approved.', 'Now confirming Pro on your Terrarun account…', true);
                 break;
               case 'checkout.closed':
+                if (window.__trTrack) window.__trTrack('web_checkout_abandoned', { from: 'pricing' });
                 ui().resetBusy();
                 ui().hide();
                 break;
               case 'checkout.payment.failed':
+                if (window.__trTrack) window.__trTrack('web_payment_failed', { from: 'pricing' });
                 ui().resetBusy();
                 ui().say('That payment did not go through.', 'Nothing was charged. Try another card or payment method.', false);
                 break;
               case 'checkout.error':
               case 'checkout.payment.error':
+                if (window.__trTrack) window.__trTrack('web_checkout_error', { from: 'pricing' });
                 ui().resetBusy();
                 ui().say('Checkout hit a problem.', 'Nothing was charged. Please try again or email support@striderunning.run.', false);
                 break;

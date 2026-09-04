@@ -1,0 +1,494 @@
+---
+/**
+ * GameTutorial — the game taught on a REAL map, between "account created" and
+ * "here is the price".
+ *
+ * WHY IT SITS THERE. The signup funnel used to go account → price. Somebody who
+ * arrived from an ad had, at that point, been asked to pay for a mechanic nobody
+ * had shown them — and the app itself learned this lesson the expensive way
+ * (1.7 walled runners before their first run and activation fell 56% → 5%). The
+ * web cannot give away a run, but it can give away the IDEA of one, on the same
+ * Mapbox streets the app draws on.
+ *
+ * ⚠️ AREA IS COMPUTED FROM GEOGRAPHY, NEVER FROM PIXELS. The app's tutorial
+ * stores its shapes in layout points and converts with a metres-per-point ratio,
+ * and that conversion has produced two separate shipped bugs — a 512-tile factor
+ * that was 4× out in area, and a centroid that came back negated. None of that
+ * can happen here: the rings are generated in lat/lng and measured with a
+ * spherical polygon formula; the map is only ever asked to DRAW them.
+ *
+ * ⚠️ THE THREE SHAPES MUST NOT OVERLAP EACH OTHER, and that is arithmetic, not
+ * layout. The running total is a SUM, so two rings that touched would double-count
+ * the ground between them on the one screen whose entire job is explaining what
+ * that number means. The raid sits ~520 m east of the claim; the grow ring is
+ * CONCENTRIC with the claim and REPLACES it in the total rather than adding to it.
+ *
+ * ⚠️ IT MUST SURVIVE MAPBOX NOT LOADING. GL JS is a third-party script on a step
+ * standing between a new account and the price — if the CDN is blocked or the
+ * token is missing, the step still has to teach and still has to let people
+ * through, so the copy and the Continue key live OUTSIDE the map and the frame
+ * degrades to a still gradient.
+ */
+const MAPBOX_TOKEN = (import.meta.env.PUBLIC_MAPBOX_TOKEN ?? '').trim();
+---
+
+<div id="tut">
+  <div
+    id="tut-map"
+    class="relative h-[300px] w-full overflow-hidden rounded-2xl"
+    style="background:linear-gradient(160deg,#0d1512,#111d18 60%,#0b1310)"
+    role="img"
+    aria-label="A city map showing territory being claimed on a running loop"
+  >
+    <!-- The readout rides the map so the number sits next to the shape it measures. -->
+    <div
+      id="tut-readout"
+      class="pointer-events-none absolute left-3 top-3 rounded-xl px-3 py-2 opacity-0 transition-opacity duration-500"
+      style="background:rgba(8,14,12,0.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)"
+    >
+      <p class="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">Your territory</p>
+      <p class="font-mono text-[19px] font-bold leading-tight text-white">
+        <span id="tut-area">0</span><span class="ml-1 text-[12px] font-semibold text-[#5FF3C0]">m²</span>
+      </p>
+    </div>
+
+    <!-- Shown only if GL JS never arrives. Never a blank rectangle. -->
+    <p id="tut-fallback" class="absolute inset-0 hidden place-items-center px-6 text-center text-sm text-white/60">
+      Close a loop on any street and the ground inside becomes yours.
+    </p>
+  </div>
+
+  <!-- ⚠️ COPY OUTSIDE THE MAP. In the app this sits on a plate over the basemap;
+       here the map is a 300px frame in a light page, and text over a moving map
+       at that size is unreadable at every step. -->
+  <div class="mt-5 min-h-[86px]">
+    <p id="tut-eyebrow" class="text-[11px] font-bold uppercase tracking-[0.16em] text-band-mid">Step 1 of 3</p>
+    <h2 id="tut-title" class="mt-1.5 font-display text-2xl font-bold leading-tight tracking-tight">Run a loop.</h2>
+    <p id="tut-body" class="mt-1.5 text-[15px] leading-relaxed text-ink-soft">
+      Any route that closes back on itself. The real ground it encloses becomes yours, measured in m².
+    </p>
+  </div>
+
+  <div class="mt-5 flex items-center gap-3">
+    <button type="button" id="tut-next" class="btn-primary flex-1">Next</button>
+    <button
+      type="button"
+      id="tut-skip"
+      class="shrink-0 px-3 py-2 text-sm font-semibold text-ink-faint hover:text-band-mid"
+    >
+      Skip
+    </button>
+  </div>
+</div>
+
+<script is:inline define:vars={{ MAPBOX_TOKEN }}>
+  (function () {
+    var frame = document.getElementById('tut-map');
+    if (!frame) return;
+
+    var R = 6378137;
+    var D2R = Math.PI / 180;
+
+    /** Spherical polygon area (m²). Exact enough at city scale and — unlike a
+     *  pixel conversion — carries no zoom, no tile size and no sign to get
+     *  wrong. abs() because winding order is not our business here. */
+    function areaM2(pts) {
+      if (!pts || pts.length < 3) return 0;
+      var sum = 0;
+      for (var i = 0; i < pts.length; i++) {
+        var a = pts[i];
+        var b = pts[(i + 1) % pts.length];
+        sum += (b[0] - a[0]) * D2R * (2 + Math.sin(a[1] * D2R) + Math.sin(b[1] * D2R));
+      }
+      return Math.abs((sum * R * R) / 2);
+    }
+
+    /** Move a lng/lat by metres. */
+    function offset(c, eastM, northM) {
+      return [c[0] + eastM / (111320 * Math.cos(c[1] * D2R)), c[1] + northM / 111320];
+    }
+
+    /** A closed ring around a centre. The two low harmonics pull it off a perfect
+     *  circle so it reads as a route somebody ran, not a radius drawn by a
+     *  computer — while staying convex enough that the fill never self-crosses. */
+    function ring(center, radiusM, rot) {
+      var out = [];
+      var n = 96;
+      for (var i = 0; i < n; i++) {
+        var t = (i / n) * Math.PI * 2;
+        var w = 1 + Math.sin(t * 3 + rot) * 0.07 + Math.cos(t * 2 - rot) * 0.05;
+        out.push(offset(center, Math.cos(t + rot) * radiusM * w, Math.sin(t + rot) * radiusM * w * 0.84));
+      }
+      out.push(out[0]);
+      return out;
+    }
+
+    var fmt = new Intl.NumberFormat(navigator.language || 'en');
+    var areaEl = document.getElementById('tut-area');
+    var readout = document.getElementById('tut-readout');
+    var eyebrow = document.getElementById('tut-eyebrow');
+    var titleEl = document.getElementById('tut-title');
+    var bodyEl = document.getElementById('tut-body');
+    var nextBtn = document.getElementById('tut-next');
+    var skipBtn = document.getElementById('tut-skip');
+
+    var ACTS = [
+      {
+        title: 'Run a loop.',
+        body: 'Any route that closes back on itself. The real ground it encloses becomes yours, measured in m².',
+      },
+      {
+        title: 'Take theirs.',
+        body: 'Run around ground somebody else holds and it changes hands. Nothing on this map is ever protected — including yours.',
+      },
+      {
+        title: 'Run it wider.',
+        body: 'The same block on a longer route encloses far more. That is the whole game, and every metre is drawn in your colour for everyone.',
+      },
+    ];
+
+    var act = 0;
+    var shown = 0;
+    var map = null;
+    var ready = false;
+    var playToken = 0; // cancels an act still animating when Next is pressed
+
+    function setCopy() {
+      var a = ACTS[act];
+      eyebrow.textContent = 'Step ' + (act + 1) + ' of ' + ACTS.length;
+      titleEl.textContent = a.title;
+      bodyEl.textContent = a.body;
+      nextBtn.textContent = act === ACTS.length - 1 ? 'Continue' : 'Next';
+    }
+
+    function reduceMotion() {
+      try {
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // ⚠️ COUNT UP, NEVER SNAP. The number IS the lesson here, and a value that
+    // appears fully formed reads as a label rather than something the loop just
+    // earned.
+    var countRaf = 0;
+    function countTo(target, ms) {
+      var from = shown;
+      var t0 = performance.now();
+      if (countRaf) cancelAnimationFrame(countRaf);
+      if (reduceMotion()) {
+        shown = target;
+        areaEl.textContent = fmt.format(Math.round(target));
+        return;
+      }
+      function step(now) {
+        var p = Math.min(1, (now - t0) / ms);
+        shown = from + (target - from) * (1 - Math.pow(1 - p, 3));
+        areaEl.textContent = fmt.format(Math.round(shown));
+        if (p < 1) countRaf = requestAnimationFrame(step);
+      }
+      countRaf = requestAnimationFrame(step);
+    }
+
+    var EMPTY = { type: 'FeatureCollection', features: [] };
+    function line(coords) {
+      return { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: coords } };
+    }
+    function poly(coords) {
+      return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [coords] } };
+    }
+    function src(id, data) {
+      if (map && map.getSource(id)) map.getSource(id).setData(data);
+    }
+    function show(key, coords) {
+      src(key + '-line', line(coords));
+      src(key + '-fill', poly(coords));
+    }
+    function hide(key) {
+      src(key + '-line', EMPTY);
+      src(key + '-fill', EMPTY);
+    }
+
+    /** Draw a ring on over `ms`, then flood the fill. */
+    function drawLoop(coords, key, ms, token) {
+      return new Promise(function (resolve) {
+        if (!map || reduceMotion()) {
+          show(key, coords);
+          return resolve();
+        }
+        var t0 = performance.now();
+        function step(now) {
+          if (token !== playToken) return resolve();
+          var p = Math.min(1, (now - t0) / ms);
+          src(key + '-line', line(coords.slice(0, Math.max(2, Math.floor(coords.length * p)))));
+          if (p < 1) return requestAnimationFrame(step);
+          src(key + '-fill', poly(coords));
+          resolve();
+        }
+        requestAnimationFrame(step);
+      });
+    }
+    function wait(ms, token) {
+      return new Promise(function (r) {
+        setTimeout(
+          function () {
+            if (token === playToken) r();
+          },
+          reduceMotion() ? 0 : ms
+        );
+      });
+    }
+
+    // ── the three shapes ────────────────────────────────────────────────────
+    var CENTER = [-0.1105, 51.5166]; // replaced by setTutorialCountry()
+    var claimRing, rivalRing, raidRing, growRing;
+    var A = {}; // areas, so the shapes and the count-ups can never disagree
+
+    function buildRings() {
+      var rivalAt = offset(CENTER, 520, 40);
+      claimRing = ring(CENTER, 170, 0.6);
+      rivalRing = ring(rivalAt, 105, 2.1);
+      raidRing = ring(rivalAt, 145, 1.2);
+      growRing = ring(CENTER, 300, 0.35);
+      A.claim = areaM2(claimRing);
+      A.raid = areaM2(raidRing);
+      A.grow = areaM2(growRing);
+    }
+
+    // ⚠️ THE CAMERA IS FITTED, NEVER A FIXED ZOOM. Mapbox zoom is metres per
+    // pixel scaled by cos(latitude), so one hardcoded number draws the SAME
+    // 965-metre scene 40% smaller in Mumbai than in Stockholm — and the frame is
+    // 335px on a phone and 472px on a desktop, which moves it again. fitBounds
+    // answers all three at once; `bearing` and `pitch` have to be passed or it
+    // levels the camera out from under the 3D view.
+    var PITCH = 42;
+    var BEARING = -14;
+    function frameAll(duration) {
+      if (!map || !window.mapboxgl) return;
+      var b = new window.mapboxgl.LngLatBounds();
+      [claimRing, rivalRing, raidRing, growRing].forEach(function (r) {
+        r.forEach(function (p) { b.extend(p); });
+      });
+      map.fitBounds(b, { padding: 26, bearing: BEARING, pitch: PITCH, duration: duration || 0 });
+    }
+
+    function setTotal(v) {
+      shown = v;
+      areaEl.textContent = fmt.format(Math.round(v));
+    }
+
+    async function playAct(i) {
+      if (!ready || !map) return;
+      var token = ++playToken;
+      readout.style.opacity = '1';
+
+      if (i === 0) {
+        hide('rival');
+        hide('raid');
+        hide('grow');
+        setTotal(0);
+        await drawLoop(claimRing, 'claim', 1500, token);
+        if (token !== playToken) return;
+        countTo(A.claim, 900);
+        return;
+      }
+
+      show('claim', claimRing); // everything from act 1 on keeps the claim up
+
+      if (i === 1) {
+        hide('grow');
+        setTotal(A.claim);
+        // ⚠️ The rival's ground appears FIRST and holds — a steal needs something
+        // visibly there to take.
+        show('rival', rivalRing);
+        await wait(750, token);
+        if (token !== playToken) return;
+        await drawLoop(raidRing, 'raid', 1400, token);
+        if (token !== playToken) return;
+        countTo(A.claim + A.raid, 900);
+        return;
+      }
+
+      // Act 2 — the wider loop REPLACES the claim in the total: it contains it,
+      // so adding the two would double-count ground the runner already held.
+      show('rival', rivalRing);
+      show('raid', raidRing);
+      setTotal(A.claim + A.raid);
+      await drawLoop(growRing, 'grow', 1500, token);
+      if (token !== playToken) return;
+      countTo(A.grow + A.raid, 1000);
+    }
+
+    function giveUp() {
+      var fb = document.getElementById('tut-fallback');
+      if (fb) {
+        fb.classList.remove('hidden');
+        fb.style.display = 'grid';
+      }
+    }
+
+    /** GL JS is not on this page — nothing else on /signup needs it, so the
+     *  tutorial pays for it itself, and only once the step is actually reached. */
+    function loadOnce(tag, attrs) {
+      return new Promise(function (res, rej) {
+        var el = document.createElement(tag);
+        Object.keys(attrs).forEach(function (k) {
+          el[k] = attrs[k];
+        });
+        el.onload = res;
+        el.onerror = rej;
+        document.head.appendChild(el);
+      });
+    }
+
+    async function boot() {
+      if (!MAPBOX_TOKEN) return giveUp();
+      if (!window.mapboxgl) {
+        try {
+          await Promise.all([
+            loadOnce('link', { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css' }),
+            loadOnce('script', { src: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js' }),
+          ]);
+        } catch (e) {
+          return giveUp();
+        }
+      }
+      if (!window.mapboxgl) return giveUp(); // blocked → the still frame stays
+      window.mapboxgl.accessToken = MAPBOX_TOKEN;
+      map = new window.mapboxgl.Map({
+        container: 'tut-map',
+        style: 'mapbox://styles/mapbox/dark-v11',
+        center: CENTER,
+        zoom: 14, // provisional — frameAll() sets the real camera on load
+        pitch: PITCH,
+        bearing: BEARING,
+        interactive: false, // an illustration, not a map to browse
+        attributionControl: false,
+      });
+      map.on('load', function () {
+        ['claim', 'rival', 'raid', 'grow'].forEach(function (k) {
+          map.addSource(k + '-fill', { type: 'geojson', data: EMPTY });
+          map.addSource(k + '-line', { type: 'geojson', data: EMPTY });
+        });
+        var MINT = '#06D6A0';
+        var RED = '#FF5A5F';
+        // Rival first, so a mint fill drawn over it reads as ground changing hands.
+        map.addLayer({
+          id: 'l-rival-fill',
+          type: 'fill',
+          source: 'rival-fill',
+          paint: { 'fill-color': RED, 'fill-opacity': 0.34 },
+        });
+        map.addLayer({
+          id: 'l-rival-line',
+          type: 'line',
+          source: 'rival-line',
+          paint: { 'line-color': RED, 'line-width': 2, 'line-dasharray': [2, 2] },
+        });
+        ['claim', 'raid', 'grow'].forEach(function (k) {
+          map.addLayer({
+            id: 'l-' + k + '-fill',
+            type: 'fill',
+            source: k + '-fill',
+            paint: { 'fill-color': MINT, 'fill-opacity': 0.32 },
+          });
+        });
+        ['claim', 'raid', 'grow'].forEach(function (k) {
+          map.addLayer({
+            id: 'l-' + k + '-line',
+            type: 'line',
+            source: k + '-line',
+            paint: { 'line-color': MINT, 'line-width': 3, 'line-blur': 0.3 },
+          });
+        });
+        ready = true;
+        frameAll(0);
+        playAct(act);
+      });
+      // A missing tile must never stop the lesson.
+      map.on('error', function () {});
+
+      // A rotation changes the frame width, and therefore the only zoom that
+      // fits the scene. GL JS resizes its own canvas; it does not re-fit.
+      var refit;
+      window.addEventListener('resize', function () {
+        clearTimeout(refit);
+        refit = setTimeout(function () { if (ready) frameAll(0); }, 150);
+      });
+    }
+
+    // ⚠️ A DELIBERATELY SMALL TABLE, and city coordinates do not go stale. The
+    // point is that the runner sees their OWN country's streets on the step that
+    // asks them to imagine running there; anywhere unlisted falls back to London
+    // rather than prompting for geolocation in the middle of signup.
+    var CITIES = {
+      US: [-73.9857, 40.7484], CA: [-79.3832, 43.6532], GB: [-0.1105, 51.5166],
+      IE: [-6.2603, 53.3498], AU: [151.2093, -33.8688], NZ: [174.7633, -36.8485],
+      IN: [72.8777, 19.076], SG: [103.8198, 1.3521], MY: [101.6869, 3.139],
+      ID: [106.8456, -6.2088], PH: [120.9842, 14.5995], TH: [100.5018, 13.7563],
+      VN: [106.6297, 10.8231], KR: [126.978, 37.5665], JP: [139.7671, 35.6812],
+      CN: [121.4737, 31.2304], HK: [114.1694, 22.3193], TW: [121.5654, 25.033],
+      DE: [13.405, 52.52], FR: [2.3522, 48.8566], ES: [-3.7038, 40.4168],
+      IT: [12.4964, 41.9028], NL: [4.9041, 52.3676], BE: [4.3517, 50.8503],
+      CH: [8.5417, 47.3769], AT: [16.3738, 48.2082], SE: [18.0686, 59.3293],
+      NO: [10.7522, 59.9139], DK: [12.5683, 55.6761], FI: [24.9384, 60.1699],
+      PL: [21.0122, 52.2297], PT: [-9.1393, 38.7223], CZ: [14.4378, 50.0755],
+      GR: [23.7275, 37.9838], TR: [28.9784, 41.0082], RO: [26.1025, 44.4268],
+      BR: [-46.6333, -23.5505], MX: [-99.1332, 19.4326], AR: [-58.3816, -34.6037],
+      CL: [-70.6693, -33.4489], CO: [-74.0721, 4.711], PE: [-77.0428, -12.0464],
+      ZA: [28.0473, -26.2041], NG: [3.3792, 6.5244], KE: [36.8219, -1.2921],
+      EG: [31.2357, 30.0444], AE: [55.2708, 25.2048], SA: [46.6753, 24.7136],
+      IL: [34.7818, 32.0853], PK: [67.0011, 24.8607], BD: [90.4125, 23.8103],
+    };
+
+    /** Called by the funnel whenever the chosen country changes. */
+    window.setTutorialCountry = function (code) {
+      var next = CITIES[String(code || '').toUpperCase()];
+      if (!next || (next[0] === CENTER[0] && next[1] === CENTER[1])) return;
+      CENTER = next;
+      buildRings();
+      if (map && ready) {
+        frameAll(0);
+        act = 0;
+        setCopy();
+        playAct(0);
+      }
+    };
+
+    /** The funnel calls this when the pane becomes visible — a Mapbox map built
+     *  inside a `hidden` parent measures 0×0 and renders nothing at all. */
+    var booting = false;
+    window.startTutorial = function () {
+      if (map) {
+        // ⚠️ resize FIRST, then re-fit. The container was 0×0 while its pane was
+        // hidden, so the camera fitBounds computed at boot was fitted to nothing.
+        map.resize();
+        if (ready) frameAll(0);
+        return;
+      }
+      // ⚠️ boot() is async and this can be called again (back, then forward
+      // through the funnel). Without the latch the second call builds a SECOND
+      // Mapbox map into the same container while the first is still loading.
+      if (booting) return;
+      booting = true;
+      boot();
+    };
+
+    nextBtn.addEventListener('click', function () {
+      if (act < ACTS.length - 1) {
+        act += 1;
+        setCopy();
+        playAct(act);
+      } else if (window.tutorialDone) {
+        window.tutorialDone('tutorial');
+      }
+    });
+    skipBtn.addEventListener('click', function () {
+      if (window.tutorialDone) window.tutorialDone('skip');
+    });
+
+    buildRings();
+    setCopy();
+  })();
+</script>

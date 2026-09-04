@@ -2,7 +2,15 @@
 /**
  * /signup — the web funnel, end to end, on ONE page.
  *
- *      1. Account   →   2. Plan   →   3. Get the app
+ *   1. Account   →   2. How it works   →   3. Plan   →   4. Get the app
+ *
+ * ⚠️ THE TUTORIAL IS STEP 2 BECAUSE PAYMENT IS NOT PART OF CREATING AN ACCOUNT.
+ * The old shape put the price directly after the form, so somebody who arrived
+ * from an ad was asked to pay for a mechanic nobody had shown them. The app
+ * learned this exact lesson the expensive way — 1.7 walled runners before their
+ * first run and activation fell 56% → 5% — and the web version of "let them run
+ * first" is to let them SEE a loop claim ground, on real streets, before the
+ * offer. The account step now takes an account and nothing else.
  *
  * ⚠️ THIS IS THE ONLY DOOR TO A PRO PURCHASE. Google Play forbids the Android app
  * from leading users to any payment method other than Play Billing, so Pro cannot
@@ -29,6 +37,7 @@
  */
 import Layout from '../layouts/Layout.astro';
 import AppStore from '../components/AppStore.astro';
+import GameTutorial from '../components/GameTutorial.astro';
 import { PALETTE } from '../lib/account';
 
 /**
@@ -81,10 +90,16 @@ const proIncludes = [
     {/* ⚠️ A FUNNEL HAS TO SAY WHERE YOU ARE AND WHERE IT ENDS. Without it this
         page reads as an unbounded form on a site that had, a moment ago, been
         free — and "how much more of this is there" is the question that loses
-        people on step one. Three steps, all named, so the shape of the
+        people on step one. Four steps, all named, so the shape of the
         commitment is visible before it is made. The nodes are driven by
-        `data-step` rather than duplicated once per pane. */}
-    <ol id="su-progress" data-step="1" class="funnel-progress mt-6 flex items-center gap-2.5" aria-label="Progress: step 1 of 3">
+        `data-step` rather than duplicated once per pane.
+
+        ⚠️ THE LABELS ARE ONLY EVER ADDED TO, NEVER SHUFFLED. `setStep` counts
+        `STEPS` and fills `data-line="n"` for every n < step, so a fifth step
+        needs one node, one line and no JavaScript change — but a node without
+        its matching line, or a count that disagrees with the markup, throws on
+        the non-null assertion and takes the whole funnel with it. */}
+    <ol id="su-progress" data-step="1" class="funnel-progress mt-6 flex items-center gap-2.5" aria-label="Progress: step 1 of 4">
       <li class="flex items-center gap-2.5">
         <span class="progress-node is-current" data-node="1">1</span>
         <span class="text-sm font-semibold text-ink" data-label="1">Account</span>
@@ -92,12 +107,17 @@ const proIncludes = [
       <li aria-hidden="true" class="progress-line" data-line="1"></li>
       <li class="flex items-center gap-2.5">
         <span class="progress-node" data-node="2">2</span>
-        <span class="text-sm text-ink-faint" data-label="2">Plan</span>
+        <span class="text-sm text-ink-faint" data-label="2">How it works</span>
       </li>
       <li aria-hidden="true" class="progress-line" data-line="2"></li>
       <li class="flex items-center gap-2.5">
         <span class="progress-node" data-node="3">3</span>
-        <span class="text-sm text-ink-faint" data-label="3">Get the app</span>
+        <span class="text-sm text-ink-faint" data-label="3">Plan</span>
+      </li>
+      <li aria-hidden="true" class="progress-line" data-line="3"></li>
+      <li class="flex items-center gap-2.5">
+        <span class="progress-node" data-node="4">4</span>
+        <span class="text-sm text-ink-faint" data-label="4">Get the app</span>
       </li>
     </ol>
 
@@ -110,10 +130,6 @@ const proIncludes = [
         One account works everywhere — the website, iPhone and Android. Take about a minute,
         then the whole map is yours to run at.
       </p>
-
-      <div class="mt-6 rounded-2xl p-4 text-sm leading-relaxed text-ink-faint" style="background:#DDE3E0">
-        <strong class="text-ink">No payment is taken on this page.</strong> Your account is what lets a web purchase unlock Pro inside the app—and gives support a safe way to recover it if the handoff is delayed.
-      </div>
 
       <form id="signup-form" class="glass mt-6 space-y-5 p-6" novalidate
         data-price-monthly={PRICE_MONTHLY} data-price-yearly={PRICE_YEARLY}>
@@ -151,6 +167,24 @@ const proIncludes = [
           </div>
         </div>
 
+        {/* ⚠️ THE COUNTRY IS ASKED HERE, AND IT IS NOT A BILLING QUESTION YET.
+            It picks the city the next step's map flies to, and it is the country
+            Paddle prices in — one answer doing two jobs, which is why it can sit
+            on a page that takes no payment without reading as a payment field.
+
+            It is PRE-FILLED, never blank: the browser's own locale seeds it
+            immediately and Paddle's geolocation corrects it the moment the price
+            preview lands — but only while nobody has touched the control, or a
+            late network answer would overwrite a deliberate choice. */}
+        <div id="su-country-field">
+          <label for="su-country" class="block text-sm font-semibold text-ink">Country</label>
+          <p class="mt-1 text-xs text-ink-faint">Sets your currency and the ways you can pay.</p>
+          <select id="su-country" name="country" autocomplete="country"
+            class="well mt-3 w-full px-4 py-3 text-[15px] text-ink outline-none">
+            <option value="">Detecting…</option>
+          </select>
+        </div>
+
         <p id="su-error" class="hidden rounded-xl px-4 py-3 text-sm" role="alert" aria-live="assertive" style="background:rgba(229,72,77,0.10);color:#A3282C"></p>
 
         <button id="su-submit" type="submit" class="btn-primary w-full">Create account</button>
@@ -171,7 +205,24 @@ const proIncludes = [
       </div>
     </div>
 
-    <!-- ══════════════ STEP 2 · PLAN ══════════════
+    <!-- ══════════════ STEP 2 · HOW IT WORKS ══════════════
+         ⚠️ THIS IS THE ONLY STEP THAT SELLS ANYTHING, and it does it by showing
+         the game rather than describing it. A real Mapbox map, on a city in the
+         country they just picked, drawing a loop and counting the ground it
+         encloses — the same three beats the app's own tutorial teaches
+         (claim → raid → grow). Skippable in one tap, because a tutorial nobody
+         can leave is a wall wearing a different hat. -->
+    <div id="pane-learn" class="funnel-pane hidden">
+      <h1 class="mt-6 font-display text-4xl font-bold leading-[1.05] tracking-tight">
+        This is the <span class="text-gradient">game</span>.
+      </h1>
+      <p class="mt-4 text-[15px] leading-relaxed text-ink-soft">
+        Thirty seconds, on a real map. Then we'll get you the app.
+      </p>
+      <GameTutorial />
+    </div>
+
+    <!-- ══════════════ STEP 3 · PLAN ══════════════
          Reached only with an account in hand, so every button here has exactly
          one runner to attach a payment to. -->
     <div id="pane-plan" class="funnel-pane hidden">
@@ -226,20 +277,31 @@ const proIncludes = [
         </li>
       </ol>
 
-      {/* ⚠️ THE COUNTRY IS DETECTED, NOT ASKED. Paddle geolocates the visitor for
-          the price preview and hands the answer back in `address.countryCode` —
-          so the country costs no question, no step and no third-party lookup, and
-          it is the SAME answer that decided the currency shown above it.
+      {/* ⚠️ THIS IS A RECEIPT FOR A DECISION ALREADY MADE, not a new question.
+          The country was chosen on the account step; this restates it next to
+          the price it produced, because "billed from" is what somebody actually
+          checks in the second before entering a card. Change writes through the
+          same `__trSetCountry` seam the account field does — two controls, one
+          value, so the label and the currency cannot drift apart.
 
-          Passing it into the checkout is what lets Paddle skip its first page.
-          ⚠️ Not everywhere: the markets that need a ZIP/postal code for tax or
-          banking compliance still ask for one, so the copy never promises a page
-          count it cannot keep.
+          Passing that country into the checkout is what lets Paddle skip its
+          first page. ⚠️ Not everywhere: the markets that need a ZIP/postal code
+          for tax or banking compliance still ask for one, so the copy never
+          promises a page count it cannot keep.
 
           ⚠️ AND THE METHODS ARE REAL. `availablePaymentMethods` comes from the
-          same response — it is Paddle's own answer for THIS location, not a row
-          of logos we chose. On a payment page run by a solo developer, an
-          invented trust signal is worse than none, and this one is free. */}
+          price preview — Paddle's own answer for THIS country, not a row of
+          logos we chose, and it changes when the country does. On a payment page
+          run by a solo developer an invented trust signal is worse than none,
+          and this one is free.
+
+          ⚠️ IF UPI OR THE KOREAN METHODS ARE MISSING, IT IS NOT THIS CODE.
+          Paddle supports UPI, KakaoPay, Naver Pay and PAYCO, and `METHOD_NAMES`
+          below already knows their labels — but each has to be ticked in
+          Paddle → Checkout → Checkout settings before the API returns it, which
+          is exactly how Google Pay was absent from every market until it was
+          enabled. The list here renders whatever Paddle sends, the moment it
+          sends it. */}
       <div id="plan-billing" class="hidden mt-6 rounded-2xl p-4" style="background:#DDE3E0">
         <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <p class="text-sm text-ink-faint">
@@ -367,6 +429,7 @@ const proIncludes = [
     const nameEl = document.getElementById('su-name') as HTMLInputElement;
     const hint = document.getElementById('su-name-hint')!;
     const paneAccount = document.getElementById('pane-account')!;
+    const paneLearn = document.getElementById('pane-learn')!;
     const panePlan = document.getElementById('pane-plan')!;
     const panePro = document.getElementById('pane-pro')!;
     const progress = document.getElementById('su-progress')!;
@@ -379,19 +442,28 @@ const proIncludes = [
     let created: Awaited<ReturnType<typeof signUp>> | null = null;
 
     // ── the progress bar is ONE element, driven by a step number ──────────
+    // ⚠️ COUNTED FROM THE MARKUP, never hardcoded. The step count has now been
+    // wrong in two directions in this file's history; reading it off the nodes
+    // that exist means adding a step to the DOM cannot leave the loop, the aria
+    // label and the connectors disagreeing about how long the funnel is.
+    const STEPS = progress.querySelectorAll('[data-node]').length;
     const setStep = (step: number) => {
       progress.dataset.step = String(step);
-      progress.setAttribute('aria-label', `Progress: step ${step} of 3`);
-      for (let i = 1; i <= 3; i++) {
+      progress.setAttribute('aria-label', `Progress: step ${step} of ${STEPS}`);
+      for (let i = 1; i <= STEPS; i++) {
         const node = progress.querySelector(`[data-node="${i}"]`)!;
         const label = progress.querySelector(`[data-label="${i}"]`)!;
         node.classList.toggle('is-done', i < step);
         node.classList.toggle('is-current', i === step);
         node.textContent = i < step ? '✓' : String(i);
-        label.className = i <= step ? 'text-sm font-semibold text-ink' : 'text-sm text-ink-faint';
+        // `step-label-away` is what collapses the other labels on a phone — see
+        // the media query in global.css. Four names do not fit one row.
+        label.className = i === step
+          ? 'text-sm font-semibold text-ink'
+          : `text-sm step-label-away ${i < step ? 'text-ink' : 'text-ink-faint'}`;
+        const line = progress.querySelector(`[data-line="${i}"]`);
+        if (line) line.classList.toggle('is-filled', step > i);
       }
-      progress.querySelector('[data-line="1"]')!.classList.toggle('is-filled', step > 1);
-      progress.querySelector('[data-line="2"]')!.classList.toggle('is-filled', step > 2);
     };
 
     // ⚠️ THE INLINE PADDLE CALLBACK CANNOT IMPORT, and it is the only thing that
@@ -401,7 +473,7 @@ const proIncludes = [
     (window as any).__trTrack = track;
 
     const showPane = (pane: HTMLElement, step: number) => {
-      [paneAccount, panePlan, panePro].forEach((p) => p.classList.add('hidden'));
+      [paneAccount, paneLearn, panePlan, panePro].forEach((p) => p.classList.add('hidden'));
       pane.classList.remove('hidden');
       // Restart the entrance every time, so a second arrival still animates.
       pane.classList.remove('pane-in');
@@ -463,7 +535,18 @@ const proIncludes = [
       submit.textContent = mode === 'signin' ? 'Sign in' : 'Create account';
     };
 
-    // ── step 2 ────────────────────────────────────────────────────────────
+    // ── step 2 → step 3 ───────────────────────────────────────────────────
+    // ⚠️ The tutorial is an inline island with no imports of its own, so the two
+    // sides meet on `window`: it calls `tutorialDone` when the last act is
+    // finished OR skipped, and the funnel decides what "done" leads to. Both
+    // outcomes are tracked — a tutorial everyone skips and a tutorial everyone
+    // watches are the same number of arrivals at the plan step.
+    const toPlan = (via: 'tutorial' | 'skip' | 'direct') => {
+      showPane(panePlan, 3);
+      track('web_plan_view', { via });
+    };
+    (window as any).tutorialDone = (via: 'tutorial' | 'skip') => toPlan(via === 'skip' ? 'skip' : 'tutorial');
+
     // An iPhone is shown the store route first. The plan cards stay where they
     // are — reordering the DOM would move a button under a thumb already
     // travelling toward it, and this is the one page where a mis-tap costs money.
@@ -563,7 +646,7 @@ const proIncludes = [
         // Somebody signing back in may already be subscribed — on iPhone, here,
         // or from a previous card. Never show them a buy button.
         if (mode === 'signin' && await isPro(acc.userId, acc.accessToken)) {
-          showPane(panePro, 3);
+          showPane(panePro, STEPS);
           track('web_already_pro');
           return;
         }
@@ -571,17 +654,206 @@ const proIncludes = [
         const nameSlot = document.getElementById('plan-name');
         if (nameSlot) nameSlot.textContent = mode === 'signup' ? username : (acc.email.split('@')[0] || 'runner');
 
-        showPane(panePlan, 2);
-        track('web_plan_view', { arrived_with_plan: !!plan });
-        // ⚠️ THEY ALREADY CHOSE. Arriving with a plan means the decision was made
-        // on the pricing page; asking a second time is a step that only loses
-        // people. The pane is shown first so closing the overlay lands on it.
-        if (plan) buy(plan);
+        // ⚠️ THEY ALREADY CHOSE. Arriving with a `?plan=` means the decision was
+        // made on the pricing page — teaching the game to somebody holding a
+        // chosen plan is a step that can only lose them, so the tutorial is
+        // skipped outright and the checkout opens over the plan pane, which is
+        // what closing the overlay lands on.
+        if (plan) {
+          toPlan('direct');
+          buy(plan);
+          return;
+        }
+
+        // ⚠️ SIGNING IN IS NOT SIGNING UP. Somebody with an account has already
+        // been through this page, or through the app's own tutorial, and being
+        // taught the game again on the way to a price reads as a stall. The
+        // lesson is for the runner who has just this second appeared.
+        if (mode === 'signin') {
+          toPlan('direct');
+          return;
+        }
+
+        showPane(paneLearn, 2);
+        track('web_tutorial_shown');
+        // ⚠️ ONLY NOW. A Mapbox map built inside a `hidden` parent measures 0×0
+        // and renders nothing at all — it has to be told the moment its pane
+        // becomes visible, and this is the only place that knows.
+        (window as any).startTutorial?.();
       } catch (e: any) {
         fail(e?.message || 'Something went wrong. Please try again.');
       }
     });
   }
+</script>
+
+{/* ══════════════ THE COUNTRY, AND WHO OWNS IT ══════════════
+    ⚠️ THIS BLOCK IS NOT GATED ON PADDLE, DELIBERATELY. The country now does two
+    jobs — it prices the plan step AND it chooses the city the tutorial's map
+    flies to — and only one of those involves money. Gated on `paddleReady`, a
+    build with a missing price id would ship an account form whose Country field
+    said "Detecting…" forever, on a step that takes no payment at all.
+
+    So the country lives here, in ONE seam (`__trSetCountry`), with two controls
+    bound to it: the field on the account step and the Change control on the plan
+    step. Two selects that each owned their own value is how a checkout ends up
+    charging a currency the page never showed. */}
+<script is:inline>
+  (function () {
+    var accSel = document.getElementById('su-country');
+    var planSel = document.getElementById('plan-country-select');
+    var planLabel = document.getElementById('plan-country');
+
+    var regionNames = null;
+    try { regionNames = new Intl.DisplayNames([navigator.language || 'en'], { type: 'region' }); } catch (e) { /* older browser */ }
+    function countryName(code) {
+      if (!code) return '';
+      try { var n = regionNames && regionNames.of(code); if (n && n !== code) return n; } catch (e) { /* not a region */ }
+      return code;
+    }
+    window.__trCountryName = countryName;
+
+    // ⚠️ Codes come from ICU rather than a table that goes stale, and the names
+    // arrive already localised. ~676 `DisplayNames.of` calls is a few
+    // milliseconds — but it is a few milliseconds of the MAIN THREAD during
+    // first paint, so it waits for idle. The field carries "Detecting…" until
+    // then and the seam below re-applies whatever was chosen in the meantime.
+    var CODES = null;
+    function countryList() {
+      if (CODES) return CODES;
+      CODES = [];
+      for (var a = 65; a <= 90; a++) {
+        for (var b = 65; b <= 90; b++) {
+          var code = String.fromCharCode(a) + String.fromCharCode(b);
+          var name = countryName(code);
+          if (name && name !== code) CODES.push([code, name]);
+        }
+      }
+      CODES.sort(function (x, y) { return x[1].localeCompare(y[1]); });
+      return CODES;
+    }
+    function fill(sel) {
+      if (!sel || sel.dataset.filled) return;
+      var frag = document.createDocumentFragment();
+      // ⚠️ THE PLACEHOLDER STAYS. Without a leading empty option, a select filled
+      // before any country has resolved displays the first entry alphabetically —
+      // so the field would read "Afghanistan" while the price beside it was
+      // computed for somewhere else, which is the exact drift this seam exists to
+      // prevent. An empty value fails the seam's own test, so it can never be
+      // submitted as a country either.
+      var ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = 'Select your country';
+      frag.appendChild(ph);
+      countryList().forEach(function (pair) {
+        var o = document.createElement('option');
+        o.value = pair[0];
+        o.textContent = pair[1];
+        frag.appendChild(o);
+      });
+      sel.innerHTML = '';
+      sel.appendChild(frag);
+      sel.dataset.filled = '1';
+      sel.value = window.__trCountry || '';
+    }
+    // The plan step's Change control builds its own copy on demand — 250 options
+    // are a real cost on the page that decides whether somebody pays, and almost
+    // nobody opens it.
+    window.__trFillCountrySelect = fill;
+
+    // Has a human chosen? A late geolocation answer must never overwrite that,
+    // and the Paddle block reads it to decide whether its FIRST price preview
+    // should ask about a country or let Paddle geolocate.
+    window.__trCountryTouched = false;
+    window.__trCountry = null;
+
+    /**
+     * The one place the country changes.
+     *   source 'user'   — a select was used. Wins over everything after it.
+     *   source 'detect' — Paddle geolocated, or the browser locale seeded it.
+     *                     Ignored once a human has chosen.
+     */
+    window.__trSetCountry = function (code, source) {
+      code = String(code || '').toUpperCase();
+      // ⚠️ A REAL REGION, not merely two letters. `navigator.languages` can end
+      // in things that look like a country and are not, and an invented code
+      // reaches Paddle's PricePreview as a billing address — which fails the
+      // whole preview and disables checkout, from a bad browser locale.
+      // ⚠️ `regionNames &&` is load-bearing: without Intl.DisplayNames,
+      // `countryName` returns the code it was given, so this test would reject
+      // EVERY country and the funnel would price nothing at all.
+      if (!/^[A-Z]{2}$/.test(code)) return;
+      if (regionNames && countryName(code) === code) return;
+      if (source === 'user') window.__trCountryTouched = true;
+      else if (window.__trCountryTouched) return;
+      if (code === window.__trCountry) return;
+
+      window.__trCountry = code;
+      if (accSel && accSel.dataset.filled) accSel.value = code;
+      if (planSel && planSel.dataset.filled) planSel.value = code;
+      if (planLabel) planLabel.textContent = countryName(code);
+      // The map on step 2 flies to a city in this country.
+      if (window.setTutorialCountry) window.setTutorialCountry(code);
+      // ⚠️ THE PRICE MUST FOLLOW THE COUNTRY. Currency and tax both change with
+      // it, so re-price rather than only relabelling — a card charged an amount
+      // the page never showed is a chargeback. Registered by the Paddle block;
+      // absent when checkout is not configured, which is not an error here.
+      if (source === 'user' && window.__trReprice) window.__trReprice(code);
+    };
+
+    if (accSel) {
+      accSel.addEventListener('change', function () {
+        window.__trSetCountry(accSel.value, 'user');
+      });
+    }
+
+    // The plan step's own Change control. It exists as well as the account
+    // field because this is the last screen before a card is entered, and
+    // "billed from the wrong country" is exactly the thing somebody notices
+    // there — but it writes through the same seam, so the two can never hold
+    // different answers.
+    var changeBtn = document.getElementById('plan-country-change');
+    if (changeBtn && planSel) {
+      changeBtn.addEventListener('click', function () {
+        fill(planSel);
+        var opening = planSel.classList.contains('hidden');
+        planSel.classList.toggle('hidden', !opening);
+        changeBtn.textContent = opening ? 'Done' : 'Change';
+        if (opening) planSel.focus();
+      });
+      planSel.addEventListener('change', function () {
+        window.__trSetCountry(planSel.value, 'user');
+      });
+    }
+
+    // Seed from the browser before any network answer, so the field is never
+    // blank and the tutorial always has somewhere to be.
+    (function seed() {
+      var langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || '']);
+      for (var i = 0; i < langs.length; i++) {
+        var m = /-([A-Za-z]{2})$/.exec(String(langs[i]));
+        if (m) { window.__trSetCountry(m[1], 'detect'); return; }
+      }
+      try {
+        var r = new Intl.Locale(navigator.language || 'en').maximize().region;
+        if (r) window.__trSetCountry(r, 'detect');
+      } catch (e) { /* no Intl.Locale — Paddle's geolocation will answer */ }
+    })();
+
+    var idle = window.requestIdleCallback || function (fn) { return setTimeout(fn, 200); };
+    idle(function () {
+      // ⚠️ NO Intl.DisplayNames ⇒ NO LIST, and an empty <select> under a
+      // "Country" label is worse than no field: it looks broken and it cannot be
+      // answered. Hide it and let Paddle's geolocation decide, which is what
+      // happened before this field existed.
+      if (!countryList().length) {
+        var field = document.getElementById('su-country-field');
+        if (field) field.style.display = 'none';
+        return;
+      }
+      fill(accSel);
+    });
+  })();
 </script>
 
 {paddleReady && (
@@ -624,27 +896,19 @@ const proIncludes = [
         return String(m).replace(/_/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
       }
 
-      var regionNames = null;
-      try { regionNames = new Intl.DisplayNames([navigator.language || 'en'], { type: 'region' }); } catch (e) { /* older browser */ }
-      function countryName(code) {
-        if (!code) return '';
-        try { var n = regionNames && regionNames.of(code); if (n && n !== code) return n; } catch (e) { /* not a region */ }
-        return code;
-      }
-
-      // The country actually in force. Read by the module wiring when it opens a
-      // checkout, so the checkout is prefilled with the same country the price
-      // on screen was calculated for — those two must never disagree.
-      window.__trCountry = null;
-
+      // ⚠️ THE COUNTRY IS NOT OWNED HERE. It is set on the account step, before
+      // this block has anything to price, and `__trSetCountry` is the only thing
+      // that writes it — this block reads it, reprices on demand, and reports
+      // what Paddle geolocated so a visitor who never touched the field gets the
+      // better answer. `renderBilling` therefore only draws the SUMMARY.
       function renderBilling(countryCode, methods) {
         var box = document.getElementById('plan-billing');
         if (!box || !countryCode) return;
-        window.__trCountry = countryCode;
+        // 'detect': Paddle's IP guess is better than the browser locale, but it
+        // must lose to a human who has already chosen.
+        window.__trSetCountry(countryCode, 'detect');
         var nameEl = document.getElementById('plan-country');
-        if (nameEl) nameEl.textContent = countryName(countryCode);
-        var sel = document.getElementById('plan-country-select');
-        if (sel && sel.options.length) sel.value = countryCode;
+        if (nameEl) nameEl.textContent = window.__trCountryName(window.__trCountry);
         var line = document.getElementById('plan-methods');
         if (line) {
           var list = (methods || [])
@@ -654,33 +918,6 @@ const proIncludes = [
           line.textContent = list.length ? 'Accepted here: ' + list.join(' · ') : '';
         }
         box.classList.remove('hidden');
-      }
-
-      // ⚠️ BUILT ONLY WHEN ASKED. 250-odd options is a real cost on the page that
-      // decides whether somebody pays, and the detected country is right for
-      // almost everyone — it is wrong for a VPN or somebody travelling, and that
-      // is who this is for. Codes come from ICU rather than a table that goes
-      // stale, and the names arrive already localised.
-      function buildCountrySelect() {
-        var sel = document.getElementById('plan-country-select');
-        if (!sel || sel.options.length) return;
-        var out = [];
-        for (var a = 65; a <= 90; a++) {
-          for (var b = 65; b <= 90; b++) {
-            var code = String.fromCharCode(a) + String.fromCharCode(b);
-            var name = countryName(code);
-            if (name && name !== code) out.push([code, name]);
-          }
-        }
-        out.sort(function (x, y) { return x[1].localeCompare(y[1]); });
-        var frag = document.createDocumentFragment();
-        out.forEach(function (pair) {
-          var o = document.createElement('option');
-          o.value = pair[0]; o.textContent = pair[1];
-          frag.appendChild(o);
-        });
-        sel.appendChild(frag);
-        if (window.__trCountry) sel.value = window.__trCountry;
       }
 
       function applyPreview(res) {
@@ -721,6 +958,7 @@ const proIncludes = [
       function loadPrices(countryCode) {
         var req = { items: [{ priceId: PRICE_MONTHLY, quantity: 1 }, { priceId: PRICE_YEARLY, quantity: 1 }] };
         if (countryCode) req.address = { countryCode: countryCode };
+        document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = '…'; });
         return window.Paddle.PricePreview(req).then(applyPreview);
       }
 
@@ -761,34 +999,25 @@ const proIncludes = [
           },
         });
 
+        // ⚠️ THE SEAM THE ACCOUNT STEP CALLS. Registered before the first preview
+        // so a country chosen while Paddle was still loading is not stranded on
+        // whatever the browser locale guessed.
+        window.__trReprice = function (code) {
+          if (window.__trTrack) window.__trTrack('web_country_changed', { country: code });
+          loadPrices(code).catch(function () {
+            disablePlans('Prices could not be loaded for that country. Nothing can be charged — pick another, or reload.');
+          });
+        };
+
         // Prices come from Paddle, localised to the visitor. Never from markup.
-        loadPrices(null).catch(function () {
+        // ⚠️ A country already chosen on the account step OUTRANKS Paddle's IP
+        // guess and must be the one this preview asks about — otherwise the very
+        // first preview comes back in the wrong currency and, because
+        // `renderBilling` reports 'detect' and a touched country ignores it, the
+        // label and the price would then disagree.
+        loadPrices(window.__trCountryTouched ? window.__trCountry : null).catch(function () {
           disablePlans('Paddle could not load this build’s prices, so checkout is disabled and nothing can be charged. The free game is unaffected.');
         });
-
-        var changeBtn = document.getElementById('plan-country-change');
-        var sel = document.getElementById('plan-country-select');
-        if (changeBtn && sel) {
-          changeBtn.addEventListener('click', function () {
-            buildCountrySelect();
-            var opening = sel.classList.contains('hidden');
-            sel.classList.toggle('hidden', !opening);
-            changeBtn.textContent = opening ? 'Done' : 'Change';
-            if (opening) sel.focus();
-          });
-          sel.addEventListener('change', function () {
-            var code = sel.value;
-            if (!code) return;
-            // ⚠️ THE PRICE MUST FOLLOW THE COUNTRY. Currency and tax both change
-            // with it, so re-price rather than only relabelling — a card charged
-            // an amount the page never showed is a chargeback.
-            if (window.__trTrack) window.__trTrack('web_country_changed', { country: code });
-            document.querySelectorAll('[data-price]').forEach(function (el) { el.textContent = '…'; });
-            loadPrices(code).catch(function () {
-              disablePlans('Prices could not be loaded for that country. Nothing can be charged — pick another, or reload.');
-            });
-          });
-        }
       };
       s.onerror = function () {
         disablePlans('Secure checkout could not load — check your connection or content blocker. The free game is unaffected.');

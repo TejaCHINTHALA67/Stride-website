@@ -245,6 +245,16 @@
   transform-origin: left;
 }
 .progress-line.is-filled::after { animation: progress-fill 420ms cubic-bezier(.16,1,.3,1) 120ms forwards; }
+/* ⚠️ FOUR NAMED STEPS DO NOT FIT A PHONE. Nodes + connectors + all four labels
+   measure ~480px against a 335px content width, and a bar that wraps to two rows
+   stops reading as a line you are travelling along — which is the only thing it
+   is for. Below `sm` only the CURRENT label is drawn (`setStep` adds
+   `.step-label-away` to the rest), so the row stays one line and still answers
+   "where am I". The connector tightens to buy the last few pixels. */
+@media (max-width: 639px) {
+  .funnel-progress .progress-line { width: 1rem; }
+  .funnel-progress .step-label-away { display: none; }
+}
 .welcome-state-in { animation: welcome-state 420ms cubic-bezier(.16,1,.3,1) both; }
 .checkout-handoff {
   position: fixed;

@@ -21,8 +21,19 @@
  */
 import { analyticsAllowed } from './consent';
 
-const KEY = import.meta.env.PUBLIC_POSTHOG_KEY ?? '';
-const HOST = import.meta.env.PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com';
+/**
+ * ⚠️ `.trim()` ON EVERY ONE, AND IT IS NOT DEFENSIVE PROGRAMMING FOR ITS OWN
+ * SAKE. These values are pasted by a human into a Cloudflare dashboard field,
+ * and on 2026-09-03 the live site rendered
+ * `data-checkout="pri_01m1gaapfrhydp3kwebssdh7df "` — a real trailing space that
+ * came straight through the build and into the markup. A trailing space happens
+ * to survive `.startsWith()`, so the price ids passed validation; a LEADING one
+ * would have failed it silently and disabled checkout with no error anywhere,
+ * and a trailing space in the token is handed to `Paddle.Initialize` verbatim.
+ * The whole failure mode of this file is silence, so normalise at the boundary.
+ */
+const KEY = (import.meta.env.PUBLIC_POSTHOG_KEY ?? '').trim();
+const HOST = (import.meta.env.PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com').trim();
 
 const ANON_KEY = 'tr.aid.v1';
 

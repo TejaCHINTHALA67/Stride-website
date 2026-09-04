@@ -21,10 +21,21 @@
 import Layout from '../layouts/Layout.astro';
 import AppStore from '../components/AppStore.astro';
 
-const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN ?? '';
-const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV ?? 'sandbox';
-const PRICE_MONTHLY = import.meta.env.PUBLIC_PADDLE_PRICE_MONTHLY ?? '';
-const PRICE_YEARLY = import.meta.env.PUBLIC_PADDLE_PRICE_YEARLY ?? '';
+/**
+ * ⚠️ `.trim()` ON EVERY ONE, AND IT IS NOT DEFENSIVE PROGRAMMING FOR ITS OWN
+ * SAKE. These values are pasted by a human into a Cloudflare dashboard field,
+ * and on 2026-09-03 the live site rendered
+ * `data-checkout="pri_01m1gaapfrhydp3kwebssdh7df "` — a real trailing space that
+ * came straight through the build and into the markup. A trailing space happens
+ * to survive `.startsWith()`, so the price ids passed validation; a LEADING one
+ * would have failed it silently and disabled checkout with no error anywhere,
+ * and a trailing space in the token is handed to `Paddle.Initialize` verbatim.
+ * The whole failure mode of this file is silence, so normalise at the boundary.
+ */
+const PADDLE_TOKEN = (import.meta.env.PUBLIC_PADDLE_TOKEN ?? '').trim();
+const PADDLE_ENV = (import.meta.env.PUBLIC_PADDLE_ENV ?? 'sandbox').trim();
+const PRICE_MONTHLY = (import.meta.env.PUBLIC_PADDLE_PRICE_MONTHLY ?? '').trim();
+const PRICE_YEARLY = (import.meta.env.PUBLIC_PADDLE_PRICE_YEARLY ?? '').trim();
 const environmentValid = PADDLE_ENV === 'sandbox' || PADDLE_ENV === 'production';
 const tokenMatchesEnvironment = PADDLE_ENV === 'production'
   ? PADDLE_TOKEN.startsWith('live_')

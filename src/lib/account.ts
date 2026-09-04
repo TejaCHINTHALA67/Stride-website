@@ -18,8 +18,19 @@
  * webhook may set it. The browser's job ends at "here is who is paying".
  */
 
-const URL_ = import.meta.env.PUBLIC_SUPABASE_URL ?? '';
-const KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '';
+/**
+ * ⚠️ `.trim()` ON EVERY ONE, AND IT IS NOT DEFENSIVE PROGRAMMING FOR ITS OWN
+ * SAKE. These values are pasted by a human into a Cloudflare dashboard field,
+ * and on 2026-09-03 the live site rendered
+ * `data-checkout="pri_01m1gaapfrhydp3kwebssdh7df "` — a real trailing space that
+ * came straight through the build and into the markup. A trailing space happens
+ * to survive `.startsWith()`, so the price ids passed validation; a LEADING one
+ * would have failed it silently and disabled checkout with no error anywhere,
+ * and a trailing space in the token is handed to `Paddle.Initialize` verbatim.
+ * The whole failure mode of this file is silence, so normalise at the boundary.
+ */
+const URL_ = (import.meta.env.PUBLIC_SUPABASE_URL ?? '').trim();
+const KEY = (import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '').trim();
 
 export const configured = Boolean(URL_ && KEY);
 

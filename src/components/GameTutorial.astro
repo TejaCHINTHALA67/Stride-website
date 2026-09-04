@@ -62,7 +62,7 @@ const MAPBOX_TOKEN = (import.meta.env.PUBLIC_MAPBOX_TOKEN ?? '').trim();
        here the map is a 300px frame in a light page, and text over a moving map
        at that size is unreadable at every step. -->
   <div class="mt-5 min-h-[86px]">
-    <p id="tut-eyebrow" class="text-[11px] font-bold uppercase tracking-[0.16em] text-band-mid">Step 1 of 3</p>
+    <p id="tut-eyebrow" class="text-[11px] font-bold uppercase tracking-[0.16em] text-band-mid">Claim</p>
     <h2 id="tut-title" class="mt-1.5 font-display text-2xl font-bold leading-tight tracking-tight">Run a loop.</h2>
     <p id="tut-body" class="mt-1.5 text-[15px] leading-relaxed text-ink-soft">
       Any route that closes back on itself. The real ground it encloses becomes yours, measured in m².
@@ -134,14 +134,21 @@ const MAPBOX_TOKEN = (import.meta.env.PUBLIC_MAPBOX_TOKEN ?? '').trim();
 
     var ACTS = [
       {
+        // ⚠️ THE EYEBROW IS A NAME, NOT A COUNT. This pane sits under the
+        // funnel's own progress bar, which is on "step 2 of 4" — a second
+        // "Step 1 of 3" a few pixels below it is two different answers to the
+        // same question on one screen.
+        eyebrow: 'Claim',
         title: 'Run a loop.',
         body: 'Any route that closes back on itself. The real ground it encloses becomes yours, measured in m².',
       },
       {
+        eyebrow: 'Raid',
         title: 'Take theirs.',
         body: 'Run around ground somebody else holds and it changes hands. Nothing on this map is ever protected — including yours.',
       },
       {
+        eyebrow: 'Grow',
         title: 'Run it wider.',
         body: 'The same block on a longer route encloses far more. That is the whole game, and every metre is drawn in your colour for everyone.',
       },
@@ -155,7 +162,7 @@ const MAPBOX_TOKEN = (import.meta.env.PUBLIC_MAPBOX_TOKEN ?? '').trim();
 
     function setCopy() {
       var a = ACTS[act];
-      eyebrow.textContent = 'Step ' + (act + 1) + ' of ' + ACTS.length;
+      eyebrow.textContent = a.eyebrow;
       titleEl.textContent = a.title;
       bodyEl.textContent = a.body;
       nextBtn.textContent = act === ACTS.length - 1 ? 'Continue' : 'Next';
@@ -346,9 +353,19 @@ const MAPBOX_TOKEN = (import.meta.env.PUBLIC_MAPBOX_TOKEN ?? '').trim();
       if (!MAPBOX_TOKEN) return giveUp();
       if (!window.mapboxgl) {
         try {
-          await Promise.all([
-            loadOnce('link', { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css' }),
-            loadOnce('script', { src: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js' }),
+          // ⚠️ THE TIMEOUT IS NOT BELT-AND-BRACES. A request that HANGS fires
+          // neither `onload` nor `onerror` — a captive portal, a stalled mobile
+          // connection, a proxy that accepts and never answers — so without this
+          // the promise never settles and the runner watches a black rectangle
+          // for the rest of the session, on the step between their new account
+          // and the price. Losing the map is fine; the copy and Continue live
+          // outside it. Silently losing the SCREEN is not.
+          await Promise.race([
+            Promise.all([
+              loadOnce('link', { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.css' }),
+              loadOnce('script', { src: 'https://api.mapbox.com/mapbox-gl-js/v3.9.0/mapbox-gl.js' }),
+            ]),
+            new Promise(function (_, rej) { setTimeout(function () { rej(new Error('timeout')); }, 8000); }),
           ]);
         } catch (e) {
           return giveUp();

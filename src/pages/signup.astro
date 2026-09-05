@@ -257,6 +257,24 @@ const proIncludes = [
         </p>
       </div>
 
+      {/* ⚠️ ON ANDROID THIS PAGE IS THE ONLY PLACE PRO CAN BE BOUGHT, so say so.
+          The Android app has no Play Billing and links to no checkout — Google's
+          External Payment Links Program would require Play Billing offered
+          alongside, on a Google-rendered choice screen, and we have none to offer.
+          The app therefore never steers anyone here; the website does its own
+          selling, which is an ordinary web-to-app funnel. The one thing an Android
+          runner needs and the iPhone branch above gives for free is the ORDER:
+          pay first, install second, and sign in with this email — Pro is on the
+          account, not on the phone. */}
+      <div id="plan-android" class="hidden mt-6 rounded-2xl p-5" style="background:#DDE3E0">
+        <p class="text-sm font-semibold text-ink">You're on Android — subscribe here, then install.</p>
+        <p class="mt-2 text-sm leading-relaxed text-ink-faint">
+          Pro lives on your account, not on your phone. Subscribe below, install Terrarun,
+          and sign in with the email you just used — it will already be on. The game itself
+          is free on Android either way; Pro removes the ads and keeps every metre counting.
+        </p>
+        <div class="mt-4"><AppStore compact={true} only="android" /></div>
+      </div>
       {/* ⚠️ WHAT THEY JUST JOINED, BEFORE WHAT IT COSTS. A runner who came
           straight to /signup from an ad has never read the landing page, and the
           next thing this pane does is show them two prices. Three lines, the
@@ -550,8 +568,11 @@ const proIncludes = [
     // An iPhone is shown the store route first. The plan cards stay where they
     // are — reordering the DOM would move a button under a thumb already
     // travelling toward it, and this is the one page where a mis-tap costs money.
-    if (devicePlatform() === 'ios') {
+    const plat = devicePlatform();
+    if (plat === 'ios') {
       document.getElementById('plan-ios')!.classList.remove('hidden');
+    } else if (plat === 'android') {
+      document.getElementById('plan-android')!.classList.remove('hidden');
     }
 
     const planError = document.getElementById('plan-error')!;

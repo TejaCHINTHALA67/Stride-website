@@ -1,0 +1,187 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const SUPABASE_URL = (import.meta.env.PUBLIC_SUPABASE_URL ?? '').trim();
+const SUPABASE_KEY = (import.meta.env.PUBLIC_SUPABASE_ANON_KEY ?? '').trim();
+---
+
+<Layout
+  title="Terrarun Competition — Run for the board"
+  description="View an official Terrarun running competition, its dates, prizes, sponsor and rules."
+  path="/competition/"
+  noindex={true}
+>
+  <main class="mx-auto min-h-[78vh] max-w-5xl px-5 pb-24 pt-28 sm:pt-36">
+    <section id="loading" class="competition-shell" aria-live="polite">
+      <div class="skeleton h-6 w-28"></div>
+      <div class="skeleton mt-7 h-14 w-4/5"></div>
+      <div class="skeleton mt-4 h-6 w-3/5"></div>
+      <div class="mt-10 grid gap-4 sm:grid-cols-3">
+        <div class="skeleton h-24"></div><div class="skeleton h-24"></div><div class="skeleton h-24"></div>
+      </div>
+    </section>
+
+    <section id="error" class="competition-shell hidden text-center" aria-live="assertive">
+      <div class="icon-well mx-auto">!</div>
+      <h1 class="mt-6 font-display text-3xl font-bold">Competition unavailable</h1>
+      <p id="error-copy" class="mx-auto mt-3 max-w-md text-ink-soft">This competition link is unavailable or has not been published.</p>
+      <a class="btn-primary mt-8" href="/">Explore Terrarun</a>
+    </section>
+
+    <article id="competition" class="hidden">
+      <section class="hero-band overflow-hidden rounded-[28px]">
+        <img id="hero-art" class="absolute inset-0 hidden h-full w-full object-cover" alt="" />
+        <div class="hero-shade absolute inset-0"></div>
+        <div class="relative z-10 flex min-h-[460px] flex-col justify-between p-7 sm:min-h-[500px] sm:p-12">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span id="status" class="band-pill">COMPETITION</span>
+            <span class="band-pill">18+ · INDIA</span>
+          </div>
+          <div class="max-w-3xl">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-white">Terrarun official competition</p>
+            <h1 id="title" class="mt-4 font-display text-4xl font-bold leading-[0.96] text-white sm:text-6xl"></h1>
+            <p id="subtitle" class="mt-5 max-w-2xl text-base leading-7 text-white sm:text-lg"></p>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div class="band-stat"><span>PRIZE VALUE</span><strong id="prize-value">—</strong></div>
+            <div class="band-stat"><span>SCORING ENDS</span><strong id="end-date">—</strong></div>
+            <div class="band-stat"><span>TIME LEFT</span><strong id="countdown">—</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="mt-8 grid gap-8 lg:grid-cols-[1.35fr_0.65fr]">
+        <div class="space-y-8">
+          <section class="competition-shell">
+            <p class="eyebrow">PRIZES</p>
+            <h2 class="mt-2 font-display text-3xl font-bold">Run for something real</h2>
+            <div id="prizes" class="mt-6 grid gap-4 sm:grid-cols-2"></div>
+          </section>
+
+          <section class="competition-shell">
+            <p class="eyebrow">FAIR PLAY</p>
+            <h2 class="mt-2 font-display text-3xl font-bold">Performance decides the board</h2>
+            <p id="metric-copy" class="mt-4 leading-7 text-ink-soft"></p>
+            <div class="seam my-6"></div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="well p-5"><p class="eyebrow">ENTRY CLOSES</p><p id="entry-date" class="mt-2 font-display text-xl font-bold"></p></div>
+              <div class="well p-5"><p class="eyebrow">RESULTS</p><p id="announce-date" class="mt-2 font-display text-xl font-bold"></p></div>
+            </div>
+          </section>
+
+          <details class="competition-shell group">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-2xl font-bold">
+              Official rules <span class="rule-plus" aria-hidden="true">+</span>
+            </summary>
+            <pre id="rules" class="mt-6 whitespace-pre-wrap font-sans text-sm leading-7 text-ink-soft"></pre>
+          </details>
+        </div>
+
+        <aside class="space-y-5 lg:sticky lg:top-28 lg:self-start">
+          <section class="competition-shell">
+            <p class="eyebrow">SPONSORED BY</p>
+            <p id="sponsor" class="mt-2 font-display text-2xl font-bold"></p>
+            <p class="mt-4 text-sm leading-6 text-ink-soft">No separate competition entry fee. Android access is free. On iOS, Stride Pro is required after the first run.</p>
+            <a id="open-app" class="btn-primary mt-7 w-full" href="#">Open in Terrarun</a>
+            <div class="mt-3 grid grid-cols-2 gap-3">
+              <a class="btn-ghost justify-center px-3 py-3 text-sm" href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395">App Store</a>
+              <a class="btn-ghost justify-center px-3 py-3 text-sm" href="https://play.google.com/store/apps/details?id=com.teja.stride">Google Play</a>
+            </div>
+          </section>
+          <p class="px-3 text-center text-xs leading-5 text-ink-faint">The leaderboard and entry controls stay private inside the app.</p>
+        </aside>
+      </div>
+    </article>
+  </main>
+
+  <script is:inline define:vars={{ SUPABASE_URL, SUPABASE_KEY }}>
+    (function () {
+      var loading = document.getElementById('loading');
+      var error = document.getElementById('error');
+      var content = document.getElementById('competition');
+      var slug = location.pathname.match(/^\/x\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/)?.[1];
+      var setText = function (id, value) { document.getElementById(id).textContent = value == null ? '' : String(value); };
+      var showError = function (message) {
+        loading.classList.add('hidden'); content.classList.add('hidden'); error.classList.remove('hidden');
+        if (message) setText('error-copy', message);
+      };
+      var formatDate = function (value) {
+        return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata', timeZoneName: 'short' }).format(new Date(value));
+      };
+      var currency = function (minor, code) {
+        return new Intl.NumberFormat('en-IN', { style: 'currency', currency: code, maximumFractionDigits: 0 }).format(Number(minor || 0) / 100);
+      };
+      var safeLink = function (value) {
+        try { var parsed = new URL(value); return parsed.protocol === 'https:' ? parsed.href : null; } catch (_) { return null; }
+      };
+      var render = function (item) {
+        document.title = item.title + ' — Terrarun Competition';
+        setText('title', item.title); setText('subtitle', item.subtitle || 'Run, score and climb the official competition board.');
+        setText('status', item.status === 'announced' ? 'RESULTS OFFICIAL' : item.status === 'review' ? 'UNDER REVIEW' : item.status === 'scoring' ? 'LIVE NOW' : 'OPEN');
+        setText('prize-value', currency(item.totalPrizeValueMinor, item.currency));
+        setText('end-date', formatDate(item.scoringEndsAt)); setText('entry-date', formatDate(item.entryClosesAt)); setText('announce-date', formatDate(item.announceAt));
+        setText('sponsor', item.sponsorName); setText('rules', item.rulesMd);
+        setText('metric-copy', item.metric === 'distance'
+          ? 'Rankings use verified distance inside the published scoring window, with the competition’s daily cap and tie-break rules applied on the server.'
+          : 'Rankings use verified days with a qualifying run inside the published scoring window. Exact ties are handled by the official rules, never by a random draw.');
+        document.getElementById('open-app').href = 'stride:///x/' + encodeURIComponent(item.slug);
+
+        var prizeRoot = document.getElementById('prizes'); prizeRoot.replaceChildren();
+        (item.prizes || []).forEach(function (prize) {
+          var card = document.createElement('div'); card.className = 'well overflow-hidden p-5';
+          var place = document.createElement('p'); place.className = 'eyebrow'; place.textContent = 'PLACE ' + prize.place;
+          var name = document.createElement('h3'); name.className = 'mt-2 font-display text-xl font-bold'; name.textContent = prize.name;
+          var value = document.createElement('p'); value.className = 'mt-2 text-sm text-ink-soft'; value.textContent = 'ARV ' + currency(prize.arvMinor, prize.currency);
+          card.append(place, name, value);
+          var link = safeLink(prize.productUrl);
+          if (link) { var anchor = document.createElement('a'); anchor.className = 'mt-4 inline-block font-semibold text-band-mid hover:underline'; anchor.href = link; anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; anchor.textContent = 'View prize'; card.append(anchor); }
+          prizeRoot.append(card);
+        });
+
+        if (item.heroAssetPath && SUPABASE_URL) {
+          var image = document.getElementById('hero-art');
+          image.src = SUPABASE_URL + '/storage/v1/render/image/public/competition-art/' + item.heroAssetPath.split('/').map(encodeURIComponent).join('/') + '?width=1600&quality=82';
+          image.onload = function () { image.classList.remove('hidden'); };
+        }
+        var end = Date.parse(item.scoringEndsAt);
+        var tick = function () {
+          var seconds = Math.max(0, Math.floor((end - Date.now()) / 1000));
+          if (!seconds) return setText('countdown', 'ENDED');
+          var days = Math.floor(seconds / 86400); var hours = Math.floor(seconds % 86400 / 3600); var minutes = Math.floor(seconds % 3600 / 60);
+          setText('countdown', days ? days + 'd ' + hours + 'h' : hours ? hours + 'h ' + minutes + 'm' : minutes + 'm');
+        };
+        tick(); window.setInterval(tick, 60000);
+        loading.classList.add('hidden'); error.classList.add('hidden'); content.classList.remove('hidden');
+      };
+
+      if (!slug) return showError();
+      if (!SUPABASE_URL || !SUPABASE_KEY) return showError('Competition details are temporarily unavailable. Open this link in the Terrarun app.');
+      fetch(SUPABASE_URL + '/rest/v1/rpc/get_public_competition', {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_slug: slug })
+      }).then(function (response) {
+        if (!response.ok) throw new Error('request'); return response.json();
+      }).then(function (item) { if (!item) showError(); else render(item); }).catch(function () {
+        showError('Competition details could not be loaded. Open this link in the Terrarun app or try again shortly.');
+      });
+    })();
+  </script>
+</Layout>
+
+<style>
+  .competition-shell { border-radius: 24px; background: #E7ECEA; padding: 1.75rem; box-shadow: 7px 8px 19px rgba(160,176,169,.55), -7px -8px 19px rgba(255,255,255,.92); }
+  .hero-band { position: relative; background: linear-gradient(150deg,#04815F,#046B4D 55%,#03503A); box-shadow: 0 10px 28px rgba(4,40,30,.26); }
+  .hero-shade { background: linear-gradient(90deg,rgba(3,54,42,.92),rgba(3,54,42,.72) 55%,rgba(3,54,42,.38)); }
+  .band-pill { border-radius: 999px; background: rgba(0,0,0,.28); padding: .55rem .85rem; color: white; font-size: .68rem; font-weight: 800; letter-spacing: .12em; }
+  .band-stat { border-radius: 16px; background: rgba(0,0,0,.28); padding: 1rem; color: white; }
+  .band-stat span { display: block; font-size: .62rem; font-weight: 800; letter-spacing: .12em; }
+  .band-stat strong { display: block; margin-top: .35rem; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+  .eyebrow { color: #03503A; font-size: .68rem; font-weight: 800; letter-spacing: .16em; }
+  .icon-well { display: grid; height: 3.5rem; width: 3.5rem; place-items: center; border-radius: 1rem; background: #DDE3E0; color: #9F2D18; font-size: 1.5rem; font-weight: 800; box-shadow: inset 3px 4px 8px rgba(160,176,169,.55), inset -3px -4px 8px rgba(255,255,255,.9); }
+  .skeleton { border-radius: 14px; background: #DDE3E0; animation: breathe 1.4s ease-in-out infinite alternate; }
+  details[open] .rule-plus { transform: rotate(45deg); }
+  .rule-plus { transition: transform .18s ease; }
+  @keyframes breathe { from { opacity: .5; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } .rule-plus { transition: none; } }
+</style>

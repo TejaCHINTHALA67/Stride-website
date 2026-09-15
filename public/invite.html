@@ -1,0 +1,77 @@
+<!doctype html>
+<!--
+  Invite landing — served for /i/* via _redirects (mig 156 referral challenge).
+  iPhones WITH Stride installed never see this: the universal link opens the app.
+  Everyone else gets the code, spelled out, and both store buttons. The Play link
+  carries `referrer=invite=<CODE>`, which the app reads on first launch
+  (expo-application getInstallReferrerAsync), so Android needs no typing at all.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stride — you’ve been invited to run</title>
+<meta name="description" content="Join Stride with a friend's invite code. The loops you run become your territory." />
+<meta property="og:title" content="You’ve been invited to Stride" />
+<meta property="og:description" content="Run a loop, own the ground inside it. Join with your friend’s invite code." />
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         background: #E7ECEA; color: #0F1714; font-family: -apple-system, "SF Pro Text", system-ui, sans-serif; }
+  .card { text-align: center; margin: 20px; padding: 32px; max-width: 440px; border-radius: 24px;
+          background:#E7ECEA; box-shadow: 8px 9px 22px rgba(160,176,169,.58), -8px -9px 22px rgba(255,255,255,.95); }
+  h1 { font-size: 26px; letter-spacing: -0.4px; margin: 0 0 6px; }
+  p { color: #566861; line-height: 1.5; }
+  .code { display:block; margin: 18px auto 6px; padding: 14px 18px; border-radius: 14px; background:#DDE3E0;
+          font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 24px; letter-spacing: 5px; font-weight: 700;
+          box-shadow: inset 3px 4px 8px rgba(160,176,169,.7), inset -3px -4px 8px rgba(255,255,255,.95); }
+  .stores { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:18px; }
+  a.btn { display: inline-block; padding: 13px 20px; border-radius: 14px;
+          background: linear-gradient(180deg,#14D694,#059669 34%,#02513A); color: white; font-weight: 700;
+          text-decoration: none; box-shadow:0 3px 6px rgba(15,23,20,.22); }
+  a.btn.secondary { background:linear-gradient(180deg,#F4F8F6,#EEF2F0 40%,#E4E9E7); color:#0F1714;
+                    box-shadow:3px 4px 8px rgba(160,176,169,.6),-3px -4px 8px rgba(255,255,255,.95); }
+  .steps { text-align:left; margin: 22px auto 0; max-width: 340px; color:#566861; font-size: 14px; line-height: 1.6; padding-left: 20px; }
+  .small { font-size: 12px; margin-top: 22px; color: #566861; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>You’ve been invited to Stride</h1>
+  <p>Run a loop; everything inside it becomes your territory. Enter this invite code when you sign up — your friend earns rewards when you run.</p>
+  <code class="code" id="code">—</code>
+  <div class="stores">
+    <a class="btn" id="ios" href="https://apps.apple.com/us/app/conquer-your-city-stride/id6776885395">App Store</a>
+    <a class="btn secondary" id="android" href="https://play.google.com/store/apps/details?id=com.teja.stride">Google Play</a>
+  </div>
+  <ol class="steps">
+    <li>Install Stride and create your account.</li>
+    <li>Enter the invite code above when it asks (within 7 days of joining).</li>
+    <li>Run at least 1 km on 2 different days in your first 30 days.</li>
+  </ol>
+  <p class="small">Invite rewards are for new Stride runners. Full rules are in the app, under Invite runners. Apple and Google are not sponsors.</p>
+</div>
+<script>
+  // /i/<CODE> — keep only what a code can contain, so nothing from the URL is rendered raw.
+  var raw = decodeURIComponent(location.pathname.split('/')[2] || '');
+  var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 64);
+  if (code) {
+    document.getElementById('code').textContent = code;
+    // Play passes this string to the app on first launch; the app applies the code itself.
+    document.getElementById('android').href =
+      'https://play.google.com/store/apps/details?id=com.teja.stride&referrer=' + encodeURIComponent('invite=' + code);
+  } else {
+    document.getElementById('code').textContent = 'Ask your friend for their code';
+  }
+  if (/Android/i.test(navigator.userAgent)) {
+    document.getElementById('android').classList.remove('secondary');
+    document.getElementById('ios').classList.add('secondary');
+  }
+  // The app is installed on this phone: the universal link already opened it, so this page
+  // only tries the custom scheme for browsers that swallowed the link.
+  if (code && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+    setTimeout(function () { location.href = 'stride:///i/' + code; }, 400);
+  }
+</script>
+</body>
+</html>

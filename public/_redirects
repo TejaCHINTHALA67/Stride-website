@@ -5,4 +5,6 @@
 /u/* /go.html 200
 /r/* /go.html 200
 /x/* /competition/ 200
-/i/* /invite.html 200
+# ⚠️ Workers assets turn a 200 rewrite into a 307, which DROPS the path — so the code
+# travels as a query parameter and invite.html reads that first.
+/i/* /invite.html?code=:splat 200

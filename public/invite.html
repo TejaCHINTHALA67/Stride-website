@@ -52,8 +52,11 @@
   <p class="small">Invite rewards are for new Stride runners. Full rules are in the app, under Invite runners. Apple and Google are not sponsors.</p>
 </div>
 <script>
-  // /i/<CODE> — keep only what a code can contain, so nothing from the URL is rendered raw.
-  var raw = decodeURIComponent(location.pathname.split('/')[2] || '');
+  // /i/<CODE> — Cloudflare answers with a 307 to /invite?code=<CODE> (Workers assets cannot
+  // rewrite in place), so read the query first and fall back to the path. Keep only what a code
+  // can contain, so nothing from the URL is ever rendered raw.
+  var params = new URLSearchParams(location.search);
+  var raw = decodeURIComponent(params.get('code') || location.pathname.split('/')[2] || '');
   var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 64);
   if (code) {
     document.getElementById('code').textContent = code;

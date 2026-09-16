@@ -39,6 +39,9 @@
 </div>
 <script>
   // Try the app via the custom scheme; if nothing handles it, surface the CTA.
+  // ⚠️ THIS READS THE PATH, so the page must be served AT the original URL. It is, via
+  // worker/index.ts — a `_redirects` 200 rewrite arrives here as /go with nothing left to
+  // read, and every link then calls itself "a page".
   var path = location.pathname.replace(/^\/+/, '');
   var labels = { e: 'an event', c: 'a club invite', u: 'a runner profile', r: 'a run' };
   var kind = labels[path.split('/')[0]] || 'a page';

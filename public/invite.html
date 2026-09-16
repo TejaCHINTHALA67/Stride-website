@@ -52,9 +52,15 @@
   <p class="small">Invite rewards are for new Terrarun runners. Full rules are in the app, under Invite runners. Apple and Google are not sponsors.</p>
 </div>
 <script>
-  // /i/<CODE> — Cloudflare answers with a 307 to /invite?code=<CODE> (Workers assets cannot
-  // rewrite in place), so read the query first and fall back to the path. Keep only what a code
-  // can contain, so nothing from the URL is ever rendered raw.
+  // /i/<CODE> — the Worker serves this page IN PLACE (worker/index.ts), so the code is still
+  // on the path. The query is read first anyway: it costs nothing and keeps a manually shared
+  // /invite?code=... link working. Keep only what a code can contain, so nothing from the URL
+  // is ever rendered raw.
+  //
+  // ⚠️ This used to claim Cloudflare answered with a 307 to /invite?code=<CODE>. It does not
+  // — it answers with a 307 to /invite and throws the code away, which is why every shared
+  // invite showed "Ask your friend for their code" until 2026-09-16. Do not trust that
+  // description again without checking the live response headers.
   var params = new URLSearchParams(location.search);
   var raw = decodeURIComponent(params.get('code') || location.pathname.split('/')[2] || '');
   var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 64);

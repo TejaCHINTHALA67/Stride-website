@@ -21,7 +21,12 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "stridewebsite",
   "compatibility_date": "2026-07-07",
+  // ⚠️ `main` + `assets.binding` are what let the Worker serve deep links IN PLACE. Without
+  // them the site is assets-only, and a 200 rewrite in `_redirects` becomes a 307 that drops
+  // the path — which silently broke every invite and deep link. See worker/index.ts.
+  "main": "./worker/index.ts",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS"
   }
 }

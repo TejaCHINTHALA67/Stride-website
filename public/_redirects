@@ -1,10 +1,19 @@
-# Deep-link paths render the app-open fallback page (200 rewrite keeps the URL).
-# iPhones WITH Stride installed never hit these — universal links intercept.
-/e/* /go.html 200
-/c/* /go.html 200
-/u/* /go.html 200
-/r/* /go.html 200
+# ⚠️ DEEP LINKS ARE NOT HANDLED HERE ANY MORE — SEE `worker/index.ts`.
+#
+# `/i/*`, `/e/*`, `/c/*`, `/u/*` and `/r/*` used to be 200 rewrites onto `go.html` /
+# `invite.html`. Cloudflare Workers static assets does not serve a 200 rewrite in place: it
+# answers with a 307 to the canonical asset URL, and that redirect DROPS the original path and
+# query string. Both pages read exactly what was being dropped — the invite code, and the
+# path segment `go.html` uses to name the link — so every shared invite landed on "Ask your
+# friend for their code" and Android invite attribution never happened at all.
+#
+# The `?code=:splat` form could never have worked either: Cloudflare's `_redirects`
+# documentation lists query parameters as unsupported — a static query string in a
+# destination is fine, a captured `:splat` inside one is not.
+#
+# ⚠️ DO NOT ADD THOSE PREFIXES BACK. Static assets (this file included) are evaluated BEFORE
+# the Worker, so a rule here would redirect the request away before the fix can run.
+
+# `/x/<slug>` is a genuine directory index, so it needs no path to survive and a plain
+# rewrite is still correct.
 /x/* /competition/ 200
-# ⚠️ Workers assets turn a 200 rewrite into a 307, which DROPS the path — so the code
-# travels as a query parameter and invite.html reads that first.
-/i/* /invite.html?code=:splat 200

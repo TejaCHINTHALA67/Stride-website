@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
   Invite landing — served for /i/* via _redirects (mig 156 referral challenge).
-  iPhones WITH Stride installed never see this: the universal link opens the app.
+  iPhones WITH Terrarun installed never see this: the universal link opens the app.
   Everyone else gets the code, spelled out, and both store buttons. The Play link
   carries `referrer=invite=<CODE>`, which the app reads on first launch
   (expo-application getInstallReferrerAsync), so Android needs no typing at all.
@@ -10,9 +10,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Stride — you’ve been invited to run</title>
-<meta name="description" content="Join Stride with a friend's invite code. The loops you run become your territory." />
-<meta property="og:title" content="You’ve been invited to Stride" />
+<title>Terrarun — you’ve been invited to run</title>
+<meta name="description" content="Join Terrarun with a friend's invite code. The loops you run become your territory." />
+<meta property="og:title" content="You’ve been invited to Terrarun" />
 <meta property="og:description" content="Run a loop, own the ground inside it. Join with your friend’s invite code." />
 <style>
   :root { color-scheme: light; }
@@ -37,7 +37,7 @@
 </head>
 <body>
 <div class="card">
-  <h1>You’ve been invited to Stride</h1>
+  <h1>You’ve been invited to Terrarun</h1>
   <p>Run a loop; everything inside it becomes your territory. Enter this invite code when you sign up — your friend earns rewards when you run.</p>
   <code class="code" id="code">—</code>
   <div class="stores">
@@ -45,11 +45,11 @@
     <a class="btn secondary" id="android" href="https://play.google.com/store/apps/details?id=com.teja.stride">Google Play</a>
   </div>
   <ol class="steps">
-    <li>Install Stride and create your account.</li>
+    <li>Install Terrarun and create your account.</li>
     <li>Enter the invite code above when it asks (within 7 days of joining).</li>
     <li>Run at least 1 km on 2 different days in your first 30 days.</li>
   </ol>
-  <p class="small">Invite rewards are for new Stride runners. Full rules are in the app, under Invite runners. Apple and Google are not sponsors.</p>
+  <p class="small">Invite rewards are for new Terrarun runners. Full rules are in the app, under Invite runners. Apple and Google are not sponsors.</p>
 </div>
 <script>
   // /i/<CODE> — Cloudflare answers with a 307 to /invite?code=<CODE> (Workers assets cannot
